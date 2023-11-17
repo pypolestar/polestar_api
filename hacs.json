@@ -1,0 +1,6 @@
+{
+    "name": "Polestar API",
+    "domains": [ "sensor"],
+    "homeassistant": "2023.10.0",
+    "iot_class": "cloud_polling"
+}

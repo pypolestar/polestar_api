@@ -1,0 +1,9 @@
+{
+  "domain": "polestar_api",
+  "name": "polestar_api",
+  "version": "0.0.1",
+  "config_flow": true,
+  "documentation": "https://github.com/leeyuentuen/polestar_api",
+  "dependencies": [],
+  "codeowners": ["leeyuentuen"]
+}

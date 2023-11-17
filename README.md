@@ -33,3 +33,6 @@ VCC api key: the key above that you have generate (i've take the first one)
 ![image](https://github.com/leeyuentuen/polestar_api/assets/1487966/11d7586b-9d88-4b65-bd2b-0c5f66ff52fa)
 
 ![image](https://github.com/leeyuentuen/polestar_api/assets/1487966/a8ae1b78-912b-40b5-9498-2534b07f4200)
+
+
+Please note that the VCC_api_key provided is meant for testing purposes, allowing a limited number of calls, capped at 10,000 per day. I've attempted to restrict the calls in the code to enable caching, aiming to avoid surpassing this limit. However, a challenge with the home assistant integration is the absence of a fixed callback URL for registration

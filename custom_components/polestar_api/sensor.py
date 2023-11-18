@@ -79,6 +79,16 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         device_class=SensorDeviceClass.BATTERY,
     ),
     PolestarSensorDescription(
+        key="last_updated",
+        name="Last updated",
+        path="{vin}/recharge-status",
+        response_path="batteryChargeLevel.timestamp",
+        unit=None,
+        round_digits=None,
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.TIMESTAMP,
+    ),
+    PolestarSensorDescription(
         key="electric_range",
         name="EV Range",
         icon="mdi:map-marker-distance",

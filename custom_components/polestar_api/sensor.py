@@ -233,5 +233,6 @@ class PolestarSensor(TibberEVEntity, SensorEntity):
     async def async_update(self):
         """Get the latest data and updates the states."""
         data = await self._device.get_data(self.entity_description.path, self.entity_description.response_path)
-        self._attr_native_value = data
-        self.value = data
+        if data is not None:
+            self._attr_native_value = data
+            self.value = data

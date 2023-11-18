@@ -79,8 +79,10 @@ class PolestarApi:
         path = path.replace('{vin}', self.vin)
 
         if self.cache_data and self.cache_data[path]:
-            if self.cache_data[path]['timestamp'] > datetime.now() - timedelta(seconds=30):
+            if self.cache_data[path]['timestamp'] > datetime.now() - timedelta(seconds=15):
                 data = self.cache_data[path]['data']
+                if data is None:
+                    return False
                 if reponse_path:
                     for key in reponse_path.split('.'):
                         data = data[key]
@@ -90,8 +92,17 @@ class PolestarApi:
         path = path.replace('{vin}', self.vin)
 
         cache_data = self.get_cache_data(path, reponse_path)
+        # if false, then we are fetching data just return
+        if cache_data is False:
+            return
         if cache_data:
+            _LOGGER.debug("Using cached data")
             return cache_data
+
+        # put as fast possible something in the cache otherwise we get a lot of requests
+        if not self.cache_data:
+            self.cache_data = {}
+        self.cache_data[path] = {'data': None, 'timestamp': datetime.now()}
 
         url = 'https://api.volvocars.com/energy/v1/vehicles/' + path
         headers = {
@@ -116,8 +127,6 @@ class PolestarApi:
         data = resp['data']
 
         # add cache_data[path]
-        if not self.cache_data:
-            self.cache_data = {}
         self.cache_data[path] = {'data': data, 'timestamp': datetime.now()}
 
         if reponse_path:

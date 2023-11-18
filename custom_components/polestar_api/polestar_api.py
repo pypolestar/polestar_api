@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+import json
 import logging
 from .const import (
     ACCESS_TOKEN_MANAGER_ID,
@@ -124,6 +125,7 @@ class PolestarApi:
         resp = await response.json(content_type=None)
 
         _LOGGER.debug(f"Response {resp}")
+
         data = resp['data']
 
         # add cache_data[path]

@@ -1,8 +1,7 @@
-import json
+from datetime import datetime, timedelta
 import logging
 from typing import Final
 from dataclasses import dataclass
-from datetime import timedelta
 
 from .const import MAX_CHARGE_RANGE
 from .entity import TibberEVEntity
@@ -76,7 +75,7 @@ TIBBER_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         path="{vin}/recharge-status",
         response_path="batteryChargeLevel.value",
         unit=PERCENTAGE,
-        round_digits=1,
+        round_digits=0,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.BATTERY,
     ),
@@ -101,6 +100,17 @@ TIBBER_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         round_digits=None,
     ),
     PolestarSensorDescription(
+        key="estimated_fully_charged_time",
+        name="Fully charged time",
+        icon="mdi:battery-clock",
+        path="{vin}/recharge-status",
+        response_path="estimatedChargingTime.value",
+        unit=None,
+        round_digits=None,
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.DURATION,
+    ),
+    PolestarSensorDescription(
         key="charging_connection_status",
         name="Charg. connection status",
         icon="mdi:car",
@@ -108,6 +118,7 @@ TIBBER_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         response_path="chargingConnectionStatus.value",
         unit=None,
         round_digits=None,
+        state_class=SensorStateClass.MEASUREMENT,
     ),
     PolestarSensorDescription(
         key="charging_system_status",
@@ -212,12 +223,19 @@ class PolestarSensor(TibberEVEntity, SensorEntity):
     @property
     def state(self) -> StateType:
         """Return the state of the sensor."""
-
         # parse the long text with a shorter one from the dict
         if self.entity_description.key == 'charging_connection_status':
             return ChargingConnectionStatusDict.get(self._attr_native_value, self._attr_native_value)
         if self.entity_description.key == 'charging_system_status':
             return ChargingSystemStatusDict.get(self._attr_native_value, self._attr_native_value)
+
+        # Custom state for estimated_fully_charged_time
+        if self.entity_description.key == 'estimated_fully_charged_time':
+            if self._attr_native_value is not None:
+                value = int(self._attr_native_value)
+                if value > 0:
+                    return datetime.now().replace(second=0, microsecond=0) + timedelta(minutes=round(value))
+            return 'Not charging'
 
         # round the value
         if self.entity_description.round_digits is not None:

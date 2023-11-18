@@ -35,7 +35,7 @@ class FlowHandler(config_entries.ConfigFlow):
             }
         )
 
-    async def _create_device(self, username: str, password: str, vin: str, vcc_api_key: str):
+    async def _create_device(self, username: str, password: str, vin: str, vcc_api_key: str) -> None:
         """Create device."""
 
         try:
@@ -59,7 +59,7 @@ class FlowHandler(config_entries.ConfigFlow):
 
         return await self._create_entry(username, password, vin, vcc_api_key)
 
-    async def async_step_user(self, user_input=None):
+    async def async_step_user(self, user_input: dict = None) -> None:
         """User initiated config flow."""
         if user_input is None:
             return self.async_show_form(
@@ -72,6 +72,6 @@ class FlowHandler(config_entries.ConfigFlow):
             )
         return await self._create_device(user_input[CONF_USERNAME], user_input[CONF_PASSWORD], user_input[CONF_VIN], user_input[CONF_VCC_API_KEY])
 
-    async def async_step_import(self, user_input):
+    async def async_step_import(self, user_input: dict) -> None:
         """Import a config entry."""
         return await self._create_device(user_input[CONF_USERNAME], user_input[CONF_PASSWORD], user_input[CONF_VIN], user_input[CONF_VCC_API_KEY])

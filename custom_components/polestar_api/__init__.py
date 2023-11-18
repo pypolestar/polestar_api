@@ -68,7 +68,7 @@ async def async_unload_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> 
     return unload_ok
 
 
-async def tibber_setup(hass: HomeAssistant, name: str, username: str, password: str) -> PolestarApi | None:
+async def polestar_setup(hass: HomeAssistant, name: str, username: str, password: str) -> PolestarApi | None:
     """Create a Polestar instance only once."""
 
     try:

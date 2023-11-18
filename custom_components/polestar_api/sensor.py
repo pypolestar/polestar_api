@@ -63,18 +63,18 @@ ChargingConnectionStatusDict = {
 
 ChargingSystemStatusDict = {
     "CHARGING_SYSTEM_UNSPECIFIED": "Unspecified",
+    "CHARGING_SYSTEM_CHARGING": "Charging",
 }
 
 
 TIBBER_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
     PolestarSensorDescription(
         key="battery_charge_level",
-        name="battery level",
-        icon="mdi:car-electric",
+        name="Battery level",
         path="{vin}/recharge-status",
         response_path="batteryChargeLevel.value",
         unit=PERCENTAGE,
-        round_digits=None,
+        round_digits=1,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.BATTERY,
     ),
@@ -95,7 +95,7 @@ TIBBER_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         icon="mdi:battery-clock",
         path="{vin}/recharge-status",
         response_path="estimatedChargingTime.value",
-        unit=None,
+        unit='Minutes',
         round_digits=None,
     ),
     PolestarSensorDescription(
@@ -216,6 +216,10 @@ class PolestarSensor(TibberEVEntity, SensorEntity):
             return ChargingConnectionStatusDict.get(self._attr_native_value, self._attr_native_value)
         if self.entity_description.key == 'charging_system_status':
             return ChargingSystemStatusDict.get(self._attr_native_value, self._attr_native_value)
+
+        # round the value
+        if self.entity_description.round_digits is not None:
+            return round(float(self._attr_native_value), self.entity_description.round_digits)
         return self._attr_native_value
 
     @property

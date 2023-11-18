@@ -179,10 +179,11 @@ class PolestarSensor(PolestarEntity, SensorEntity):
         """Initialize the sensor."""
         super().__init__(device)
         self._device = device
-        # get the first 8 character of the id
-        unique_id = device.vin[:8]
+        # get the last 4 character of the id
+        unique_id = device.vin[-4:]
+        self.entity_id = f"{POLESTAR_API_DOMAIN}.'polestar_'.{unique_id}_{description.key}"
         self._attr_name = f"{description.name}"
-        self._attr_unique_id = f"{unique_id}-{description.key}"
+        self._attr_unique_id = f"polestar_{unique_id}-{description.key}"
         self.value = None
         self.description = description
 

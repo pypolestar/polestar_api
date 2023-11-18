@@ -64,6 +64,7 @@ ChargingConnectionStatusDict = {
 ChargingSystemStatusDict = {
     "CHARGING_SYSTEM_UNSPECIFIED": "Unspecified",
     "CHARGING_SYSTEM_CHARGING": "Charging",
+    "CHARGING_SYSTEM_IDLE": "Idle",
 }
 
 
@@ -219,7 +220,8 @@ class PolestarSensor(TibberEVEntity, SensorEntity):
 
         # round the value
         if self.entity_description.round_digits is not None:
-            return round(float(self._attr_native_value), self.entity_description.round_digits)
+            if self._attr_native_value is not None:
+                return round(float(self._attr_native_value), self.entity_description.round_digits)
         return self._attr_native_value
 
     @property

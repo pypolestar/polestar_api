@@ -79,7 +79,7 @@ class PolestarApi:
         path = path.replace('{vin}', self.vin)
 
         if self.cache_data and self.cache_data[path]:
-            if self.cache_data[path]['timestamp'] > datetime.now() - timedelta(seconds=15):
+            if self.cache_data[path]['timestamp'] > datetime.now() - timedelta(seconds=30):
                 data = self.cache_data[path]['data']
                 if reponse_path:
                     for key in reponse_path.split('.'):

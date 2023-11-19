@@ -31,8 +31,22 @@ email and password: are these from your polestar developer account
 VIN: is the car identification number that you can find in your polestar app or polestar account
 VCC api key: the key above that you have generate (i've take the first one)
 
-issue with create account? these are the steps: 
-https://github.com/leeyuentuen/polestar_api/issues/3#issuecomment-1817916621
+issue with create account? these are the steps: Thanks to @Ottmar0815: https://github.com/leeyuentuen/polestar_api/issues/3#issuecomment-1817916621
+```
+Steps:
+
+1. Generated a Volvo-ID with your Link https://volvoid.eu.volvocars.com/VolvoLogin/login
+2. Generated a Developer-Account with Google-Login.
+3. Under developer account generate the app.
+4. Get the 'vcc api key'.
+5. Used HACS, add the repository and install the HACS-Integration.
+6. Go to HomeAssistant integration and add polestar_api integration
+7. Use the Volvo-ID credentials, your VIN and the developer 'vcc api key' at integration-setup in HomeAssistant.
+Now Data are show instantly.
+```
+
+
+
 
 ![image](https://github.com/leeyuentuen/polestar_api/assets/1487966/11d7586b-9d88-4b65-bd2b-0c5f66ff52fa)
 

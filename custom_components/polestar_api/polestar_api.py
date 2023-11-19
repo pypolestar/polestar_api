@@ -73,6 +73,20 @@ class PolestarApi:
 
         _LOGGER.debug(f"Response {self.access_token}")
 
+    def get_latest_data(self, path: str, reponse_path: str = None) -> dict or bool or None:
+        # i don't care what cache is, just give me the latest data in the cache
+        # replace the string {vin} with the actual vin
+        path = path.replace('{vin}', self.vin)
+
+        if self.cache_data and self.cache_data[path]:
+            data = self.cache_data[path]['data']
+            if data is None:
+                return False
+            if reponse_path:
+                for key in reponse_path.split('.'):
+                    data = data[key]
+            return data
+
     def get_cache_data(self, path: str, reponse_path: str = None) -> dict or bool or None:
         # replace the string {vin} with the actual vin
         path = path.replace('{vin}', self.vin)
@@ -101,7 +115,9 @@ class PolestarApi:
         # put as fast possible something in the cache otherwise we get a lot of requests
         if not self.cache_data:
             self.cache_data = {}
-        self.cache_data[path] = {'data': None, 'timestamp': datetime.now()}
+            self.cache_data[path] = {'data': None, 'timestamp': datetime.now()}
+        else:
+            self.cache_data[path]['timestamp'] = datetime.now()
 
         url = 'https://api.volvocars.com/energy/v1/vehicles/' + path
         headers = {

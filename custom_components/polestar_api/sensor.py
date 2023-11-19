@@ -82,6 +82,18 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         max_value=None
     ),
     PolestarSensorDescription(
+        key="estimate_full_charge_range_miles",
+        name="Est. full charge range",
+        icon="mdi:map-marker-distance",
+        path="{vin}/recharge-status",
+        response_path=None,
+        unit='miles',
+        round_digits=None,
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.DISTANCE,
+        max_value=None
+    ),
+    PolestarSensorDescription(
         key="battery_charge_level",
         name="Battery level",
         path="{vin}/recharge-status",
@@ -114,6 +126,18 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.DISTANCE,
         max_value=570,  # prevent spike value, and this should be the max range of polestar
+    ),
+    PolestarSensorDescription(
+        key="electric_range_miles",
+        name="EV Range",
+        icon="mdi:map-marker-distance",
+        path="{vin}/recharge-status",
+        response_path="electricRange.value",
+        unit='miles',
+        round_digits=None,
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.DISTANCE,
+        max_value=355,  # prevent spike value, and this should be the max range of polestar
     ),
     PolestarSensorDescription(
         key="estimated_charging_time",
@@ -289,10 +313,10 @@ class PolestarSensor(PolestarEntity, SensorEntity):
                 return int(self._attr_native_value)
             return round(float(self._attr_native_value), self.entity_description.round_digits)
 
-        if self.entity_description.key == 'estimate_full_charge_range':
-            battery_level = self._device.get_cache_data(
+        if self.entity_description.key in ('estimate_full_charge_range', 'estimate_full_charge_range_miles'):
+            battery_level = self._device.get_latest_data(
                 self.entity_description.path, 'batteryChargeLevel.value')
-            estimate_range = self._device.get_cache_data(
+            estimate_range = self._device.get_latest_data(
                 self.entity_description.path, 'electricRange.value')
 
             if battery_level is None or estimate_range is None:
@@ -304,8 +328,25 @@ class PolestarSensor(PolestarEntity, SensorEntity):
             battery_level = int(battery_level.replace('.0', ''))
             estimate_range = int(estimate_range)
 
-            return round(estimate_range / battery_level * 100)
+            estimate_range = round(estimate_range / battery_level * 100)
 
+            if self.entity_description.key == 'estimate_full_charge_range_miles':
+                return round(estimate_range / 1.609344, self.entity_description.round_digits if self.entity_description.round_digits is not None else 0)
+
+            return estimate_range
+
+        if self.entity_description.key == 'electric_range_miles':
+            if self._attr_native_value is None:
+                return None
+
+            if self._attr_native_value is False:
+                return None
+
+            self._attr_native_value = int(self._attr_native_value)
+            miles = round(self._attr_native_value / 1.609344,
+                          self.entity_description.round_digits if self.entity_description.round_digits is not None else 0)
+
+            return miles
         return self._attr_native_value
 
     @property

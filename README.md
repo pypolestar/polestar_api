@@ -9,6 +9,7 @@ First you need to create a Polestar Developer account on this website:
 https://developer.volvocars.com/apis/extended-vehicle/v1/overview/
 on your right side you can choose "Sign Up" and just follow the step.
 
+
 ## Create 'vcc_api_key'
 Sign into your Polestar Account and go to your account:
 https://developer.volvocars.com/account/
@@ -29,6 +30,9 @@ and fill the information:
 email and password: are these from your polestar developer account
 VIN: is the car identification number that you can find in your polestar app or polestar account
 VCC api key: the key above that you have generate (i've take the first one)
+
+issue with create account? these are the steps: 
+https://github.com/leeyuentuen/polestar_api/issues/3#issuecomment-1817916621
 
 ![image](https://github.com/leeyuentuen/polestar_api/assets/1487966/11d7586b-9d88-4b65-bd2b-0c5f66ff52fa)
 

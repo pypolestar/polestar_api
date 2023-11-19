@@ -70,6 +70,18 @@ ChargingSystemStatusDict = {
 
 POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
     PolestarSensorDescription(
+        key="estimate_full_charge_range",
+        name="Est. full charge range",
+        icon="mdi:map-marker-distance",
+        path="{vin}/recharge-status",
+        response_path=None,
+        unit='km',
+        round_digits=None,
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.DISTANCE,
+        max_value=None
+    ),
+    PolestarSensorDescription(
         key="battery_charge_level",
         name="Battery level",
         path="{vin}/recharge-status",
@@ -276,6 +288,24 @@ class PolestarSensor(PolestarEntity, SensorEntity):
             if self.entity_description.round_digits == 0 and isinstance(self._attr_native_value, int):
                 return int(self._attr_native_value)
             return round(float(self._attr_native_value), self.entity_description.round_digits)
+
+        if self.entity_description.key == 'estimate_full_charge_range':
+            battery_level = self._device.get_cache_data(
+                self.entity_description.path, 'batteryChargeLevel.value')
+            estimate_range = self._device.get_cache_data(
+                self.entity_description.path, 'electricRange.value')
+
+            if battery_level is None or estimate_range is None:
+                return None
+
+            if battery_level is False or estimate_range is False:
+                return None
+
+            battery_level = int(battery_level.replace('.0', ''))
+            estimate_range = int(estimate_range)
+
+            return round(estimate_range / battery_level * 100)
+
         return self._attr_native_value
 
     @property

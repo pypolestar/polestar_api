@@ -45,6 +45,7 @@ class PolestarSensorDescriptionMixin:
     round_digits: int | None
     unit: str | None
     response_path: str | None
+    max_value: int | None
 
 
 @dataclass
@@ -77,6 +78,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         round_digits=0,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.BATTERY,
+        max_value=None,
     ),
     PolestarSensorDescription(
         key="last_updated",
@@ -87,6 +89,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         round_digits=None,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.TIMESTAMP,
+        max_value=None,
     ),
     PolestarSensorDescription(
         key="electric_range",
@@ -98,6 +101,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         round_digits=None,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.DISTANCE,
+        max_value=570,  # prevent spike value, and this should be the max range of polestar
     ),
     PolestarSensorDescription(
         key="estimated_charging_time",
@@ -107,6 +111,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         response_path="estimatedChargingTime.value",
         unit='Minutes',
         round_digits=None,
+        max_value=None,
     ),
     PolestarSensorDescription(
         key="estimated_fully_charged_time",
@@ -118,6 +123,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         round_digits=None,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.DURATION,
+        max_value=None,
     ),
     PolestarSensorDescription(
         key="charging_connection_status",
@@ -128,6 +134,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         unit=None,
         round_digits=None,
         state_class=SensorStateClass.MEASUREMENT,
+        max_value=None,
     ),
     PolestarSensorDescription(
         key="charging_system_status",
@@ -137,6 +144,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         response_path="chargingSystemStatus.value",
         unit=None,
         round_digits=None,
+        max_value=None,
     ),
 
 )
@@ -247,6 +255,13 @@ class PolestarSensor(PolestarEntity, SensorEntity):
             if isinstance(self._attr_native_value, str):
                 self._attr_native_value = int(
                     self._attr_native_value.replace('.0', ''))
+
+        # prevent exponentianal value, we only give state value that is lower than the max value
+        if self.entity_description.max_value is not None:
+            if isinstance(self._attr_native_value, str):
+                self._attr_native_value = int(self._attr_native_value)
+            if self._attr_native_value > self.entity_description.max_value:
+                return None
 
         # Custom state for estimated_fully_charged_time
         if self.entity_description.key == 'estimated_fully_charged_time':

@@ -1,8 +1,10 @@
 from datetime import datetime, timedelta
+import json
 import logging
 from .const import (
     ACCESS_TOKEN_MANAGER_ID,
     AUTHORIZATION,
+    CACHE_TIME,
     GRANT_TYPE,
     HEADER_AUTHORIZATION,
     HEADER_VCC_API_KEY
@@ -21,8 +23,6 @@ _LOGGER = logging.getLogger(__name__)
 
 
 class PolestarApi:
-    QUERY_PAYLOAD = ""
-
     def __init__(self,
                  hass: HomeAssistant,
                  username: str,
@@ -40,14 +40,13 @@ class PolestarApi:
         self.refresh_token = None
         self.vin = vin
         self.vcc_api_key = vcc_api_key
-        # data and timestamp e.g. {'data': {}, 'timestamp': 1234567890}
         self.cache_data = None
         disable_warnings()
 
     async def init(self):
         await self.get_token()
 
-    async def get_token(self):
+    async def get_token(self) -> None:
         response = await self._session.post(
             url='https://volvoid.eu.volvocars.com/as/token.oauth2',
             data={
@@ -74,12 +73,12 @@ class PolestarApi:
 
         _LOGGER.debug(f"Response {self.access_token}")
 
-    def get_cache_data(self, path, reponse_path=None):
+    def get_cache_data(self, path: str, reponse_path: str = None) -> dict or bool or None:
         # replace the string {vin} with the actual vin
         path = path.replace('{vin}', self.vin)
 
         if self.cache_data and self.cache_data[path]:
-            if self.cache_data[path]['timestamp'] > datetime.now() - timedelta(seconds=15):
+            if self.cache_data[path]['timestamp'] > datetime.now() - timedelta(seconds=CACHE_TIME):
                 data = self.cache_data[path]['data']
                 if data is None:
                     return False
@@ -88,7 +87,7 @@ class PolestarApi:
                         data = data[key]
                 return data
 
-    async def get_data(self, path, reponse_path=None):
+    async def get_data(self, path: str, reponse_path: str = None) -> dict or bool or None:
         path = path.replace('{vin}', self.vin)
 
         cache_data = self.get_cache_data(path, reponse_path)
@@ -124,6 +123,7 @@ class PolestarApi:
         resp = await response.json(content_type=None)
 
         _LOGGER.debug(f"Response {resp}")
+
         data = resp['data']
 
         # add cache_data[path]

@@ -1,7 +1,6 @@
 DOMAIN = "polestar_api"
 TIMEOUT = 90
 
-MAX_CHARGE_RANGE = 375
 
 CONF_VIN = "vin"
 CONF_VCC_API_KEY = "vcc_api_key"
@@ -12,3 +11,5 @@ AUTHORIZATION = "Basic aDRZZjBiOlU4WWtTYlZsNnh3c2c1WVFxWmZyZ1ZtSWFEcGhPc3kxUENhV
 
 HEADER_AUTHORIZATION = "authorization"
 HEADER_VCC_API_KEY = "vcc-api-key"
+
+CACHE_TIME = 15

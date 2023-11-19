@@ -1,11 +1,9 @@
-import json
+from datetime import datetime, timedelta
 import logging
 from typing import Final
 from dataclasses import dataclass
-from datetime import timedelta
 
-from .const import MAX_CHARGE_RANGE
-from .entity import TibberEVEntity
+from .entity import PolestarEntity
 
 from homeassistant.helpers.typing import StateType
 
@@ -24,7 +22,7 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from homeassistant.helpers import entity_platform
 
-from . import DOMAIN as TIBBER_EV_DOMAIN
+from . import DOMAIN as POLESTAR_API_DOMAIN
 
 
 from .polestar import PolestarApi
@@ -47,6 +45,7 @@ class PolestarSensorDescriptionMixin:
     round_digits: int | None
     unit: str | None
     response_path: str | None
+    max_value: int | None
 
 
 @dataclass
@@ -69,16 +68,40 @@ ChargingSystemStatusDict = {
 }
 
 
-TIBBER_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
+POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
+    PolestarSensorDescription(
+        key="estimate_full_charge_range",
+        name="Est. full charge range",
+        icon="mdi:map-marker-distance",
+        path="{vin}/recharge-status",
+        response_path=None,
+        unit='km',
+        round_digits=None,
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.DISTANCE,
+        max_value=None
+    ),
     PolestarSensorDescription(
         key="battery_charge_level",
         name="Battery level",
         path="{vin}/recharge-status",
         response_path="batteryChargeLevel.value",
         unit=PERCENTAGE,
-        round_digits=1,
+        round_digits=0,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.BATTERY,
+        max_value=None,
+    ),
+    PolestarSensorDescription(
+        key="last_updated",
+        name="Last updated",
+        path="{vin}/recharge-status",
+        response_path="batteryChargeLevel.timestamp",
+        unit=None,
+        round_digits=None,
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.TIMESTAMP,
+        max_value=None,
     ),
     PolestarSensorDescription(
         key="electric_range",
@@ -90,6 +113,7 @@ TIBBER_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         round_digits=None,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.DISTANCE,
+        max_value=570,  # prevent spike value, and this should be the max range of polestar
     ),
     PolestarSensorDescription(
         key="estimated_charging_time",
@@ -99,6 +123,19 @@ TIBBER_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         response_path="estimatedChargingTime.value",
         unit='Minutes',
         round_digits=None,
+        max_value=None,
+    ),
+    PolestarSensorDescription(
+        key="estimated_fully_charged_time",
+        name="Fully charged time",
+        icon="mdi:battery-clock",
+        path="{vin}/recharge-status",
+        response_path="estimatedChargingTime.value",
+        unit=None,
+        round_digits=None,
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.DURATION,
+        max_value=None,
     ),
     PolestarSensorDescription(
         key="charging_connection_status",
@@ -108,6 +145,8 @@ TIBBER_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         response_path="chargingConnectionStatus.value",
         unit=None,
         round_digits=None,
+        state_class=SensorStateClass.MEASUREMENT,
+        max_value=None,
     ),
     PolestarSensorDescription(
         key="charging_system_status",
@@ -117,6 +156,7 @@ TIBBER_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         response_path="chargingSystemStatus.value",
         unit=None,
         round_digits=None,
+        max_value=None,
     ),
 
 )
@@ -137,18 +177,18 @@ async def async_setup_entry(
     """Set up using config_entry."""
     # get the device
     device: PolestarApi
-    device = hass.data[TIBBER_EV_DOMAIN][entry.entry_id]
+    device = hass.data[POLESTAR_API_DOMAIN][entry.entry_id]
     # put data in cache
     await device.get_data("{vin}/recharge-status")
 
     sensors = [
-        PolestarSensor(device, description) for description in TIBBER_SENSOR_TYPES
+        PolestarSensor(device, description) for description in POLESTAR_SENSOR_TYPES
     ]
     async_add_entities(sensors)
     platform = entity_platform.current_platform.get()
 
 
-class PolestarSensor(TibberEVEntity, SensorEntity):
+class PolestarSensor(PolestarEntity, SensorEntity):
     """Representation of a Polestar Sensor."""
 
     entity_description: PolestarSensorDescription
@@ -159,10 +199,11 @@ class PolestarSensor(TibberEVEntity, SensorEntity):
         """Initialize the sensor."""
         super().__init__(device)
         self._device = device
-        # get the first 8 character of the id
-        unique_id = device.vin[:8]
+        # get the last 4 character of the id
+        unique_id = device.vin[-4:]
+        self.entity_id = f"{POLESTAR_API_DOMAIN}.'polestar_'.{unique_id}_{description.key}"
         self._attr_name = f"{description.name}"
-        self._attr_unique_id = f"{unique_id}-{description.key}"
+        self._attr_unique_id = f"polestar_{unique_id}-{description.key}"
         self.value = None
         self.description = description
 
@@ -212,6 +253,8 @@ class PolestarSensor(TibberEVEntity, SensorEntity):
     @property
     def state(self) -> StateType:
         """Return the state of the sensor."""
+        if self._attr_native_value is None:
+            return None
 
         # parse the long text with a shorter one from the dict
         if self.entity_description.key == 'charging_connection_status':
@@ -219,10 +262,50 @@ class PolestarSensor(TibberEVEntity, SensorEntity):
         if self.entity_description.key == 'charging_system_status':
             return ChargingSystemStatusDict.get(self._attr_native_value, self._attr_native_value)
 
+        # battery charge level contain ".0" at the end, this should be removed
+        if self.entity_description.key == 'battery_charge_level':
+            if isinstance(self._attr_native_value, str):
+                self._attr_native_value = int(
+                    self._attr_native_value.replace('.0', ''))
+
+        # prevent exponentianal value, we only give state value that is lower than the max value
+        if self.entity_description.max_value is not None:
+            if isinstance(self._attr_native_value, str):
+                self._attr_native_value = int(self._attr_native_value)
+            if self._attr_native_value > self.entity_description.max_value:
+                return None
+
+        # Custom state for estimated_fully_charged_time
+        if self.entity_description.key == 'estimated_fully_charged_time':
+            value = int(self._attr_native_value)
+            if value > 0:
+                return datetime.now().replace(second=0, microsecond=0) + timedelta(minutes=round(value))
+            return 'Not charging'
+
         # round the value
         if self.entity_description.round_digits is not None:
-            if self._attr_native_value is not None:
-                return round(float(self._attr_native_value), self.entity_description.round_digits)
+            # if the value is integer, remove the decimal
+            if self.entity_description.round_digits == 0 and isinstance(self._attr_native_value, int):
+                return int(self._attr_native_value)
+            return round(float(self._attr_native_value), self.entity_description.round_digits)
+
+        if self.entity_description.key == 'estimate_full_charge_range':
+            battery_level = self._device.get_cache_data(
+                self.entity_description.path, 'batteryChargeLevel.value')
+            estimate_range = self._device.get_cache_data(
+                self.entity_description.path, 'electricRange.value')
+
+            if battery_level is None or estimate_range is None:
+                return None
+
+            if battery_level is False or estimate_range is False:
+                return None
+
+            battery_level = int(battery_level.replace('.0', ''))
+            estimate_range = int(estimate_range)
+
+            return round(estimate_range / battery_level * 100)
+
         return self._attr_native_value
 
     @property
@@ -230,9 +313,11 @@ class PolestarSensor(TibberEVEntity, SensorEntity):
         """Return the unit of measurement."""
         return self.entity_description.unit
 
-    async def async_update(self):
+    async def async_update(self) -> None:
         """Get the latest data and updates the states."""
         data = await self._device.get_data(self.entity_description.path, self.entity_description.response_path)
-        if data is not None:
-            self._attr_native_value = data
-            self.value = data
+        if data is None:
+            return
+
+        self._attr_native_value = data
+        self.value = data

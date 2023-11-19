@@ -1,21 +1,20 @@
-from datetime import timedelta
 import logging
 
 from .polestar import PolestarApi
-from .const import DOMAIN as Tibber_EV_DOMAIN
+from .const import DOMAIN as POLESTAR_API_DOMAIN
 from homeassistant.helpers.entity import DeviceInfo, Entity
 
 _LOGGER = logging.getLogger(__name__)
 
 
-class TibberEVEntity(Entity):
+class PolestarEntity(Entity):
 
     def __init__(self, device: PolestarApi) -> None:
         """Initialize the Polestar entity."""
         self._device = device
 
         self._attr_device_info = DeviceInfo(
-            identifiers={(Tibber_EV_DOMAIN, self._device.name)},
+            identifiers={(POLESTAR_API_DOMAIN, self._device.name)},
             manufacturer="Polestar",
             model=None,
             name=device.name,

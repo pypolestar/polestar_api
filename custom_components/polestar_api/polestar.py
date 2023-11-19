@@ -33,8 +33,8 @@ class Polestar:
         self.polestar_api = polestar_api
         disable_warnings()
 
-    async def init(self):
-        self.id = "tibber_{}".format(self.name)
+    async def init(self) -> None:
+        self.id = "polestar{}".format(self.name)
         if self.name is None:
             self.name = f"{self.info.identity} ({self.host})"
 
@@ -43,5 +43,5 @@ class Polestar:
         return self._status
 
     @Throttle(timedelta(seconds=10))
-    async def async_update(self):
+    async def async_update(self) -> None:
         self.raw_data = await self.polestar_api.get_ev_data()

@@ -57,14 +57,16 @@ class PolestarSensorDescription(
 
 ChargingConnectionStatusDict = {
     "CONNECTION_STATUS_DISCONNECTED": "Disconnected",
-    "CONNECTION_STATUS_CONNECTED": "Connected",
     "CONNECTION_STATUS_CONNECTED_AC": "Connected AC",
+    "CONNECTION_STATUS_CONNECTED_DC": "Connected DC",
+    "CONNECTION_STATUS_UNSPECIFIED": "Unspecified",
 }
 
 ChargingSystemStatusDict = {
     "CHARGING_SYSTEM_UNSPECIFIED": "Unspecified",
     "CHARGING_SYSTEM_CHARGING": "Charging",
     "CHARGING_SYSTEM_IDLE": "Idle",
+    "CHARGING_SYSTEM_FAULT": "Fault",
 }
 
 

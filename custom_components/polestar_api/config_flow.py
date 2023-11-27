@@ -48,6 +48,13 @@ class FlowHandler(config_entries.ConfigFlow):
             )
             with timeout(TIMEOUT):
                 await device.init()
+
+            # check if we have a token, otherwise throw exception
+            if device.access_token is None:
+                _LOGGER.exception(
+                    "No token, Could be wrong credentials (invalid email or password))")
+                return self.async_abort(reason="no_token")
+
         except asyncio.TimeoutError:
             return self.async_abort(reason="api_timeout")
         except ClientError:

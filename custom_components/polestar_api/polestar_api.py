@@ -41,6 +41,7 @@ class PolestarApi:
         self.vin = vin
         self.vcc_api_key = vcc_api_key
         self.cache_data = None
+        self.latest_call_code = None
         disable_warnings()
 
     async def init(self):
@@ -89,6 +90,8 @@ class PolestarApi:
 
     def get_cache_data(self, path: str, reponse_path: str = None) -> dict or bool or None:
         # replace the string {vin} with the actual vin
+        if path is None:
+            return None
         path = path.replace('{vin}', self.vin)
 
         if self.cache_data and self.cache_data[path]:
@@ -102,6 +105,9 @@ class PolestarApi:
                 return data
 
     async def get_data(self, path: str, reponse_path: str = None) -> dict or bool or None:
+        if path is None:
+            return None
+
         path = path.replace('{vin}', self.vin)
 
         cache_data = self.get_cache_data(path, reponse_path)
@@ -130,6 +136,7 @@ class PolestarApi:
             headers=headers
         )
         _LOGGER.debug(f"Response {response}")
+        self.latest_call_code = response.status
         if response.status == 401:
             await self.get_token()
             return

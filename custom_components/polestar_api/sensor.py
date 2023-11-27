@@ -69,6 +69,12 @@ ChargingSystemStatusDict = {
     "CHARGING_SYSTEM_FAULT": "Fault",
 }
 
+API_STATUS_DICT = {
+    200: "OK",
+    401: "Unauthorized",
+    404: "API Down"
+}
+
 
 POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
     PolestarSensorDescription(
@@ -184,6 +190,16 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         round_digits=None,
         max_value=None,
     ),
+    PolestarSensorDescription(
+        key="api_status_code",
+        name="API status",
+        icon="mdi:heart",
+        path=None,
+        response_path=None,
+        unit=None,
+        round_digits=None,
+        max_value=None,
+    ),
 
 )
 
@@ -279,7 +295,11 @@ class PolestarSensor(PolestarEntity, SensorEntity):
     @property
     def state(self) -> StateType:
         """Return the state of the sensor."""
-        if self._attr_native_value is None:
+
+        if self.entity_description.key == 'api_status_code':
+            return API_STATUS_DICT.get(self._device.latest_call_code, "Error")
+
+        if self._attr_native_value in (None, False):
             return None
 
         # parse the long text with a shorter one from the dict
@@ -338,12 +358,6 @@ class PolestarSensor(PolestarEntity, SensorEntity):
             return estimate_range
 
         if self.entity_description.key == 'electric_range_miles':
-            if self._attr_native_value is None:
-                return None
-
-            if self._attr_native_value is False:
-                return None
-
             self._attr_native_value = int(self._attr_native_value)
             miles = round(self._attr_native_value / 1.609344,
                           self.entity_description.round_digits if self.entity_description.round_digits is not None else 0)

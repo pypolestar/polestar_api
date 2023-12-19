@@ -206,7 +206,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
     ),
     PolestarSensorDescription(
         key="charger_connection_status",
-        name="Charging power",
+        name="Charging Connection Status",
         icon="mdi:battery-clock",
         query="getBatteryData",
         field_name="chargerConnectionStatus",

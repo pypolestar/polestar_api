@@ -79,7 +79,7 @@ API_STATUS_DICT = {
 POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
     PolestarSensorDescription(
         key="estimate_distance_to_empty_miles",
-        name="Est. distance miles",
+        name="Distance miles Remaining",
         icon="mdi:map-marker-distance",
         query="getBatteryData",
         field_name="estimatedDistanceToEmptyMiles",
@@ -91,7 +91,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
     ),
     PolestarSensorDescription(
         key="estimate_distance_to_empty_km",
-        name="Est. distance km",
+        name="Distance km Remaining",
         icon="mdi:map-marker-distance",
         query="getBatteryData",
         field_name="estimatedDistanceToEmptyKm",
@@ -115,7 +115,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
     ),
     PolestarSensorDescription(
         key="average_speed_km_per_hour",
-        name="Average Speed Per Hour",
+        name="Avg Speed Per Hour",
         icon="mdi:map-marker-distance",
         query="getOdometerData",
         field_name="averageSpeedKmPerHour",
@@ -182,7 +182,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
     ),
     PolestarSensorDescription(
         key="charging_power_watts",
-        name="Charging Watt",
+        name="Charging Power",
         icon="mdi:lightning-bolt",
         query="getBatteryData",
         field_name="chargingPowerWatts",
@@ -194,7 +194,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
     ),
     PolestarSensorDescription(
         key="charging_current_amps",
-        name="Charging Amps",
+        name="Charging Current",
         icon="mdi:current-ac",
         query="getBatteryData",
         field_name="chargingCurrentAmps",
@@ -218,7 +218,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
     ),
     PolestarSensorDescription(
         key="average_energy_consumption_kwh_per_100_km",
-        name="Average energy consumption",
+        name="Avg. energy consumption",
         icon="mdi:battery-clock",
         query="getBatteryData",
         field_name="averageEnergyConsumptionKwhPer100Km",
@@ -262,7 +262,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
     ),
     PolestarSensorDescription(
         key="estimated_fully_charged_time",
-        name="Est. Full charged",
+        name="Time Full charged",
         icon="mdi:battery-clock",
         query="getBatteryData",
         field_name="estimatedChargingTimeToFullMinutes",
@@ -291,6 +291,30 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.TIMESTAMP,
         max_value=None,
+    ),
+    PolestarSensorDescription(
+        key="estimate_full_charge_range_miles",
+        name="Calc. miles Full Charge",
+        icon="mdi:map-marker-distance",
+        query="getBatteryData",
+        field_name="estimatedDistanceToEmptyMiles",
+        unit='miles',
+        round_digits=None,
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.DISTANCE,
+        max_value=None
+    ),
+    PolestarSensorDescription(
+        key="estimate_full_charge_range",
+        name="Calc. km Full Charge",
+        icon="mdi:map-marker-distance",
+        query="getBatteryData",
+        field_name="estimatedDistanceToEmptyKm",
+        unit='km',
+        round_digits=None,
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.DISTANCE,
+        max_value=None
     ),
 
 )
@@ -395,7 +419,7 @@ class PolestarSensor(PolestarEntity, SensorEntity):
         if self.entity_description.key == 'api_status_code':
             return API_STATUS_DICT.get(self._device.latest_call_code, "Error")
 
-        if self._attr_native_value in (None, False):
+        if self._attr_native_value != 0 and self._attr_native_value in (None, False):
             return None
 
         # parse the long text with a shorter one from the dict
@@ -433,9 +457,9 @@ class PolestarSensor(PolestarEntity, SensorEntity):
 
         if self.entity_description.key in ('estimate_full_charge_range', 'estimate_full_charge_range_miles'):
             battery_level = self._device.get_latest_data(
-                self.entity_description.path, 'batteryChargeLevel.value')
+                self.entity_description.query, 'batteryChargeLevelPercentage')
             estimate_range = self._device.get_latest_data(
-                self.entity_description.path, 'electricRange.value')
+                self.entity_description.query, self.entity_description.field_name)
 
             if battery_level is None or estimate_range is None:
                 return None
@@ -443,13 +467,10 @@ class PolestarSensor(PolestarEntity, SensorEntity):
             if battery_level is False or estimate_range is False:
                 return None
 
-            battery_level = int(battery_level.replace('.0', ''))
+            battery_level = int(battery_level)
             estimate_range = int(estimate_range)
 
             estimate_range = round(estimate_range / battery_level * 100)
-
-            if self.entity_description.key == 'estimate_full_charge_range_miles':
-                return round(estimate_range / 1.609344, self.entity_description.round_digits if self.entity_description.round_digits is not None else 0)
 
             return estimate_range
 

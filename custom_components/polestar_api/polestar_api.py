@@ -2,6 +2,8 @@ from datetime import datetime, timedelta
 import json
 import logging
 
+from urllib.parse import parse_qs, urlparse
+
 from .const import (
     ACCESS_TOKEN_MANAGER_ID,
     AUTHORIZATION,
@@ -59,20 +61,20 @@ class PolestarApi:
         if result.status != 200:
             _LOGGER.error(f"Error getting resume path {result.status}")
             return
-        return result.real_url.query_string
+        return result.real_url.raw_path_qs
 
     async def _get_code(self) -> None:
         resumePath = await self._get_resume_path()
+        parsed_url = urlparse(resumePath)
+        query_params = parse_qs(parsed_url.query)
 
-        # if resumepath has code, then we don't need to login
-        if 'code' in resumePath:
-            return resumePath.replace('code=', '')
+        # check if code is in query_params
+        if query_params.get('code'):
+            return query_params.get(('code'))[0]
 
-        # if resumepath has resumepat
-
-        # get the realUrl
-        resumePath = resumePath.replace(
-            'resumePath=', '').replace('&client_id=polmystar', '')
+        # get the resumePath
+        if query_params.get('resumePath'):
+            resumePath = query_params.get(('resumePath'))[0]
 
         if resumePath is None:
             return
@@ -84,13 +86,25 @@ class PolestarApi:
             'pf.username': self.username,
             'pf.pass': self.password
         }
-        result = await self._session.post(f"https://polestarid.eu.polestar.com/as/{resumePath}/resume/as/authorization.ping", params=params, data=data)
+        result = await self._session.post(
+            f"https://polestarid.eu.polestar.com/as/{resumePath}/resume/as/authorization.ping",
+            params=params,
+            data=data
+        )
         if result.status != 200:
             _LOGGER.error(f"Error getting code {result.status}")
             return
         # get the realUrl
         url = result.url
-        code = result.url.query_string.replace('code=', '')
+
+        parsed_url = urlparse(result.real_url.raw_path_qs)
+        query_params = parse_qs(parsed_url.query)
+
+        if not query_params.get('code'):
+            _LOGGER.error(f"Error getting code {result.status}")
+            return
+
+        code = query_params.get(('code'))[0]
 
         # sign-in-callback
         result = await self._session.get("https://www.polestar.com/sign-in-callback?code=" + code)
@@ -109,10 +123,11 @@ class PolestarApi:
 
         # get token
         params = {
-            "query": "query getAuthToken($code: String!) { getAuthToken(code: $code) {    id_token    access_token    refresh_token    expires_in  }}",
+            "query": "query getAuthToken($code: String!) { getAuthToken(code: $code) { id_token access_token refresh_token expires_in }}",
             "operationName": "getAuthToken",
-            "variables": "{\"code\":\"" + code + "\"}"
+            "variables": json.dumps({"code": code})
         }
+
         headers = {
             "Content-Type": "application/json"
         }
@@ -129,19 +144,12 @@ class PolestarApi:
 
         _LOGGER.debug(f"Response {self.access_token}")
 
-    def get_latest_data(self, path: str, reponse_path: str = None) -> dict or bool or None:
-        # i don't care what cache is, just give me the latest data in the cache
-        # replace the string {vin} with the actual vin
-        path = path.replace('{vin}', self.vin)
-
-        if self.cache_data and self.cache_data[path]:
-            data = self.cache_data[path]['data']
+    def get_latest_data(self, query: str, field_name: str) -> dict or bool or None:
+        if self.cache_data and self.cache_data[query]:
+            data = self.cache_data[query]['data']
             if data is None:
                 return False
-            if reponse_path:
-                for key in reponse_path.split('.'):
-                    data = data[key]
-            return data
+            return self._get_field_name_value(field_name, data)
 
     def _get_field_name_value(self, field_name: str, data: dict) -> str or bool or None:
         if '/' in field_name:

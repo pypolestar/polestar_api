@@ -14,8 +14,10 @@ https://polestarid.eu.polestar.com/PolestarLogin/login
 Add custom repository in HACS: https://github.com/leeyuentuen/polestar_api
 Search for integration 'polestar_api'
 
-and fill the information:
-email and password: this are the credential to login on your polestar account
+### Fill the information:
+
+Email and password: this are the credential to login on your polestar account
+
 VIN: is the car identification number that you can find in your polestar app or polestar account
 
 

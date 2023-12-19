@@ -1,13 +1,15 @@
 from datetime import datetime, timedelta
 import json
 import logging
+
+from urllib.parse import parse_qs, urlparse
+
 from .const import (
     ACCESS_TOKEN_MANAGER_ID,
     AUTHORIZATION,
     CACHE_TIME,
     GRANT_TYPE,
     HEADER_AUTHORIZATION,
-    HEADER_VCC_API_KEY
 )
 
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
@@ -15,7 +17,6 @@ from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from urllib3 import disable_warnings
 
 from homeassistant.core import HomeAssistant
-
 
 POST_HEADER_JSON = {"Content-Type": "application/json"}
 
@@ -28,7 +29,6 @@ class PolestarApi:
                  username: str,
                  password: str,
                  vin: str,
-                 vcc_api_key: str,
                  ) -> None:
         self.id = vin[:8]
         self.name = "Polestar " + vin[-4:]
@@ -39,98 +39,206 @@ class PolestarApi:
         self.token_type = None
         self.refresh_token = None
         self.vin = vin
-        self.vcc_api_key = vcc_api_key
-        self.cache_data = None
+        self.cache_data = {}
+        self.latest_call_code = None
+        self.updating = False
         disable_warnings()
 
     async def init(self):
         await self.get_token()
+        result = await self.get_vehicle_data()
+        self.cache_data['getConsumerCarsV2'] = {
+            'data': result['data']['getConsumerCarsV2'][0], 'timestamp': datetime.now()}
+
+    async def _get_resume_path(self):
+        # Get Resume Path
+        params = {
+            "response_type": "code",
+            "client_id": "polmystar",
+            "redirect_uri": "https://www.polestar.com/sign-in-callback"
+        }
+        result = await self._session.get("https://polestarid.eu.polestar.com/as/authorization.oauth2", params=params)
+        if result.status != 200:
+            _LOGGER.error(f"Error getting resume path {result.status}")
+            return
+        return result.real_url.raw_path_qs
+
+    async def _get_code(self) -> None:
+        resumePath = await self._get_resume_path()
+        parsed_url = urlparse(resumePath)
+        query_params = parse_qs(parsed_url.query)
+
+        # check if code is in query_params
+        if query_params.get('code'):
+            return query_params.get(('code'))[0]
+
+        # get the resumePath
+        if query_params.get('resumePath'):
+            resumePath = query_params.get(('resumePath'))[0]
+
+        if resumePath is None:
+            return
+
+        params = {
+            'client_id': 'polmystar'
+        }
+        data = {
+            'pf.username': self.username,
+            'pf.pass': self.password
+        }
+        result = await self._session.post(
+            f"https://polestarid.eu.polestar.com/as/{resumePath}/resume/as/authorization.ping",
+            params=params,
+            data=data
+        )
+        if result.status != 200:
+            _LOGGER.error(f"Error getting code {result.status}")
+            return
+        # get the realUrl
+        url = result.url
+
+        parsed_url = urlparse(result.real_url.raw_path_qs)
+        query_params = parse_qs(parsed_url.query)
+
+        if not query_params.get('code'):
+            _LOGGER.error(f"Error getting code {result.status}")
+            return
+
+        code = query_params.get(('code'))[0]
+
+        # sign-in-callback
+        result = await self._session.get("https://www.polestar.com/sign-in-callback?code=" + code)
+        if result.status != 200:
+            _LOGGER.error(f"Error getting code callback {result.status}")
+            return
+        # url encode the code
+        result = await self._session.get(url)
+
+        return code
 
     async def get_token(self) -> None:
-        response = await self._session.post(
-            url='https://volvoid.eu.volvocars.com/as/token.oauth2',
-            data={
-                'username': self.username,
-                'password': self.password,
-                'grant_type': GRANT_TYPE,
-                'access_token_manager_id': ACCESS_TOKEN_MANAGER_ID,
-                'scope': 'openid email profile care_by_volvo:financial_information:invoice:read care_by_volvo:financial_information:payment_method care_by_volvo:subscription:read customer:attributes customer:attributes:write order:attributes vehicle:attributes tsp_customer_api:all conve:brake_status conve:climatization_start_stop conve:command_accessibility conve:commands conve:diagnostics_engine_status conve:diagnostics_workshop conve:doors_status conve:engine_status conve:environment conve:fuel_status conve:honk_flash conve:lock conve:lock_status conve:navigation conve:odometer_status conve:trip_statistics conve:tyre_status conve:unlock conve:vehicle_relation conve:warnings conve:windows_status energy:battery_charge_level energy:charging_connection_status energy:charging_system_status energy:electric_range energy:estimated_charging_time energy:recharge_status'
-            },
-            headers={
-                HEADER_AUTHORIZATION: AUTHORIZATION,
-                'content-type': 'application/x-www-form-urlencoded',
-                'user-agent': 'okhttp/4.10.0'
-            },
-        )
-        _LOGGER.debug(f"Response {response}")
-        if response.status != 200:
-            _LOGGER.info("Info API not available")
+        code = await self._get_code()
+        if code is None:
             return
-        resp = await response.json(content_type=None)
-        self.access_token = resp['access_token']
-        self.refresh_token = resp['refresh_token']
-        self.token_type = resp['token_type']
+
+        # get token
+        params = {
+            "query": "query getAuthToken($code: String!) { getAuthToken(code: $code) { id_token access_token refresh_token expires_in }}",
+            "operationName": "getAuthToken",
+            "variables": json.dumps({"code": code})
+        }
+
+        headers = {
+            "Content-Type": "application/json"
+        }
+        result = await self._session.get("https://pc-api.polestar.com/eu-north-1/auth/", params=params, headers=headers)
+        if result.status != 200:
+            _LOGGER.error(f"Error getting code {result.status}")
+            return
+        resultData = await result.json()
+        _LOGGER.debug(resultData)
+
+        self.access_token = resultData['data']['getAuthToken']['access_token']
+        self.refresh_token = resultData['data']['getAuthToken']['refresh_token']
+        # ID Token
 
         _LOGGER.debug(f"Response {self.access_token}")
 
-    def get_cache_data(self, path: str, reponse_path: str = None) -> dict or bool or None:
-        # replace the string {vin} with the actual vin
-        path = path.replace('{vin}', self.vin)
+    def get_latest_data(self, query: str, field_name: str) -> dict or bool or None:
+        if self.cache_data and self.cache_data[query]:
+            data = self.cache_data[query]['data']
+            if data is None:
+                return False
+            return self._get_field_name_value(field_name, data)
 
-        if self.cache_data and self.cache_data[path]:
-            if self.cache_data[path]['timestamp'] > datetime.now() - timedelta(seconds=CACHE_TIME):
-                data = self.cache_data[path]['data']
-                if data is None:
-                    return False
-                if reponse_path:
-                    for key in reponse_path.split('.'):
-                        data = data[key]
+    def _get_field_name_value(self, field_name: str, data: dict) -> str or bool or None:
+        if '/' in field_name:
+            field_name = field_name.split('/')
+        if data:
+            if isinstance(field_name, list):
+                for key in field_name:
+                    data = data[key]
                 return data
+            return data[field_name]
+        return None
 
-    async def get_data(self, path: str, reponse_path: str = None) -> dict or bool or None:
-        path = path.replace('{vin}', self.vin)
+    def get_cache_data(self, query: str, field_name: str, skip_cache: bool = False):
+        if self.cache_data and self.cache_data[query]:
+            if skip_cache is False:
+                if self.cache_data[query]['timestamp'] + timedelta(seconds=CACHE_TIME) > datetime.now():
+                    data = self.cache_data[query]['data']
+                    if data is None:
+                        return None
+                    return self._get_field_name_value(field_name, data)
+            else:
+                data = self.cache_data[query]['data']
+                if data is None:
+                    return None
+                return self._get_field_name_value(field_name, data)
+        return None
 
-        cache_data = self.get_cache_data(path, reponse_path)
-        # if false, then we are fetching data just return
-        if cache_data is False:
+    async def getOdometerData(self):
+        result = await self.get_odo_data()
+        # put result in cache
+        self.cache_data['getOdometerData'] = {
+            'data': result['data']['getOdometerData'], 'timestamp': datetime.now()}
+
+    async def getBatteryData(self):
+        result = await self.get_battery_data()
+        # put result in cache
+        self.cache_data['getBatteryData'] = {
+            'data': result['data']['getBatteryData'], 'timestamp': datetime.now()}
+
+    async def get_ev_data(self):
+        if self.updating is True:
             return
-        if cache_data:
-            _LOGGER.debug("Using cached data")
-            return cache_data
+        self.updating = True
+        await self.getOdometerData()
+        await self.getBatteryData()
+        self.updating = False
 
-        # put as fast possible something in the cache otherwise we get a lot of requests
-        if not self.cache_data:
-            self.cache_data = {}
-        self.cache_data[path] = {'data': None, 'timestamp': datetime.now()}
-
-        url = 'https://api.volvocars.com/energy/v1/vehicles/' + path
+    async def get_graph_ql(self, params: dict):
         headers = {
-            HEADER_AUTHORIZATION: f'{self.token_type} {self.access_token}',
-            HEADER_VCC_API_KEY: self.vcc_api_key
+            "Content-Type": "application/json",
+            "authorization": "Bearer " + self.access_token
         }
 
-        response = await self._session.get(
-            url=url,
-            headers=headers
-        )
-        _LOGGER.debug(f"Response {response}")
-        if response.status == 401:
-            await self.get_token()
-            return
-        if response.status != 200:
-            _LOGGER.debug("Info API not available")
-            return
-        resp = await response.json(content_type=None)
+        result = await self._session.get("https://pc-api.polestar.com/eu-north-1/my-star/", params=params, headers=headers)
+        resultData = await result.json()
 
-        _LOGGER.debug(f"Response {resp}")
+        # if auth error, get new token
+        if resultData.get('errors'):
+            if resultData['errors'][0]['message'] == 'User not authenticated':
+                await self.get_token()
+                resultData = await self.get_graph_ql(params)
+            # log the error
+            _LOGGER.info(resultData.get('errors'))
+        _LOGGER.debug(resultData)
+        return resultData
 
-        data = resp['data']
+    async def get_odo_data(self):
+        # get Odo Data
+        params = {
+            "query": "query GetOdometerData($vin: String!) { getOdometerData(vin: $vin) { averageSpeedKmPerHour eventUpdatedTimestamp { iso unix __typename } odometerMeters tripMeterAutomaticKm tripMeterManualKm __typename }}",
+            "operationName": "GetOdometerData",
+            "variables": "{\"vin\":\"" + self.vin + "\"}"
+        }
+        return await self.get_graph_ql(params)
 
-        # add cache_data[path]
-        self.cache_data[path] = {'data': data, 'timestamp': datetime.now()}
+    async def get_battery_data(self):
+        # get Battery Data
+        params = {
+            "query": "query GetBatteryData($vin: String!) {  getBatteryData(vin: $vin) {    averageEnergyConsumptionKwhPer100Km    batteryChargeLevelPercentage    chargerConnectionStatus    chargingCurrentAmps    chargingPowerWatts    chargingStatus    estimatedChargingTimeMinutesToTargetDistance    estimatedChargingTimeToFullMinutes    estimatedDistanceToEmptyKm    estimatedDistanceToEmptyMiles    eventUpdatedTimestamp {      iso      unix      __typename    }    __typename  }}",
+            "operationName": "GetBatteryData",
+            "variables": "{\"vin\":\"" + self.vin + "\"}"
+        }
+        return await self.get_graph_ql(params)
 
-        if reponse_path:
-            for key in reponse_path.split('.'):
-                data = data[key]
-
-        return data
+    async def get_vehicle_data(self):
+        # get Vehicle Data
+        params = {
+            "query": "query getCars {  getConsumerCarsV2 {    vin    internalVehicleIdentifier    modelYear    content {      model {        code        name        __typename      }      images {        studio {          url          angles          __typename        }        __typename      }      __typename    }    hasPerformancePackage    registrationNo    deliveryDate    currentPlannedDeliveryDate    __typename  }}",
+            "operationName": "getCars",
+            "variables": "{}"
+        }
+        return await self.get_graph_ql(params)

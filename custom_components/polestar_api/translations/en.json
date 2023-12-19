@@ -8,15 +8,15 @@
           "name": "Friendly name",
           "username": "Username",
           "password": "Password",
-          "vin": "VIN",
-          "vcc_api_key": "VCC API Key"
+          "vin": "VIN"
         }
       }
     },
     "abort": {
       "api_timeout": "Timeout connecting to the api.",
       "api_failed": "Unexpected error creating api.",
-      "already_configured": "Polestar API is already configured"
+      "already_configured": "Polestar API is already configured",
+      "no_token": "No token found in response. Please check your credentials."
     }
   }
 }

@@ -18,6 +18,7 @@ and fill the information:
 email and password: this are the credential to login on your polestar account
 VIN: is the car identification number that you can find in your polestar app or polestar account
 
+
 ![image](https://github.com/leeyuentuen/polestar_api/assets/1487966/30645415-ce93-4c73-ad60-6cbff78e691a)
 
 Result:

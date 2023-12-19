@@ -6,6 +6,7 @@ import logging
 
 from aiohttp import ClientConnectionError
 from async_timeout import timeout
+
 from .polestar_api import PolestarApi
 
 from homeassistant.config_entries import ConfigEntry
@@ -20,7 +21,6 @@ from homeassistant.exceptions import ConfigEntryNotReady
 
 from .const import (
     CONF_VIN,
-    CONF_VCC_API_KEY,
     DOMAIN,
     TIMEOUT
 )
@@ -43,7 +43,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> b
 
     _LOGGER.debug("async_setup_entry: %s", config_entry)
     polestarApi = PolestarApi(
-        hass, conf[CONF_USERNAME], conf[CONF_PASSWORD], conf[CONF_VIN], conf[CONF_VCC_API_KEY])
+        hass, conf[CONF_USERNAME], conf[CONF_PASSWORD], conf[CONF_VIN])
     await polestarApi.init()
 
     hass.data.setdefault(DOMAIN, {})

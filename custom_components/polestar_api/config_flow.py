@@ -11,7 +11,7 @@ from homeassistant.const import CONF_NAME, CONF_USERNAME, CONF_PASSWORD
 
 from .polestar import PolestarApi
 
-from .const import CONF_VIN, CONF_VCC_API_KEY, DOMAIN, TIMEOUT
+from .const import CONF_VIN, DOMAIN, TIMEOUT
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -23,7 +23,7 @@ class FlowHandler(config_entries.ConfigFlow):
     VERSION = 1
     CONNECTION_CLASS = config_entries.CONN_CLASS_LOCAL_POLL
 
-    async def _create_entry(self, username: str, password: str, vin: str, vcc_api_key: str) -> None:
+    async def _create_entry(self, username: str, password: str, vin: str) -> None:
         """Register new entry."""
         return self.async_create_entry(
             title='Polestar EV',
@@ -31,11 +31,10 @@ class FlowHandler(config_entries.ConfigFlow):
                 CONF_USERNAME: username,
                 CONF_PASSWORD: password,
                 CONF_VIN: vin,
-                CONF_VCC_API_KEY: vcc_api_key
             }
         )
 
-    async def _create_device(self, username: str, password: str, vin: str, vcc_api_key: str) -> None:
+    async def _create_device(self, username: str, password: str, vin: str) -> None:
         """Create device."""
 
         try:
@@ -43,9 +42,7 @@ class FlowHandler(config_entries.ConfigFlow):
                 self.hass,
                 username,
                 password,
-                vin,
-                vcc_api_key
-            )
+                vin)
             with timeout(TIMEOUT):
                 await device.init()
 
@@ -64,7 +61,7 @@ class FlowHandler(config_entries.ConfigFlow):
             _LOGGER.exception("Unexpected error creating device")
             return self.async_abort(reason="api_failed")
 
-        return await self._create_entry(username, password, vin, vcc_api_key)
+        return await self._create_entry(username, password, vin)
 
     async def async_step_user(self, user_input: dict = None) -> None:
         """User initiated config flow."""
@@ -73,12 +70,11 @@ class FlowHandler(config_entries.ConfigFlow):
                 step_id="user", data_schema=vol.Schema({
                     vol.Required(CONF_USERNAME): str,
                     vol.Required(CONF_PASSWORD): str,
-                    vol.Required(CONF_VIN): str,
-                    vol.Required(CONF_VCC_API_KEY): str,
+                    vol.Required(CONF_VIN): str
                 })
             )
-        return await self._create_device(user_input[CONF_USERNAME], user_input[CONF_PASSWORD], user_input[CONF_VIN], user_input[CONF_VCC_API_KEY])
+        return await self._create_device(user_input[CONF_USERNAME], user_input[CONF_PASSWORD], user_input[CONF_VIN])
 
     async def async_step_import(self, user_input: dict) -> None:
         """Import a config entry."""
-        return await self._create_device(user_input[CONF_USERNAME], user_input[CONF_PASSWORD], user_input[CONF_VIN], user_input[CONF_VCC_API_KEY])
+        return await self._create_device(user_input[CONF_USERNAME], user_input[CONF_PASSWORD], user_input[CONF_VIN])

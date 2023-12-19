@@ -8,8 +8,7 @@
           "name": "Friendly name",
           "username": "Username",
           "password": "Password",
-          "vin": "VIN",
-          "vcc_api_key": "VCC API Key"
+          "vin": "VIN"
         }
       }
     },

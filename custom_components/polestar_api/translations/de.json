@@ -1,0 +1,23 @@
+{
+    "config": {
+      "step": {
+        "user": {
+          "title": "Konfiguriere Deinen Polestar",
+          "description": "Eingabe der Zugangsdaten Deines Polestar",
+          "data": {
+            "name": "Anzeige Name",
+            "username": "Benutzername",
+            "password": "Passwort",
+            "vin": "VIN"
+          }
+        }
+      },
+      "abort": {
+        "api_timeout": "Zeitüberschreitung bei der Verbindung mit der API.",
+        "api_failed": "Unerwarteter Fehler beim Erstellen der API.",
+        "already_configured": "Die Polestar API ist bereits konfiguriert",
+        "no_token": "Kein Token in der Antwort gefunden. Bitte überprüfe Deine Anmeldeinformationen."
+      }
+    }
+  }
+  

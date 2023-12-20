@@ -25,7 +25,7 @@ from homeassistant.helpers import entity_platform
 from . import DOMAIN as POLESTAR_API_DOMAIN
 
 
-from .polestar import PolestarApi
+from .polestar_api import PolestarApi
 
 from homeassistant.const import (
     PERCENTAGE,
@@ -72,7 +72,8 @@ ChargingSystemStatusDict = {
 API_STATUS_DICT = {
     200: "OK",
     401: "Unauthorized",
-    404: "API Down"
+    404: "API Down",
+    500: "Internal Server Error",
 }
 
 
@@ -316,6 +317,16 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         device_class=SensorDeviceClass.DISTANCE,
         max_value=None
     ),
+    PolestarSensorDescription(
+        key="api_status_code",
+        name="API status",
+        icon="mdi:heart",
+        query=None,
+        field_name=None,
+        unit=None,
+        round_digits=None,
+        max_value=None,
+    ),
 
 )
 
@@ -336,6 +347,7 @@ async def async_setup_entry(
     # get the device
     device: PolestarApi
     device = hass.data[POLESTAR_API_DOMAIN][entry.entry_id]
+
     # put data in cache
     await device.get_ev_data()
 
@@ -370,7 +382,8 @@ class PolestarSensor(PolestarEntity, SensorEntity):
             self._attr_state_class = description.state_class
         if description.device_class is not None:
             self._attr_device_class = description.device_class
-        self._async_update_attrs()
+        if self._device is not None and self._device.latest_call_code == 200:
+            self._async_update_attrs()
 
     def _get_current_value(self) -> StateType | None:
         """Get the current value."""

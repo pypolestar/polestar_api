@@ -5,11 +5,7 @@ import logging
 from urllib.parse import parse_qs, urlparse
 
 from .const import (
-    ACCESS_TOKEN_MANAGER_ID,
-    AUTHORIZATION,
     CACHE_TIME,
-    GRANT_TYPE,
-    HEADER_AUTHORIZATION,
 )
 
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
@@ -27,18 +23,17 @@ class PolestarApi:
     def __init__(self,
                  hass: HomeAssistant,
                  username: str,
-                 password: str,
-                 vin: str,
+                 password: str
                  ) -> None:
-        self.id = vin[:8]
-        self.name = "Polestar " + vin[-4:]
+        self.id = None
+        self.name = "Polestar "
         self._session = async_get_clientsession(hass, verify_ssl=False)
         self.username = username
         self.password = password
         self.access_token = None
         self.token_type = None
         self.refresh_token = None
-        self.vin = vin
+        self.vin = None
         self.cache_data = {}
         self.latest_call_code = None
         self.updating = False
@@ -46,9 +41,23 @@ class PolestarApi:
 
     async def init(self):
         await self.get_token()
+        if self.access_token is None:
+            return
         result = await self.get_vehicle_data()
+
+        # check if there are cars in the account
+        if result['data']['getConsumerCarsV2'] is None or len(result['data']['getConsumerCarsV2']) == 0:
+            _LOGGER.exception("No cars found in account")
+            # throw new exception
+            raise Exception("No cars found in account")
+
         self.cache_data['getConsumerCarsV2'] = {
             'data': result['data']['getConsumerCarsV2'][0], 'timestamp': datetime.now()}
+
+        # fill the vin and id in the constructor
+        self.vin = result['data']['getConsumerCarsV2'][0]['vin']
+        self.id = self.vin[:8]
+        self.name = "Polestar " + self.vin[-4:]
 
     async def _get_resume_path(self):
         # Get Resume Path
@@ -91,6 +100,7 @@ class PolestarApi:
             params=params,
             data=data
         )
+        self.latest_call_code = result.status
         if result.status != 200:
             _LOGGER.error(f"Error getting code {result.status}")
             return
@@ -101,18 +111,21 @@ class PolestarApi:
         query_params = parse_qs(parsed_url.query)
 
         if not query_params.get('code'):
-            _LOGGER.error(f"Error getting code {result.status}")
+            _LOGGER.error(f"Error getting code in {query_params}")
+            _LOGGER.warning("Check if username and password are correct")
             return
 
         code = query_params.get(('code'))[0]
 
         # sign-in-callback
         result = await self._session.get("https://www.polestar.com/sign-in-callback?code=" + code)
+        self.latest_call_code = result.status
         if result.status != 200:
             _LOGGER.error(f"Error getting code callback {result.status}")
             return
         # url encode the code
         result = await self._session.get(url)
+        self.latest_call_code = result.status
 
         return code
 
@@ -132,8 +145,9 @@ class PolestarApi:
             "Content-Type": "application/json"
         }
         result = await self._session.get("https://pc-api.polestar.com/eu-north-1/auth/", params=params, headers=headers)
+        self.latest_call_code = result.status
         if result.status != 200:
-            _LOGGER.error(f"Error getting code {result.status}")
+            _LOGGER.error(f"Error getting token {result.status}")
             return
         resultData = await result.json()
         _LOGGER.debug(resultData)
@@ -152,18 +166,30 @@ class PolestarApi:
             return self._get_field_name_value(field_name, data)
 
     def _get_field_name_value(self, field_name: str, data: dict) -> str or bool or None:
+        if field_name is None:
+            return None
+
+        if data is None:
+            return None
+
         if '/' in field_name:
             field_name = field_name.split('/')
         if data:
             if isinstance(field_name, list):
                 for key in field_name:
-                    data = data[key]
+                    if data.get(key):
+                        data = data[key]
+                    else:
+                        return None
                 return data
             return data[field_name]
         return None
 
     def get_cache_data(self, query: str, field_name: str, skip_cache: bool = False):
-        if self.cache_data and self.cache_data[query]:
+        if query is None:
+            return None
+
+        if self.cache_data and self.cache_data.get(query):
             if skip_cache is False:
                 if self.cache_data[query]['timestamp'] + timedelta(seconds=CACHE_TIME) > datetime.now():
                     data = self.cache_data[query]['data']
@@ -204,6 +230,7 @@ class PolestarApi:
         }
 
         result = await self._session.get("https://pc-api.polestar.com/eu-north-1/my-star/", params=params, headers=headers)
+        self.latest_call_code = result.status
         resultData = await result.json()
 
         # if auth error, get new token
@@ -211,8 +238,10 @@ class PolestarApi:
             if resultData['errors'][0]['message'] == 'User not authenticated':
                 await self.get_token()
                 resultData = await self.get_graph_ql(params)
-            # log the error
-            _LOGGER.info(resultData.get('errors'))
+            else:
+                # log the error
+                _LOGGER.warning(resultData.get('errors'))
+                self.latest_call_code = 500  # set internal error
         _LOGGER.debug(resultData)
         return resultData
 

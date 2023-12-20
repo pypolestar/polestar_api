@@ -20,7 +20,6 @@ from homeassistant.exceptions import ConfigEntryNotReady
 
 
 from .const import (
-    CONF_VIN,
     DOMAIN,
     TIMEOUT
 )
@@ -43,7 +42,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> b
 
     _LOGGER.debug("async_setup_entry: %s", config_entry)
     polestarApi = PolestarApi(
-        hass, conf[CONF_USERNAME], conf[CONF_PASSWORD], conf[CONF_VIN])
+        hass, conf[CONF_USERNAME], conf[CONF_PASSWORD])
     await polestarApi.init()
 
     hass.data.setdefault(DOMAIN, {})

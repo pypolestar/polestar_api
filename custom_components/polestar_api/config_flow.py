@@ -5,13 +5,13 @@ import logging
 from aiohttp import ClientError
 from async_timeout import timeout
 import voluptuous as vol
+from .polestar_api import PolestarApi
 
 from homeassistant import config_entries
-from homeassistant.const import CONF_NAME, CONF_USERNAME, CONF_PASSWORD
+from homeassistant.const import CONF_USERNAME, CONF_PASSWORD
 
-from .polestar import PolestarApi
 
-from .const import CONF_VIN, DOMAIN, TIMEOUT
+from .const import DOMAIN, TIMEOUT
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -23,26 +23,24 @@ class FlowHandler(config_entries.ConfigFlow):
     VERSION = 1
     CONNECTION_CLASS = config_entries.CONN_CLASS_LOCAL_POLL
 
-    async def _create_entry(self, username: str, password: str, vin: str) -> None:
+    async def _create_entry(self, username: str, password: str) -> None:
         """Register new entry."""
         return self.async_create_entry(
             title='Polestar EV',
             data={
                 CONF_USERNAME: username,
                 CONF_PASSWORD: password,
-                CONF_VIN: vin,
             }
         )
 
-    async def _create_device(self, username: str, password: str, vin: str) -> None:
+    async def _create_device(self, username: str, password: str) -> None:
         """Create device."""
 
         try:
             device = PolestarApi(
                 self.hass,
                 username,
-                password,
-                vin)
+                password)
             with timeout(TIMEOUT):
                 await device.init()
 
@@ -57,11 +55,11 @@ class FlowHandler(config_entries.ConfigFlow):
         except ClientError:
             _LOGGER.exception("ClientError")
             return self.async_abort(reason="api_failed")
-        except Exception:  # pylint: disable=broad-except
+        except Exception as e:  # pylint: disable=broad-except
             _LOGGER.exception("Unexpected error creating device")
             return self.async_abort(reason="api_failed")
 
-        return await self._create_entry(username, password, vin)
+        return await self._create_entry(username, password, )
 
     async def async_step_user(self, user_input: dict = None) -> None:
         """User initiated config flow."""
@@ -69,12 +67,11 @@ class FlowHandler(config_entries.ConfigFlow):
             return self.async_show_form(
                 step_id="user", data_schema=vol.Schema({
                     vol.Required(CONF_USERNAME): str,
-                    vol.Required(CONF_PASSWORD): str,
-                    vol.Required(CONF_VIN): str
+                    vol.Required(CONF_PASSWORD): str
                 })
             )
-        return await self._create_device(user_input[CONF_USERNAME], user_input[CONF_PASSWORD], user_input[CONF_VIN])
+        return await self._create_device(user_input[CONF_USERNAME], user_input[CONF_PASSWORD])
 
     async def async_step_import(self, user_input: dict) -> None:
         """Import a config entry."""
-        return await self._create_device(user_input[CONF_USERNAME], user_input[CONF_PASSWORD], user_input[CONF_VIN])
+        return await self._create_device(user_input[CONF_USERNAME], user_input[CONF_PASSWORD])

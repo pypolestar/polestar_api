@@ -28,6 +28,8 @@ PLATFORMS = [
     Platform.SENSOR,
 ]
 
+CONFIG_SCHEMA = cv.removed(DOMAIN, raise_if_present=False)
+
 _LOGGER = logging.getLogger(__name__)
 
 

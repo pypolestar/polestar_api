@@ -1,0 +1,22 @@
+{
+    "config": {
+        "step": {
+            "user": {
+                "title": "Konfigurera din Polestar",
+                "description": "Ange autentisering av din Polestar",
+                "data": {
+                    "name": "Namn på displayen",
+                    "username": "Användernam",
+                    "password": "Lösenord",
+                    "vin": "VIN"
+                }
+            }
+        },
+        "abort": {
+            "api_timeout": "Timeout för anslutning till API.",
+            "api_failed": "Oväntat fel vid skapande av API.",
+            "already_configured": "Polestar API är redan konfigurerat",
+            "no_token": "Ingen token hittades i svaret. Vänligen kontrollera dina uppgifter."
+        }
+    }
+}

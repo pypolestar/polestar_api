@@ -5,7 +5,7 @@
                 "title": "Konfiguriere Deinen Polestar",
                 "description": "Eingabe der Zugangsdaten Deines Polestar",
                 "data": {
-                    "name": "Anzeige Name",
+                    "name": "Anzeigename",
                     "username": "Benutzername",
                     "password": "Passwort",
                     "vin": "VIN"

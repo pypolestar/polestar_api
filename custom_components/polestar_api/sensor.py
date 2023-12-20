@@ -93,6 +93,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
     PolestarSensorDescription(
         key="estimate_distance_to_empty_km",
         name="Distance km Remaining",
+        translation_key="polestar_api_estimate_distance_to_empty_km",
         icon="mdi:map-marker-distance",
         query="getBatteryData",
         field_name="estimatedDistanceToEmptyKm",

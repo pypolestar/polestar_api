@@ -152,9 +152,10 @@ class PolestarApi:
         resultData = await result.json()
         _LOGGER.debug(resultData)
 
-        self.access_token = resultData['data']['getAuthToken']['access_token']
-        self.refresh_token = resultData['data']['getAuthToken']['refresh_token']
-        # ID Token
+        if resultData['data']:
+            self.access_token = resultData['data']['getAuthToken']['access_token']
+            self.refresh_token = resultData['data']['getAuthToken']['refresh_token']
+            # ID Token
 
         _LOGGER.debug(f"Response {self.access_token}")
 
@@ -205,15 +206,19 @@ class PolestarApi:
 
     async def getOdometerData(self):
         result = await self.get_odo_data()
-        # put result in cache
-        self.cache_data['getOdometerData'] = {
-            'data': result['data']['getOdometerData'], 'timestamp': datetime.now()}
+
+        if result and result['data']:
+            # put result in cache
+            self.cache_data['getOdometerData'] = {
+                'data': result['data']['getOdometerData'], 'timestamp': datetime.now()}
 
     async def getBatteryData(self):
         result = await self.get_battery_data()
-        # put result in cache
-        self.cache_data['getBatteryData'] = {
-            'data': result['data']['getBatteryData'], 'timestamp': datetime.now()}
+
+        if result and result['data']:
+            # put result in cache
+            self.cache_data['getBatteryData'] = {
+                'data': result['data']['getBatteryData'], 'timestamp': datetime.now()}
 
     async def get_ev_data(self):
         if self.updating is True:
@@ -242,6 +247,7 @@ class PolestarApi:
                 # log the error
                 _LOGGER.warning(resultData.get('errors'))
                 self.latest_call_code = 500  # set internal error
+                return None
         _LOGGER.debug(resultData)
         return resultData
 

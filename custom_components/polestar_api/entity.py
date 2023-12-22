@@ -1,6 +1,7 @@
 import logging
 
-from .polestar import PolestarApi
+from .polestar_api import PolestarApi
+
 from .const import DOMAIN as POLESTAR_API_DOMAIN
 from homeassistant.helpers.entity import DeviceInfo, Entity
 

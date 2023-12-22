@@ -1,22 +1,29 @@
 {
-  "config": {
-    "step": {
-      "user": {
-        "title": "Configure Polestar EV",
-        "description": "Enter Authentication of Polestar EV",
-        "data": {
-          "name": "Friendly name",
-          "username": "Username",
-          "password": "Password",
-          "vin": "VIN"
+    "config": {
+        "step": {
+            "user": {
+                "title": "Configure Polestar EV",
+                "description": "Enter Authentication of Polestar EV",
+                "data": {
+                    "name": "Friendly name",
+                    "username": "Username",
+                    "password": "Password",
+                    "vin": "VIN"
+                }
+            }
+        },
+        "abort": {
+            "api_timeout": "Timeout connecting to the api.",
+            "api_failed": "Unexpected error creating api.",
+            "already_configured": "Polestar API is already configured",
+            "no_token": "No token found in response. Please check your credentials."
         }
-      }
     },
-    "abort": {
-      "api_timeout": "Timeout connecting to the api.",
-      "api_failed": "Unexpected error creating api.",
-      "already_configured": "Polestar API is already configured",
-      "no_token": "No token found in response. Please check your credentials."
+    "entity": {
+        "sensor": {
+            "polestar_api_estimate_distance_to_empty_km": {
+                "name": "Distance km Remaining"
+            }
+        }
     }
-  }
 }

@@ -19,7 +19,7 @@ from homeassistant.const import (
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryNotReady
-
+from homeassistant.helpers import config_validation as cv
 
 from .const import (
     DOMAIN,
@@ -29,6 +29,8 @@ from .const import (
 PLATFORMS = [
     Platform.SENSOR,
 ]
+
+CONFIG_SCHEMA = cv.removed(DOMAIN, raise_if_present=False)
 
 _LOGGER = logging.getLogger(__name__)
 

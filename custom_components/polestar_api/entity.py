@@ -1,6 +1,6 @@
 import logging
 
-from .polestar_api import PolestarApi
+from .polestar import Polestar
 
 from .const import DOMAIN as POLESTAR_API_DOMAIN
 from homeassistant.helpers.entity import DeviceInfo, Entity
@@ -10,7 +10,7 @@ _LOGGER = logging.getLogger(__name__)
 
 class PolestarEntity(Entity):
 
-    def __init__(self, device: PolestarApi) -> None:
+    def __init__(self, device: Polestar) -> None:
         """Initialize the Polestar entity."""
         self._device = device
 

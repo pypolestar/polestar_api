@@ -25,7 +25,7 @@ from homeassistant.helpers import entity_platform
 from . import DOMAIN as POLESTAR_API_DOMAIN
 
 
-from .polestar_api import PolestarApi
+from .polestar import Polestar
 
 from homeassistant.const import (
     PERCENTAGE,
@@ -345,7 +345,7 @@ async def async_setup_entry(
         async_add_entities: AddEntitiesCallback):
     """Set up using config_entry."""
     # get the device
-    device: PolestarApi
+    device: Polestar
     device = hass.data[POLESTAR_API_DOMAIN][entry.entry_id]
 
     # put data in cache
@@ -364,7 +364,7 @@ class PolestarSensor(PolestarEntity, SensorEntity):
     entity_description: PolestarSensorDescription
 
     def __init__(self,
-                 device: PolestarApi,
+                 device: Polestar,
                  description: PolestarSensorDescription) -> None:
         """Initialize the sensor."""
         super().__init__(device)
@@ -430,7 +430,7 @@ class PolestarSensor(PolestarEntity, SensorEntity):
         """Return the state of the sensor."""
 
         if self.entity_description.key == 'api_status_code':
-            return API_STATUS_DICT.get(self._device.latest_call_code, "Error")
+            return API_STATUS_DICT.get(self._device.get_latest_call_code(), "Error")
 
         if self._attr_native_value != 0 and self._attr_native_value in (None, False):
             return None

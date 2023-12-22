@@ -7,7 +7,9 @@ import logging
 from aiohttp import ClientConnectionError
 from async_timeout import timeout
 
-from .polestar_api import PolestarApi
+from .pypolestar.polestar import PolestarApi
+from .polestar import Polestar
+
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
@@ -41,7 +43,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> b
     conf = config_entry.data
 
     _LOGGER.debug("async_setup_entry: %s", config_entry)
-    polestarApi = PolestarApi(
+    polestarApi = Polestar(
         hass, conf[CONF_USERNAME], conf[CONF_PASSWORD])
     await polestarApi.init()
 
@@ -72,7 +74,7 @@ async def polestar_setup(hass: HomeAssistant, name: str, username: str, password
 
     try:
         with timeout(TIMEOUT):
-            device = PolestarApi(hass, name, username, password)
+            device = Polestar(hass, name, username, password)
             await device.init()
     except asyncio.TimeoutError:
         _LOGGER.debug("Connection to %s timed out", name)

@@ -5,7 +5,7 @@ import logging
 from aiohttp import ClientError
 from async_timeout import timeout
 import voluptuous as vol
-from .polestar_api import PolestarApi
+from .polestar import Polestar
 
 from homeassistant import config_entries
 from homeassistant.const import CONF_USERNAME, CONF_PASSWORD
@@ -37,7 +37,7 @@ class FlowHandler(config_entries.ConfigFlow):
         """Create device."""
 
         try:
-            device = PolestarApi(
+            device = Polestar(
                 self.hass,
                 username,
                 password)

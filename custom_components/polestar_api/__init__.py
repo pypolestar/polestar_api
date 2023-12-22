@@ -1,16 +1,12 @@
 """Polestar EV integration."""
 
 import asyncio
-from datetime import timedelta
 import logging
 
 from aiohttp import ClientConnectionError
 from async_timeout import timeout
-
 from .pypolestar.polestar import PolestarApi
 from .polestar import Polestar
-
-
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     CONF_USERNAME,
@@ -20,7 +16,6 @@ from homeassistant.const import (
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryNotReady
 from homeassistant.helpers import config_validation as cv
-
 from .const import (
     DOMAIN,
     TIMEOUT

@@ -1,15 +1,11 @@
-from datetime import datetime, timedelta
 import logging
+
+from datetime import datetime, timedelta
 from typing import Final
 from dataclasses import dataclass
-
 from .entity import PolestarEntity
-
 from homeassistant.helpers.typing import StateType
-
 from homeassistant.config_entries import ConfigEntry
-
-
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.components.sensor import (
     SensorEntity,
@@ -19,14 +15,9 @@ from homeassistant.components.sensor import (
 
 )
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-
 from homeassistant.helpers import entity_platform
-
 from . import DOMAIN as POLESTAR_API_DOMAIN
-
-
 from .polestar import Polestar
-
 from homeassistant.const import (
     PERCENTAGE,
 )
@@ -45,6 +36,7 @@ class PolestarSensorDescriptionMixin:
     round_digits: int | None
     unit: str | None
     max_value: int | None
+    dict_data: dict | None
 
 
 @dataclass
@@ -54,12 +46,12 @@ class PolestarSensorDescription(
     """Class to describe an Polestar sensor entity."""
 
 
-ChargingConnectionStatusDict = {
+CHARGING_CONNECTION_STATUS_DICT = {
     "CHARGER_CONNECTION_STATUS_CONNECTED": "Connected",
     "CHARGER_CONNECTION_STATUS_DISCONNECTED": "Disconnected",
 }
 
-ChargingSystemStatusDict = {
+CHARGING_STATUS_DICT = {
     "CHARGING_STATUS_DONE": "Done",
     "CHARGING_STATUS_IDLE": "Idle",
     "CHARGING_STATUS_CHARGING": "Charging",
@@ -71,6 +63,7 @@ ChargingSystemStatusDict = {
 
 API_STATUS_DICT = {
     200: "OK",
+    303: "OK",
     401: "Unauthorized",
     404: "API Down",
     500: "Internal Server Error",
@@ -88,7 +81,8 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         round_digits=None,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.DISTANCE,
-        max_value=None
+        max_value=None,
+        dict_data=None
     ),
     PolestarSensorDescription(
         key="estimate_distance_to_empty_km",
@@ -100,7 +94,8 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         round_digits=None,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.DISTANCE,
-        max_value=None
+        max_value=None,
+        dict_data=None
     ),
     PolestarSensorDescription(
         key="current_odometer_meters",
@@ -112,7 +107,8 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         round_digits=None,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.DISTANCE,
-        max_value=None
+        max_value=None,
+        dict_data=None
     ),
     PolestarSensorDescription(
         key="average_speed_km_per_hour",
@@ -124,7 +120,8 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         round_digits=None,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.DISTANCE,
-        max_value=None
+        max_value=None,
+        dict_data=None
     ),
     PolestarSensorDescription(
         key="current_trip_meter_automatic",
@@ -136,7 +133,8 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         round_digits=None,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.DISTANCE,
-        max_value=None
+        max_value=None,
+        dict_data=None
     ),
     PolestarSensorDescription(
         key="current_trip_meter_manual",
@@ -148,7 +146,8 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         round_digits=None,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.DISTANCE,
-        max_value=None
+        max_value=None,
+        dict_data=None
     ),
     PolestarSensorDescription(
         key="battery_charge_level",
@@ -160,6 +159,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.BATTERY,
         max_value=None,
+        dict_data=None
     ),
     PolestarSensorDescription(
         key="estimated_charging_time_to_full_minutes",
@@ -170,6 +170,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         unit='Minutes',
         round_digits=None,
         max_value=None,
+        dict_data=None
     ),
     PolestarSensorDescription(
         key="charging_status",
@@ -180,6 +181,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         unit=None,
         round_digits=None,
         max_value=None,
+        dict_data=CHARGING_STATUS_DICT
     ),
     PolestarSensorDescription(
         key="charging_power_watts",
@@ -192,6 +194,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         max_value=None,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.POWER,
+        dict_data=None
     ),
     PolestarSensorDescription(
         key="charging_current_amps",
@@ -204,6 +207,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         max_value=None,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.POWER,
+        dict_data=None
     ),
     PolestarSensorDescription(
         key="charger_connection_status",
@@ -216,6 +220,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         max_value=None,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.POWER,
+        dict_data=CHARGING_CONNECTION_STATUS_DICT
     ),
     PolestarSensorDescription(
         key="average_energy_consumption_kwh_per_100_km",
@@ -228,6 +233,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         max_value=None,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.POWER,
+        dict_data=None
     ),
     PolestarSensorDescription(
         key="estimated_charging_time_minutes_to_target_distance",
@@ -240,6 +246,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         max_value=None,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.POWER,
+        dict_data=None
     ),
     PolestarSensorDescription(
         key="vin",
@@ -250,6 +257,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         unit=None,
         round_digits=None,
         max_value=None,
+        dict_data=None
     ),
     PolestarSensorDescription(
         key="registration_number",
@@ -260,6 +268,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         unit=None,
         round_digits=None,
         max_value=None,
+        dict_data=None
     ),
     PolestarSensorDescription(
         key="estimated_fully_charged_time",
@@ -272,6 +281,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.DURATION,
         max_value=None,
+        dict_data=None
     ),
     PolestarSensorDescription(
         key="model_name",
@@ -281,6 +291,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         unit=None,
         round_digits=None,
         max_value=None,
+        dict_data=None
     ),
     PolestarSensorDescription(
         key="last_updated",
@@ -292,6 +303,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.TIMESTAMP,
         max_value=None,
+        dict_data=None
     ),
     PolestarSensorDescription(
         key="estimate_full_charge_range_miles",
@@ -303,7 +315,8 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         round_digits=None,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.DISTANCE,
-        max_value=None
+        max_value=None,
+        dict_data=None
     ),
     PolestarSensorDescription(
         key="estimate_full_charge_range",
@@ -315,7 +328,8 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         round_digits=None,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.DISTANCE,
-        max_value=None
+        max_value=None,
+        dict_data=None
     ),
     PolestarSensorDescription(
         key="api_status_code",
@@ -326,6 +340,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         unit=None,
         round_digits=None,
         max_value=None,
+        dict_data=API_STATUS_DICT
     ),
 
 )
@@ -349,7 +364,7 @@ async def async_setup_entry(
     device = hass.data[POLESTAR_API_DOMAIN][entry.entry_id]
 
     # put data in cache
-    await device.get_ev_data()
+    await device.async_update()
 
     sensors = [
         PolestarSensor(device, description) for description in POLESTAR_SENSOR_TYPES
@@ -374,7 +389,6 @@ class PolestarSensor(PolestarEntity, SensorEntity):
         self.entity_id = f"{POLESTAR_API_DOMAIN}.'polestar_'.{unique_id}_{description.key}"
         self._attr_name = f"{description.name}"
         self._attr_unique_id = f"polestar_{unique_id}-{description.key}"
-        self.value = None
         self.description = description
 
         self.entity_description = description
@@ -382,7 +396,7 @@ class PolestarSensor(PolestarEntity, SensorEntity):
             self._attr_state_class = description.state_class
         if description.device_class is not None:
             self._attr_device_class = description.device_class
-        if self._device is not None and self._device.latest_call_code == 200:
+        if self._device is not None and self._device.get_latest_call_code() == 200:
             self._async_update_attrs()
 
     def _get_current_value(self) -> StateType | None:
@@ -396,8 +410,7 @@ class PolestarSensor(PolestarEntity, SensorEntity):
     @callback
     def _async_update_attrs(self) -> None:
         """Update the state and attributes."""
-        # try to fill the current cache data
-        self._attr_native_value = self._device.get_cache_data(
+        self._attr_native_value = self._device.get_value(
             self.description.query, self.description.field_name, self.get_skip_cache())
 
     @property
@@ -418,6 +431,8 @@ class PolestarSensor(PolestarEntity, SensorEntity):
     @property
     def native_value(self) -> StateType:
         """Return the state of the sensor."""
+        if self.entity_description.round_digits is not None:
+            return round(self.state, self.entity_description.round_digits)
         return round(self.state, 2)
 
     @property
@@ -428,18 +443,15 @@ class PolestarSensor(PolestarEntity, SensorEntity):
     @property
     def state(self) -> StateType:
         """Return the state of the sensor."""
-
-        if self.entity_description.key == 'api_status_code':
-            return API_STATUS_DICT.get(self._device.get_latest_call_code(), "Error")
+        if self.entity_description.dict_data is not None:
+            # exception for api_status_code
+            if self.entity_description.key == 'api_status_code':
+                return self.entity_description.dict_data.get(self._device.get_latest_call_code(), "Error")
+            return self.entity_description.dict_data.get(
+                self._attr_native_value, self._attr_native_value)
 
         if self._attr_native_value != 0 and self._attr_native_value in (None, False):
             return None
-
-        # parse the long text with a shorter one from the dict
-        if self.entity_description.key == 'charger_connection_status':
-            return ChargingConnectionStatusDict.get(self._attr_native_value, self._attr_native_value)
-        if self.entity_description.key == 'charging_status':
-            return ChargingSystemStatusDict.get(self._attr_native_value, self._attr_native_value)
 
         # battery charge level contain ".0" at the end, this should be removed
         if self.entity_description.key == 'battery_charge_level':
@@ -487,26 +499,13 @@ class PolestarSensor(PolestarEntity, SensorEntity):
 
             return estimate_range
 
-        if self.entity_description.key == 'current_odometer_meters' and int(self._attr_native_value) > 1000:
+        if self.entity_description.key in 'current_odometer_meters' and int(self._attr_native_value) > 1000:
             self._attr_native_value = int(self._attr_native_value)
             km = round(self._attr_native_value / 1000,
                        self.entity_description.round_digits if self.entity_description.round_digits is not None else 0)
 
             return km
 
-        if self.entity_description.key == 'current_trip_meter_manual' and int(self._attr_native_value) > 1000:
-            self._attr_native_value = int(self._attr_native_value)
-            km = round(self._attr_native_value / 1000,
-                       self.entity_description.round_digits if self.entity_description.round_digits is not None else 0)
-
-            return km
-
-        if self.entity_description.key == 'current_trip_meter_automatic' and int(self._attr_native_value) > 1000:
-            self._attr_native_value = int(self._attr_native_value)
-            km = round(self._attr_native_value / 1000,
-                       self.entity_description.round_digits if self.entity_description.round_digits is not None else 0)
-
-            return km
         return self._attr_native_value
 
     @property
@@ -516,12 +515,6 @@ class PolestarSensor(PolestarEntity, SensorEntity):
 
     async def async_update(self) -> None:
         """Get the latest data and updates the states."""
-        data = self._device.get_cache_data(
-            self.entity_description.query, self.entity_description.field_name, self.get_skip_cache())
-        if data is None:
-            data = self._device.get_cache_data(
-                self.entity_description.query, self.entity_description.field_name, True)
-            await self._device.get_ev_data()
-
-        self._attr_native_value = data
-        self.value = data
+        await self._device.async_update()
+        self._attr_native_value = self._device.get_value(
+            self.description.query, self.description.field_name, self.get_skip_cache())

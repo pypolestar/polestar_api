@@ -18,12 +18,5 @@
             "already_configured": "Die Polestar API ist bereits konfiguriert",
             "no_token": "Kein Token in der Antwort gefunden. Bitte überprüfe Deine Anmeldeinformationen."
         }
-    },
-    "entity": {
-        "sensor": {
-            "polestar_api_estimate_distance_to_empty_km": {
-                "name": "Reichweite"
-            }
-        }
     }
 }

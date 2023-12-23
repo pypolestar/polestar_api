@@ -5,6 +5,8 @@ import logging
 
 from aiohttp import ClientConnectionError
 from async_timeout import timeout
+
+from .pypolestar.exception import PolestarApiException
 from .pypolestar.polestar import PolestarApi
 from .polestar import Polestar
 from homeassistant.config_entries import ConfigEntry
@@ -42,14 +44,17 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> b
     _LOGGER.debug("async_setup_entry: %s", config_entry)
     polestarApi = Polestar(
         hass, conf[CONF_USERNAME], conf[CONF_PASSWORD])
-    await polestarApi.init()
+    try:
+        await polestarApi.init()
 
-    hass.data.setdefault(DOMAIN, {})
-    hass.data[DOMAIN][config_entry.entry_id] = polestarApi
+        hass.data.setdefault(DOMAIN, {})
+        hass.data[DOMAIN][config_entry.entry_id] = polestarApi
 
-    await hass.config_entries.async_forward_entry_setups(config_entry, PLATFORMS)
+        await hass.config_entries.async_forward_entry_setups(config_entry, PLATFORMS)
 
-    return True
+        return True
+    except PolestarApiException as e:
+        _LOGGER.exception("API Exception %s", str(e))
 
 
 async def async_unload_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> bool:

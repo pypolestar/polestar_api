@@ -4,6 +4,8 @@ import httpx
 
 from datetime import datetime, timedelta
 
+from .exception import PolestarAuthException
+
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -38,8 +40,8 @@ class PolestarAuth:
         result = await self._client_session.get("https://pc-api.polestar.com/eu-north-1/auth/", params=params, headers=headers)
         self.latest_call_code = result.status_code
         if result.status_code != 200:
-            _LOGGER.error(f"Error getting token {result.status_code}")
-            return
+            raise PolestarAuthException(
+                f"Error getting token", result.status_code)
         resultData = result.json()
         _LOGGER.debug(resultData)
 
@@ -80,8 +82,8 @@ class PolestarAuth:
         )
         self.latest_call_code = result.status_code
         if result.status_code != 302:
-            _LOGGER.error(f"Error getting code {result.status_code}")
-            return
+            raise PolestarAuthException(
+                f"Error getting code", result.status_code)
 
         # get the realUrl
         url = result.url
@@ -92,8 +94,9 @@ class PolestarAuth:
         self.latest_call_code = result.status_code
 
         if result.status_code != 200:
-            _LOGGER.error(f"Error getting code callback {result.status_code}")
-            return
+            raise PolestarAuthException(
+                f"Error getting code callback", result.status_code)
+
         # url encode the code
         result = await self._client_session.get(url)
         self.latest_call_code = result.status_code
@@ -109,6 +112,6 @@ class PolestarAuth:
         }
         result = await self._client_session.get("https://polestarid.eu.polestar.com/as/authorization.oauth2", params=params)
         if result.status_code != 303:
-            _LOGGER.error(f"Error getting resume path {result.status_code}")
-            return
+            raise PolestarAuthException(
+                f"Error getting resume path ", result.status_code)
         return result.next_request.url.params

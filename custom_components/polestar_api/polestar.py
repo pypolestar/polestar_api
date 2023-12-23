@@ -1,8 +1,11 @@
 
+from datetime import timedelta
 import logging
 
 from .pypolestar.polestar import PolestarApi
+
 from urllib3 import disable_warnings
+
 from homeassistant.core import HomeAssistant
 
 POST_HEADER_JSON = {"Content-Type": "application/json"}
@@ -35,6 +38,10 @@ class Polestar:
         return self.polestarApi.get_latest_data(query, field_name)
 
     def get_latest_call_code(self):
+        # if AUTH code last code is not 200 then we return that error code,
+        # otherwise just give the call_code in API
+        if self.polestarApi.auth.latest_call_code != 200:
+            return self.polestarApi.auth.latest_call_code
         return self.polestarApi.latest_call_code
 
     async def async_update(self) -> None:

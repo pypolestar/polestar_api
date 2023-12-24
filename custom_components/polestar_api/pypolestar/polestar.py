@@ -114,6 +114,7 @@ class PolestarApi:
             if self.auth.token_expiry < datetime.now():
                 await self.auth.get_token()
         except PolestarAuthException as e:
+            self.latest_call_code = 500
             _LOGGER.exception("Auth Exception: %s", str(e))
             self.updating = False
             return
@@ -123,6 +124,7 @@ class PolestarApi:
         except PolestarNotAuthorizedException:
             await self.auth.get_token()
         except PolestarApiException as e:
+            self.latest_call_code = 500
             _LOGGER.warning('Failed to get Odo Meter data %s', str(e))
 
         try:
@@ -130,6 +132,7 @@ class PolestarApi:
         except PolestarNotAuthorizedException:
             await self.auth.get_token()
         except PolestarApiException as e:
+            self.latest_call_code = 500
             _LOGGER.exception('Failed to get Battery data %s', str(e))
 
         self.updating = False
@@ -168,8 +171,13 @@ class PolestarApi:
                 f"Get GraphQL error: {result.text}")
         resultData = result.json()
         # if we get result with errors and with message "user is not authorized" then we throw an exception
-        if resultData.get('errors') and resultData['errors'][0]['message'] == "User is not authorized":
-            raise PolestarNotAuthorizedException("Unauthorized Exception")
+        if resultData.get('errors'):
+            # we get 200 but if there is error, then we should have an internal error
+            self.latest_call_code = 500
+            if resultData['errors'][0]['message'] == "User is not authorized":
+                raise PolestarNotAuthorizedException("Unauthorized Exception")
+            # otherwise log the error
+            _LOGGER.error(resultData['errors'][0]['message'])
 
         _LOGGER.debug(resultData)
         return resultData

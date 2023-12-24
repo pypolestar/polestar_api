@@ -108,6 +108,16 @@ class PolestarApi:
         if self.updating is True:
             return
         self.updating = True
+
+        # check if the token is still valid
+        try:
+            if self.auth.token_expiry < datetime.now():
+                await self.auth.get_token()
+        except PolestarAuthException as e:
+            _LOGGER.exception("Auth Exception: %s", str(e))
+            self.updating = False
+            return
+
         try:
             await self._get_odometer_data(vin)
         except PolestarNotAuthorizedException:
@@ -157,6 +167,9 @@ class PolestarApi:
             raise PolestarApiException(
                 f"Get GraphQL error: {result.text}")
         resultData = result.json()
+        # if we get result with errors and with message "user is not authorized" then we throw an exception
+        if resultData.get('errors') and resultData['errors'][0]['message'] == "User is not authorized":
+            raise PolestarNotAuthorizedException("Unauthorized Exception")
 
         _LOGGER.debug(resultData)
         return resultData

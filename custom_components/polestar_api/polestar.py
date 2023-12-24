@@ -1,6 +1,7 @@
-
-from datetime import timedelta
+"""Polestar API for Polestar integration."""
 import logging
+
+from .pypolestar.exception import PolestarApiException, PolestarAuthException
 
 from .pypolestar.polestar import PolestarApi
 
@@ -45,7 +46,12 @@ class Polestar:
         return self.polestarApi.latest_call_code
 
     async def async_update(self) -> None:
-        await self.polestarApi.get_ev_data(self.vin)
+        try:
+            await self.polestarApi.get_ev_data(self.vin)
+        except PolestarApiException as e:
+            _LOGGER.warning("API Exception on update data %s", str(e))
+        except PolestarAuthException as e:
+            _LOGGER.warning("Auth Exception on update data %s", str(e))
 
     def get_value(self, query: str, field_name: str, skip_cache: bool = False):
         data = self.polestarApi.get_cache_data(query, field_name, skip_cache)

@@ -294,9 +294,21 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         dict_data=None
     ),
     PolestarSensorDescription(
-        key="last_updated",
-        name="Last updated",
+        key="last_updated_odometer_data",
+        name="Last updated odometer data",
         query="getOdometerData",
+        field_name="eventUpdatedTimestamp/iso",
+        unit=None,
+        round_digits=None,
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.TIMESTAMP,
+        max_value=None,
+        dict_data=None
+    ),
+    PolestarSensorDescription(
+        key="last_updated_battery_data",
+        name="Last updated battery data",
+        query="getBatteryData",
         field_name="eventUpdatedTimestamp/iso",
         unit=None,
         round_digits=None,

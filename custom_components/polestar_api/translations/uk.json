@@ -1,0 +1,29 @@
+{
+    "config": {
+        "step": {
+            "user": {
+                "title": "Налаштування Polestar EV",
+                "description": "Введіть дані аутентифікації для Polestar EV",
+                "data": {
+                    "name": "Назва",
+                    "username": "Ім’я користувача",
+                    "password": "Пароль",
+                    "vin": "VIN"
+                }
+            }
+        },
+        "abort": {
+            "api_timeout": "Таймаут підключення до API.",
+            "api_failed": "Неочікувана помилка при створенні API.",
+            "already_configured": "Polestar API вже налаштовано.",
+            "no_token": "Токен не знайдено у відповіді. Будь ласка, перевірте Ваші дані."
+        }
+    },
+    "entity": {
+        "sensor": {
+            "polestar_api_estimate_distance_to_empty_km": {
+                "name": "Запас відстані, км"
+            }
+        }
+    }
+}

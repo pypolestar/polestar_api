@@ -39,23 +39,21 @@ class PolestarApi:
             return self._get_field_name_value(field_name, data)
 
     def _get_field_name_value(self, field_name: str, data: dict) -> str or bool or None:
-        if field_name is None:
-            return None
-
-        if data is None:
+        if field_name is None or data is None:
             return None
 
         if '/' in field_name:
-            field_name = field_name.split('/')
-        if data:
-            if isinstance(field_name, list):
-                for key in field_name:
-                    if data.get(key):
-                        data = data[key]
-                    else:
-                        return None
-                return data
+            field_names = field_name.split('/')
+            for key in field_names:
+                if isinstance(data, dict) and key in data:
+                    data = data[key]
+                else:
+                    return None
+            return data
+
+        if isinstance(data, dict) and field_name in data:
             return data[field_name]
+
         return None
 
     async def _get_odometer_data(self, vin: str):
@@ -105,35 +103,32 @@ class PolestarApi:
                 'data': result['data'][CAR_INFO_DATA][0], 'timestamp': datetime.now()}
 
     async def get_ev_data(self, vin: str):
-        if self.updating is True:
+        if self.updating:
             return
+
         self.updating = True
 
-        # check if the token is still valid
         try:
             if self.auth.token_expiry < datetime.now():
                 await self.auth.get_token()
         except PolestarAuthException as e:
             self.latest_call_code = 500
-            _LOGGER.exception("Auth Exception: %s", str(e))
+            _LOGGER.warning("Auth Exception: %s", str(e))
             self.updating = False
             return
 
-        try:
-            await self._get_odometer_data(vin)
-        except PolestarNotAuthorizedException:
-            await self.auth.get_token()
-        except PolestarApiException as e:
-            self.latest_call_code = 500
-            _LOGGER.warning('Failed to get Odo Meter data %s', str(e))
+        async def call_api(func):
+            try:
+                await func()
+            except PolestarNotAuthorizedException:
+                await self.auth.get_token()
+            except PolestarApiException as e:
+                self.latest_call_code = 500
+                _LOGGER.warning('Failed to get %s data %s',
+                                func.__name__, str(e))
 
-        try:
-            await self._get_battery_data(vin)
-        except PolestarNotAuthorizedException:
-            await self.auth.get_token()
-        except PolestarApiException as e:
-            self.latest_call_code = 500
-            _LOGGER.exception('Failed to get Battery data %s', str(e))
+        await call_api(lambda: self._get_odometer_data(vin))
+        await call_api(lambda: self._get_battery_data(vin))
 
         self.updating = False
 
@@ -142,42 +137,36 @@ class PolestarApi:
             return None
 
         if self.cache_data and self.cache_data.get(query):
-            if skip_cache is False:
-                if self.cache_data[query]['timestamp'] + timedelta(seconds=CACHE_TIME) > datetime.now():
-                    data = self.cache_data[query]['data']
-                    if data is None:
-                        return None
+            cache_entry = self.cache_data[query]
+            data = cache_entry['data']
+            if data is not None:
+                if skip_cache is False or cache_entry['timestamp'] + timedelta(seconds=CACHE_TIME) > datetime.now():
                     return self._get_field_name_value(field_name, data)
-            else:
-                data = self.cache_data[query]['data']
-                if data is None:
-                    return None
-                return self._get_field_name_value(field_name, data)
         return None
 
     async def get_graph_ql(self, params: dict):
         headers = {
             "Content-Type": "application/json",
-            "authorization": "Bearer " + self.auth.access_token
+            "authorization": f"Bearer {self.auth.access_token}"
         }
 
-        result = await self._client_session.get("https://pc-api.polestar.com/eu-north-1/my-star/", params=params, headers=headers)
+        url = "https://pc-api.polestar.com/eu-north-1/my-star/"
+        result = await self._client_session.get(url, params=params, headers=headers)
         self.latest_call_code = result.status_code
+
         if result.status_code == 401:
             raise PolestarNotAuthorizedException("Unauthorized Exception")
 
         if result.status_code != 200:
-            raise PolestarApiException(
-                f"Get GraphQL error: {result.text}")
+            raise PolestarApiException(f"Get GraphQL error: {result.text}")
+
         resultData = result.json()
-        # if we get result with errors and with message "user is not authorized" then we throw an exception
         if resultData.get('errors'):
-            # we get 200 but if there is error, then we should have an internal error
             self.latest_call_code = 500
-            if resultData['errors'][0]['message'] == "User is not authorized":
+            error_message = resultData['errors'][0]['message']
+            if error_message == "User is not authorized":
                 raise PolestarNotAuthorizedException("Unauthorized Exception")
-            # otherwise log the error
-            _LOGGER.error(resultData['errors'][0]['message'])
+            _LOGGER.error(error_message)
 
         _LOGGER.debug(resultData)
         return resultData

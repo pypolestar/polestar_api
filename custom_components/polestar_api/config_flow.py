@@ -45,7 +45,7 @@ class FlowHandler(config_entries.ConfigFlow):
                 await device.init()
 
             # check if we have a token, otherwise throw exception
-            if device.access_token is None:
+            if device.polestarApi.auth.access_token is None:
                 _LOGGER.exception(
                     "No token, Could be wrong credentials (invalid email or password))")
                 return self.async_abort(reason="no_token")

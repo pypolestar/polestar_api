@@ -1,22 +1,98 @@
 {
-    "config": {
-        "step": {
-            "user": {
-                "title": "Konfigurera din Polestar",
-                "description": "Ange autentisering av din Polestar",
-                "data": {
-                    "name": "Namn på displayen",
-                    "username": "Användernam",
-                    "password": "Lösenord",
-                    "vin": "VIN"
-                }
-            }
-        },
-        "abort": {
-            "api_timeout": "Timeout för anslutning till API.",
-            "api_failed": "Oväntat fel vid skapande av API.",
-            "already_configured": "Polestar API är redan konfigurerat",
-            "no_token": "Ingen token hittades i svaret. Vänligen kontrollera dina uppgifter."
+  "config": {
+    "step": {
+      "user": {
+        "title": "Konfigurera din Polestar",
+        "description": "Ange autentisering av din Polestar",
+        "data": {
+          "name": "Namn på displayen",
+          "username": "Användernam",
+          "password": "Lösenord",
+          "vin": "VIN"
         }
+      }
+    },
+    "abort": {
+      "api_timeout": "Timeout för anslutning till API.",
+      "api_failed": "Oväntat fel vid skapande av API.",
+      "already_configured": "Polestar API är redan konfigurerat",
+      "no_token": "Ingen token hittades i svaret. Vänligen kontrollera dina uppgifter."
     }
+  },
+  "entity": {
+    "sensor": {
+      "polestar_estimate_distance_to_empty_miles": {
+        "name": "Avstånd Miles kvar"
+      },
+      "polestar_estimate_distance_to_empty_km": {
+        "name": "Avstånd km kvar"
+      },
+      "polestar_current_odometer_meters": {
+        "name": "Mätarställning"
+      },
+      "polestar_average_speed_km_per_hour": {
+        "name": "Medelhastighet km/h"
+      },
+      "polestar_current_trip_meter_automatic": {
+        "name": "Trippmätare automatiskt"
+      },
+      "polestar_current_trip_meter_manual": {
+        "name": "Trippmätare manual"
+      },
+      "polestar_battery_charge_level": {
+        "name": "Batterinivå"
+      },
+      "polestar_estimated_charging_time_to_full_minutes": {
+        "name": "Laddningstid till full"
+      },
+      "polestar_charging_status": {
+        "name": "Laddningsstatus"
+      },
+      "polestar_charging_power_watts": {
+        "name": "Laddningseffekt"
+      },
+      "polestar_charging_current_amps": {
+        "name": "Laddningsström"
+      },
+      "polestar_charger_connection_status": {
+        "name": "Laddare ansluten"
+      },
+      "polestar_average_energy_consumption_kwh_per_100_km": {
+        "name": "Medelförbrukning kWh/100km"
+      },
+      "polestar_estimated_charging_time_minutes_to_target_distance": {
+        "name": "Laddningstid till mål"
+      },
+      "polestar_vin": {
+        "name": "VIN"
+      },
+      "polestar_registration_number": {
+        "name": "Registreringsnummer"
+      },
+      "polestar_estimated_fully_charged_time": {
+        "name": "Beräknad fulladdningstid"
+      },
+      "polestar_model_name": {
+        "name": "Modell"
+      },
+      "polestar_last_updated_odometer_data": {
+        "name": "Senast uppdaterad mätarställning"
+      },
+      "polestar_last_updated_battery_data": {
+        "name": "Senast uppdaterad batteridata"
+      },
+      "polestar_estimate_full_charge_range_miles": {
+        "name": "Estimerad räckvidd vid fulladdning miles"
+      },
+      "polestar_estimate_full_charge_range": {
+        "name": "Estimerad räckvidd vid fulladdning"
+      },
+      "polestar_api_status_code": {
+        "name": "API-statuskod"
+      },
+      "polestar_api_token_expires_at": {
+        "name": "API-token löper ut kl"
+      }
+    }
+  }
 }

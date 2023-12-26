@@ -1,29 +1,98 @@
 {
-    "config": {
-        "step": {
-            "user": {
-                "title": "Налаштування Polestar EV",
-                "description": "Введіть дані аутентифікації для Polestar EV",
-                "data": {
-                    "name": "Назва",
-                    "username": "Ім’я користувача",
-                    "password": "Пароль",
-                    "vin": "VIN"
-                }
-            }
-        },
-        "abort": {
-            "api_timeout": "Таймаут підключення до API.",
-            "api_failed": "Неочікувана помилка при створенні API.",
-            "already_configured": "Polestar API вже налаштовано.",
-            "no_token": "Токен не знайдено у відповіді. Будь ласка, перевірте Ваші дані."
+  "config": {
+    "step": {
+      "user": {
+        "title": "Налаштування Polestar EV",
+        "description": "Введіть дані аутентифікації для Polestar EV",
+        "data": {
+          "name": "Назва",
+          "username": "Ім’я користувача",
+          "password": "Пароль",
+          "vin": "VIN"
         }
+      }
     },
-    "entity": {
-        "sensor": {
-            "polestar_api_estimate_distance_to_empty_km": {
-                "name": "Запас відстані, км"
-            }
-        }
+    "abort": {
+      "api_timeout": "Таймаут підключення до API.",
+      "api_failed": "Неочікувана помилка при створенні API.",
+      "already_configured": "Polestar API вже налаштовано.",
+      "no_token": "Токен не знайдено у відповіді. Будь ласка, перевірте Ваші дані."
     }
+  },
+  "entity": {
+    "sensor": {
+      "polestar_estimate_distance_to_empty_miles": {
+        "name": "Запас відстані, миль"
+      },
+      "polestar_estimate_distance_to_empty_km": {
+        "name": "Запас відстані, км"
+      },
+      "polestar_current_odometer_meters": {
+        "name": "Пробіг, метри"
+      },
+      "polestar_average_speed_km_per_hour": {
+        "name": "Середня швидкість, км/год"
+      },
+      "polestar_current_trip_meter_automatic": {
+        "name": "Лічильник поїздок, автоматичний"
+      },
+      "polestar_current_trip_meter_manual": {
+        "name": "Лічильник поїздок, ручний"
+      },
+      "polestar_battery_charge_level": {
+        "name": "Рівень заряду батареї"
+      },
+      "polestar_estimated_charging_time_to_full_minutes": {
+        "name": "Час до повного заряду, хв"
+      },
+      "polestar_charging_status": {
+        "name": "Статус зарядки"
+      },
+      "polestar_charging_power_watts": {
+        "name": "Потужність зарядки, Вт"
+      },
+      "polestar_charging_current_amps": {
+        "name": "Сила струму зарядки, А"
+      },
+      "polestar_charger_connection_status": {
+        "name": "Статус підключення зарядного пристрою"
+      },
+      "polestar_average_energy_consumption_kwh_per_100_km": {
+        "name": "Середнє споживання енергії, кВт·год/100 км"
+      },
+      "polestar_estimated_charging_time_minutes_to_target_distance": {
+        "name": "Час до повного заряду, хв"
+      },
+      "polestar_vin": {
+        "name": "VIN"
+      },
+      "polestar_registration_number": {
+        "name": "Реєстраційний номер"
+      },
+      "polestar_estimated_fully_charged_time": {
+        "name": "Час до повного заряду"
+      },
+      "polestar_model_name": {
+        "name": "Модель"
+      },
+      "polestar_last_updated_odometer_data": {
+        "name": "Останні дані пробігу"
+      },
+      "polestar_last_updated_battery_data": {
+        "name": "Останні дані батареї"
+      },
+      "polestar_estimate_full_charge_range_miles": {
+        "name": "Запас відстані при повному заряді, миль"
+      },
+      "polestar_estimate_full_charge_range": {
+        "name": "Запас відстані при повному заряді"
+      },
+      "polestar_api_status_code": {
+        "name": "Код статусу API"
+      },
+      "polestar_api_token_expires_at": {
+        "name": "Токен закінчується"
+      }
+    }
+  }
 }

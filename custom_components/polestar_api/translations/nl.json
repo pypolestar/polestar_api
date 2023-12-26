@@ -21,77 +21,77 @@
   },
   "entity": {
     "sensor": {
-      "polestar_estimate_distance_to_empty_miles": {
-        "name": "Distance Miles Remaining"
+      "polestar_distance_to_empty_miles": {
+        "name": "Resterende afstand (mijl)"
       },
       "polestar_estimate_distance_to_empty_km": {
-        "name": "Distance km Remaining"
+        "name": "Resterende afstand (km)"
       },
       "polestar_current_odometer_meters": {
-        "name": "Odometer Meters"
+        "name": "Huidige kilometerstand"
       },
       "polestar_average_speed_km_per_hour": {
-        "name": "Average Speed km/h"
+        "name": "Gemiddelde snelheid (km/u)"
       },
       "polestar_current_trip_meter_automatic": {
-        "name": "Trip Meter Automatic"
+        "name": "Huidige trip meter (automatisch)"
       },
       "polestar_current_trip_meter_manual": {
-        "name": "Trip Meter Manual"
+        "name": "Huidige trip meter (manueel)"
       },
       "polestar_battery_charge_level": {
-        "name": "Battery Charge Level"
+        "name": "Batterij niveau"
       },
       "polestar_estimated_charging_time_to_full_minutes": {
-        "name": "Estimated Charging Time to Full Minutes"
+        "name": "Geschatte laadtijd tot vol (min)"
       },
       "polestar_charging_status": {
-        "name": "Charging Status"
+        "name": "Laadstatus"
       },
       "polestar_charging_power_watts": {
-        "name": "Charging Power Watts"
+        "name": "Laadvermogen (W)"
       },
       "polestar_charging_current_amps": {
-        "name": "Charging Current Amps"
+        "name": "Laadstroom (A)"
       },
       "polestar_charger_connection_status": {
-        "name": "Charger Connection Status"
+        "name": "Laadkabel status"
       },
       "polestar_average_energy_consumption_kwh_per_100_km": {
-        "name": "Average Energy Consumption kWh/100km"
+        "name": "Gemiddeld verbruik (kWh/100km)"
       },
       "polestar_estimated_charging_time_minutes_to_target_distance": {
-        "name": "Estimated Charging Time Minutes to Target Distance"
+        "name": "Geschatte laadtijd tot doelafstand (min)"
       },
       "polestar_vin": {
         "name": "VIN"
       },
       "polestar_registration_number": {
-        "name": "Registration Number"
+        "name": "Registratienummer"
       },
       "polestar_estimated_fully_charged_time": {
-        "name": "Estimated Fully Charged Time"
+        "name": "Geschatte volledig opgeladen tijd"
       },
       "polestar_model_name": {
-        "name": "Model Name"
+        "name": "Model"
       },
       "polestar_last_updated_odometer_data": {
-        "name": "Last Updated Odometer Data"
+        "name": "Laatst geüpdatete kilometerstand"
       },
       "polestar_last_updated_battery_data": {
-        "name": "Last Updated Battery Data"
+        "name": "Laatst geüpdatete batterijgegevens"
       },
       "polestar_estimate_full_charge_range_miles": {
-        "name": "Estimate Full Charge Range Miles"
+        "name": "Geschatte volledige laadafstand (mijl)"
       },
       "polestar_estimate_full_charge_range": {
-        "name": "Estimate Full Charge Range"
+        "name": "Geschatte volledige laadafstand (km)"
       },
       "polestar_api_status_code": {
         "name": "API Status Code"
       },
       "polestar_api_token_expires_at": {
-        "name": "API Token Expires At"
+        "name": "API Token vervalt op"
       }
     }
   }

@@ -413,8 +413,8 @@ class PolestarSensor(PolestarEntity, SensorEntity):
         #self._attr_name = f"{description.name}"
         self._attr_unique_id = f"polestar_{unique_id}-{description.key}"
         self.description = description
-        self.translation_key = f"polestar_{description.key}"
-        self.has_entity_name = True
+        self.attr_translation_key = f"polestar_{description.key}"
+        self.attr_has_entity_name = True
 
         self.entity_description = description
         if description.state_class is not None:

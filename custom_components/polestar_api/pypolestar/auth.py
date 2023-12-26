@@ -22,34 +22,44 @@ class PolestarAuth:
         self.latest_call_code = None
         self._client_session = httpx.AsyncClient()
 
-    async def get_token(self) -> None:
-        code = await self._get_code()
-        if code is None:
-            return
+    async def get_token(self, refresh=False) -> None:
+        # get access / refresh token
+        headers = {"Content-Type": "application/json"}
+        operationName = "getAuthToken"
+        if not refresh:
+            code = await self._get_code()
+            if code is None:
+                return
+            params = {
+                "query": "query getAuthToken($code: String!) { getAuthToken(code: $code) { id_token access_token refresh_token expires_in }}",
+                "operationName": operationName,
+                "variables": json.dumps({"code": code}),
+            }
+        else:
+            if self.refresh_token is None:
+                return
+            token = self.refresh_token
+            operationName = "refreshAuthToken"
+            headers["Authorization"] = f"Bearer {self.access_token}"
 
-        # get token
-        params = {
-            "query": "query getAuthToken($code: String!) { getAuthToken(code: $code) { id_token access_token refresh_token expires_in }}",
-            "operationName": "getAuthToken",
-            "variables": json.dumps({"code": code})
-        }
-
-        headers = {
-            "Content-Type": "application/json"
-        }
+            params = {
+                "query": "query refreshAuthToken($token: String!) { refreshAuthToken(token: $token) { id_token access_token refresh_token expires_in }}",
+                "operationName": operationName,
+                "variables": json.dumps({"token": token}),
+            }
         result = await self._client_session.get("https://pc-api.polestar.com/eu-north-1/auth/", params=params, headers=headers)
         self.latest_call_code = result.status_code
-        if result.status_code != 200:
+        resultData = result.json()
+        if result.status_code != 200 or ("errors" in resultData and len(resultData["errors"])):
             raise PolestarAuthException(
                 f"Error getting token", result.status_code)
-        resultData = result.json()
         _LOGGER.debug(resultData)
 
         if resultData['data']:
-            self.access_token = resultData['data']['getAuthToken']['access_token']
-            self.refresh_token = resultData['data']['getAuthToken']['refresh_token']
+            self.access_token = resultData['data'][operationName]['access_token']
+            self.refresh_token = resultData['data'][operationName]['refresh_token']
             self.token_expiry = datetime.now(
-            ) + timedelta(seconds=resultData['data']['getAuthToken']['expires_in'])
+            ) + timedelta(seconds=resultData['data'][operationName]['expires_in'])
             # ID Token
 
         _LOGGER.debug(f"Response {self.access_token}")

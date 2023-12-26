@@ -142,7 +142,7 @@ class PolestarApi:
             cache_entry = self.cache_data[query]
             data = cache_entry['data']
             if data is not None:
-                if skip_cache is False or cache_entry['timestamp'] + timedelta(seconds=CACHE_TIME) > datetime.now():
+                if skip_cache is True or cache_entry['timestamp'] + timedelta(seconds=CACHE_TIME) > datetime.now():
                     return self._get_field_name_value(field_name, data)
         return None
 

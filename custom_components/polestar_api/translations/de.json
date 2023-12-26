@@ -1,22 +1,98 @@
 {
-    "config": {
-        "step": {
-            "user": {
-                "title": "Konfiguriere Deinen Polestar",
-                "description": "Eingabe der Zugangsdaten Deines Polestar",
-                "data": {
-                    "name": "Anzeigename",
-                    "username": "Benutzername",
-                    "password": "Passwort",
-                    "vin": "VIN"
-                }
-            }
-        },
-        "abort": {
-            "api_timeout": "Zeitüberschreitung bei der Verbindung mit der API.",
-            "api_failed": "Unerwarteter Fehler beim Erstellen der API.",
-            "already_configured": "Die Polestar API ist bereits konfiguriert",
-            "no_token": "Kein Token in der Antwort gefunden. Bitte überprüfe Deine Anmeldeinformationen."
+  "config": {
+    "step": {
+      "user": {
+        "title": "Konfiguriere Deinen Polestar",
+        "description": "Eingabe der Zugangsdaten Deines Polestar",
+        "data": {
+          "name": "Anzeigename",
+          "username": "Benutzername",
+          "password": "Passwort",
+          "vin": "VIN"
         }
+      }
+    },
+    "abort": {
+      "api_timeout": "Zeitüberschreitung bei der Verbindung mit der API.",
+      "api_failed": "Unerwarteter Fehler beim Erstellen der API.",
+      "already_configured": "Die Polestar API ist bereits konfiguriert",
+      "no_token": "Kein Token in der Antwort gefunden. Bitte überprüfe Deine Anmeldeinformationen."
     }
+  },
+  "entity": {
+    "sensor": {
+      "polestar_estimate_distance_to_empty_miles": {
+        "name": "Reichweite (Meilen)"
+      },
+      "polestar_estimate_distance_to_empty_km": {
+        "name": "Reichweite (km)"
+      },
+      "polestar_current_odometer_meters": {
+        "name": "Kilometerstand"
+      },
+      "polestar_average_speed_km_per_hour": {
+        "name": "Durchschnittsgeschwindigkeit (km/h)"
+      },
+      "polestar_current_trip_meter_automatic": {
+        "name": "Trip Meter Automatisch"
+      },
+      "polestar_current_trip_meter_manual": {
+        "name": "Trip Meter Manuell"
+      },
+      "polestar_battery_charge_level": {
+        "name": "Batterieladestand"
+      },
+      "polestar_estimated_charging_time_to_full_minutes": {
+        "name": "Geschätzte Ladezeit bis zur vollen Batterie"
+      },
+      "polestar_charging_status": {
+        "name": "Ladezustand"
+      },
+      "polestar_charging_power_watts": {
+        "name": "Ladeleistung"
+      },
+      "polestar_charging_current_amps": {
+        "name": "Ladestrom"
+      },
+      "polestar_charger_connection_status": {
+        "name": "Ladestatus"
+      },
+      "polestar_average_energy_consumption_kwh_per_100_km": {
+        "name": "Durchschnittlicher Energieverbrauch (kWh/100km)"
+      },
+      "polestar_estimated_charging_time_minutes_to_target_distance": {
+        "name": "Geschätzte Ladezeit bis zur Zielentfernung"
+      },
+      "polestar_vin": {
+        "name": "VIN"
+      },
+      "polestar_registration_number": {
+        "name": "Registrierungsnummer"
+      },
+      "polestar_estimated_fully_charged_time": {
+        "name": "Geschätzte vollständig geladene Zeit"
+      },
+      "polestar_model_name": {
+        "name": "Modellname"
+      },
+      "polestar_last_updated_odometer_data": {
+        "name": "Letzte Aktualisierung der Kilometerstanddaten"
+      },
+      "polestar_last_updated_battery_data": {
+        "name": "Letzte Aktualisierung der Batteriedaten"
+      },
+      "polestar_estimate_full_charge_range_miles": {
+        "name": "Geschätzte Reichweite bei voller Ladung (Meilen)"
+      },
+      "polestar_estimate_full_charge_range": {
+        "name": "Geschätzte Reichweite bei voller Ladung"
+      },
+      "polestar_api_status_code": {
+        "name": "API Status Code"
+      },
+      "polestar_api_token_expires_at": {
+        "name": "API Token läuft ab"
+      }
+    }
+  }
 }

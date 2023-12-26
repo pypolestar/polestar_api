@@ -82,7 +82,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.DISTANCE,
         max_value=None,
-        dict_data=None
+        dict_data=None,
     ),
     PolestarSensorDescription(
         key="estimate_distance_to_empty_km",
@@ -354,6 +354,17 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         max_value=None,
         dict_data=API_STATUS_DICT
     ),
+    PolestarSensorDescription(
+        key="api_token_expires_at",
+        name="API token expired at",
+        icon="mdi:heart",
+        query=None,
+        field_name=None,
+        unit=None,
+        round_digits=None,
+        max_value=None,
+        dict_data=None
+    ),
 
 )
 
@@ -382,7 +393,7 @@ async def async_setup_entry(
         PolestarSensor(device, description) for description in POLESTAR_SENSOR_TYPES
     ]
     async_add_entities(sensors)
-    platform = entity_platform.current_platform.get()
+    entity_platform.current_platform.get()
 
 
 class PolestarSensor(PolestarEntity, SensorEntity):
@@ -399,9 +410,11 @@ class PolestarSensor(PolestarEntity, SensorEntity):
         # get the last 4 character of the id
         unique_id = device.vin[-4:]
         self.entity_id = f"{POLESTAR_API_DOMAIN}.'polestar_'.{unique_id}_{description.key}"
-        self._attr_name = f"{description.name}"
+        #self._attr_name = f"{description.name}"
         self._attr_unique_id = f"polestar_{unique_id}-{description.key}"
         self.description = description
+        self.translation_key = f"polestar_{description.key}"
+        self.has_entity_name = True
 
         self.entity_description = description
         if description.state_class is not None:
@@ -431,11 +444,6 @@ class PolestarSensor(PolestarEntity, SensorEntity):
         return f"{self._device.id}-{self.entity_description.key}"
 
     @property
-    def name(self) -> str:
-        """Return the name of the sensor."""
-        return self._attr_name
-
-    @property
     def icon(self) -> str | None:
         """Return the icon of the sensor."""
         return self.entity_description.icon
@@ -462,6 +470,10 @@ class PolestarSensor(PolestarEntity, SensorEntity):
             return self.entity_description.dict_data.get(
                 self._attr_native_value, self._attr_native_value)
 
+        if self.entity_description.key == 'api_token_expires_at':
+            if self._device.get_token_expiry() is None:
+                return None
+            return self._device.get_token_expiry().strftime("%Y-%m-%d %H:%M:%S")
         if self._attr_native_value != 0 and self._attr_native_value in (None, False):
             return None
 

@@ -35,6 +35,9 @@ class Polestar:
             self.id = vin[:8]
             self.name = "Polestar " + vin[-4:]
 
+    def get_token_expiry(self):
+        return self.polestarApi.auth.token_expiry
+
     def get_latest_data(self, query: str, field_name: str):
         return self.polestarApi.get_latest_data(query, field_name)
 

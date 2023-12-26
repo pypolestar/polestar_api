@@ -539,6 +539,9 @@ class PolestarSensor(PolestarEntity, SensorEntity):
 
     async def async_update(self) -> None:
         """Get the latest data and updates the states."""
-        await self._device.async_update()
-        self._attr_native_value = self._device.get_value(
-            self.description.query, self.description.field_name, self.get_skip_cache())
+        try:
+            await self._device.async_update()
+            self._attr_native_value = self._device.get_value(
+                self.description.query, self.description.field_name, self.get_skip_cache())
+        except Exception:
+            _LOGGER.warning("Failed to update sensor async update")

@@ -6,7 +6,7 @@
                 "description": "Ange autentisering av din Polestar",
                 "data": {
                     "name": "Namn på displayen",
-                    "username": "Användernam",
+                    "username": "Användarnamn",
                     "password": "Lösenord",
                     "vin": "VIN"
                 }

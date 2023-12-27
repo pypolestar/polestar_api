@@ -6,7 +6,7 @@
         "description": "Ange autentisering av din Polestar",
         "data": {
           "name": "Namn på displayen",
-          "username": "Användernam",
+          "username": "Användarnamn",
           "password": "Lösenord",
           "vin": "VIN"
         }
@@ -22,10 +22,10 @@
   "entity": {
     "sensor": {
       "polestar_estimate_distance_to_empty_miles": {
-        "name": "Avstånd Miles kvar"
+        "name": "Avstånd kvar (miles)"
       },
       "polestar_estimate_distance_to_empty_km": {
-        "name": "Avstånd km kvar"
+        "name": "Avstånd kvar (km)"
       },
       "polestar_current_odometer_meters": {
         "name": "Mätarställning"
@@ -34,10 +34,10 @@
         "name": "Medelhastighet km/h"
       },
       "polestar_current_trip_meter_automatic": {
-        "name": "Trippmätare automatiskt"
+        "name": "Trippmätare automatisk"
       },
       "polestar_current_trip_meter_manual": {
-        "name": "Trippmätare manual"
+        "name": "Trippmätare manuell"
       },
       "polestar_battery_charge_level": {
         "name": "Batterinivå"
@@ -82,10 +82,10 @@
         "name": "Senast uppdaterad batteridata"
       },
       "polestar_estimate_full_charge_range_miles": {
-        "name": "Estimerad räckvidd vid fulladdning miles"
+        "name": "Estimerad räckvidd vid full laddning miles"
       },
       "polestar_estimate_full_charge_range": {
-        "name": "Estimerad räckvidd vid fulladdning"
+        "name": "Estimerad räckvidd vid full laddning"
       },
       "polestar_api_status_code": {
         "name": "API-statuskod"

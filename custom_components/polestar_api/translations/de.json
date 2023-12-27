@@ -34,49 +34,49 @@
         "name": "Durchschnittsgeschwindigkeit (km/h)"
       },
       "polestar_current_trip_meter_automatic": {
-        "name": "Trip Meter Automatisch"
+        "name": "Kilometerzähler automatisch"
       },
       "polestar_current_trip_meter_manual": {
-        "name": "Trip Meter Manuell"
+        "name": "Kilometerzähler manuell"
       },
       "polestar_battery_charge_level": {
         "name": "Batterieladestand"
       },
       "polestar_estimated_charging_time_to_full_minutes": {
-        "name": "Geschätzte Ladezeit bis zur vollen Batterie"
+        "name": "Geschätzte Ladezeit bis zur vollen Batterie (Minuten)"
       },
       "polestar_charging_status": {
-        "name": "Ladezustand"
+        "name": "Ladestatus"
       },
       "polestar_charging_power_watts": {
-        "name": "Ladeleistung"
+        "name": "Ladeleistung (W)"
       },
       "polestar_charging_current_amps": {
-        "name": "Ladestrom"
+        "name": "Ladestrom (A)"
       },
       "polestar_charger_connection_status": {
-        "name": "Ladestatus"
+        "name": "Verbindungsstatus Ladepunkt"
       },
       "polestar_average_energy_consumption_kwh_per_100_km": {
         "name": "Durchschnittlicher Energieverbrauch (kWh/100km)"
       },
       "polestar_estimated_charging_time_minutes_to_target_distance": {
-        "name": "Geschätzte Ladezeit bis zur Zielentfernung"
+        "name": "Geschätzte Ladezeit bis zur Zielreichweite"
       },
       "polestar_vin": {
         "name": "VIN"
       },
       "polestar_registration_number": {
-        "name": "Registrierungsnummer"
+        "name": "Kennzeichen"
       },
       "polestar_estimated_fully_charged_time": {
-        "name": "Geschätzte vollständig geladene Zeit"
+        "name": "Geschätzte Zeit zur vollen Ladung"
       },
       "polestar_model_name": {
         "name": "Modellname"
       },
       "polestar_last_updated_odometer_data": {
-        "name": "Letzte Aktualisierung der Kilometerstanddaten"
+        "name": "Letzte Aktualisierung des Kilometerstands"
       },
       "polestar_last_updated_battery_data": {
         "name": "Letzte Aktualisierung der Batteriedaten"
@@ -91,7 +91,7 @@
         "name": "API Status Code"
       },
       "polestar_api_token_expires_at": {
-        "name": "API Token läuft ab"
+        "name": "API Token gültig bis"
       }
     }
   }

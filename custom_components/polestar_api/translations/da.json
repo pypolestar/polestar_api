@@ -58,7 +58,7 @@
         "name": "Ladekabel forbundet"
       },
       "polestar_average_energy_consumption_kwh_per_100_km": {
-        "name": "Gennemsnitligt energiforbrug (kWh/100km)"
+        "name": "Gennemsnitlig energiforbrug (kWh/100km)"
       },
       "polestar_estimated_charging_time_minutes_to_target_distance": {
         "name": "Estimeret ladetid til ønsket afstand"

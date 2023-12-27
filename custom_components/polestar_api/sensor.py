@@ -113,7 +113,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
     PolestarSensorDescription(
         key="average_speed_km_per_hour",
         name="Avg Speed Per Hour",
-        icon="mdi:map-marker-distance",
+        icon="mdi:speedometer",
         query="getOdometerData",
         field_name="averageSpeedKmPerHour",
         unit='km',
@@ -175,7 +175,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
     PolestarSensorDescription(
         key="charging_status",
         name="Charging status",
-        icon="mdi:battery-clock",
+        icon="mdi:ev-station",
         query="getBatteryData",
         field_name="chargingStatus",
         unit=None,
@@ -212,7 +212,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
     PolestarSensorDescription(
         key="charger_connection_status",
         name="Charging Connection Status",
-        icon="mdi:battery-clock",
+        icon="mdi:connection",
         query="getBatteryData",
         field_name="chargerConnectionStatus",
         unit=None,
@@ -286,6 +286,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
     PolestarSensorDescription(
         key="model_name",
         name="Model name",
+        icon="mdi:car-electric",
         query="getConsumerCarsV2",
         field_name="content/model/name",
         unit=None,
@@ -296,6 +297,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
     PolestarSensorDescription(
         key="last_updated_odometer_data",
         name="Last updated odometer data",
+        icon="mdi:counter",
         query="getOdometerData",
         field_name="eventUpdatedTimestamp/iso",
         unit=None,

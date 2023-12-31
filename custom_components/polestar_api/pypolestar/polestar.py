@@ -144,6 +144,7 @@ class PolestarApi:
         await call_api(lambda: self._get_battery_data(vin))
 
         self.updating = False
+        self.next_update = datetime.now() + timedelta(seconds=5)
 
     def get_cache_data(self, query: str, field_name: str, skip_cache: bool = False):
         if query is None:

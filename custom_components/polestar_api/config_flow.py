@@ -5,13 +5,12 @@ import logging
 from aiohttp import ClientError
 from async_timeout import timeout
 import voluptuous as vol
-from .polestar import Polestar
 
 from homeassistant import config_entries
-from homeassistant.const import CONF_USERNAME, CONF_PASSWORD
-
+from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
 
 from .const import DOMAIN, TIMEOUT
+from .polestar import Polestar
 
 _LOGGER = logging.getLogger(__name__)
 

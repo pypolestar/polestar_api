@@ -6,22 +6,16 @@ import logging
 from aiohttp import ClientConnectionError
 from async_timeout import timeout
 
-from .pypolestar.exception import PolestarApiException
-from .pypolestar.polestar import PolestarApi
-from .polestar import Polestar
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import (
-    CONF_USERNAME,
-    CONF_PASSWORD,
-    Platform,
-)
+from homeassistant.const import CONF_PASSWORD, CONF_USERNAME, Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryNotReady
 from homeassistant.helpers import config_validation as cv
-from .const import (
-    DOMAIN,
-    TIMEOUT
-)
+
+from .const import DOMAIN, TIMEOUT
+from .polestar import Polestar
+from .pypolestar.exception import PolestarApiException
+from .pypolestar.polestar import PolestarApi
 
 PLATFORMS = [
     Platform.SENSOR,

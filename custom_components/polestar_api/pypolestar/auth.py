@@ -1,11 +1,10 @@
-import logging
+from datetime import datetime, timedelta
 import json
+import logging
+
 import httpx
 
-from datetime import datetime, timedelta
-
 from .exception import PolestarAuthException
-
 
 _LOGGER = logging.getLogger(__name__)
 

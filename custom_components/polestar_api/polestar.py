@@ -1,6 +1,7 @@
 """Polestar API for Polestar integration."""
 import datetime
 import logging
+import httpx
 
 from urllib3 import disable_warnings
 
@@ -8,6 +9,7 @@ from homeassistant.core import HomeAssistant
 
 from .pypolestar.exception import PolestarApiException, PolestarAuthException
 from .pypolestar.polestar import PolestarApi
+from datetime import datetime, timedelta
 
 POST_HEADER_JSON = {"Content-Type": "application/json"}
 
@@ -53,8 +55,23 @@ class Polestar:
             await self.polestarApi.get_ev_data(self.vin)
         except PolestarApiException as e:
             _LOGGER.warning("API Exception on update data %s", str(e))
+            self.polestarApi.next_update = datetime.now() + timedelta(seconds=5)
         except PolestarAuthException as e:
             _LOGGER.warning("Auth Exception on update data %s", str(e))
+            self.polestarApi.next_update = datetime.now() + timedelta(seconds=5)
+        except httpx.ConnectTimeout as e:
+            _LOGGER.warning("Connection Timeout on update data %s", str(e))
+            self.polestarApi.next_update = datetime.now() + timedelta(seconds=15)
+        except httpx.ConnectError as e:
+            _LOGGER.warning("Connection Error on update data %s", str(e))
+            self.polestarApi.next_update = datetime.now() + timedelta(seconds=15)
+        except httpx.ReadTimeout as e:
+            _LOGGER.warning("Read Timeout on update data %s", str(e))
+            self.polestarApi.next_update = datetime.now() + timedelta(seconds=15)
+        except Exception as e:
+            _LOGGER.error("Unexpected Error on update data %s", str(e))
+            self.polestarApi.next_update = datetime.now() + timedelta(seconds=60)
+
 
     def get_value(self, query: str, field_name: str, skip_cache: bool = False):
         data = self.polestarApi.get_cache_data(query, field_name, skip_cache)

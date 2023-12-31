@@ -1,0 +1,98 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Configuration Polestar VE",
+        "description": "Entrez les paramètres d'authentification pour Polestar",
+        "data": {
+          "name": "Nom personnalisé",
+          "username": "Nom d'utilisateur",
+          "password": "Mot de passe",
+          "vin": "NIV"
+        }
+      }
+    },
+    "abort": {
+      "api_timeout": "Délai d'attente expiré lors de la connexion à l'API.",
+      "api_failed": "Erreur inattendue lors de la création de l'API.",
+      "already_configured": "L'API Polestar est déjà configurée.",
+      "no_token": "Jeton non trouvé dans la réponse. Veuillez vérifier vos identifiants de connexion."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "polestar_estimate_distance_to_empty_miles": {
+        "name": "Distance restante en miles"
+      },
+      "polestar_estimate_distance_to_empty_km": {
+        "name": "Distance restante en km"
+      },
+      "polestar_current_odometer_meters": {
+        "name": "Odomètre"
+      },
+      "polestar_average_speed_km_per_hour": {
+        "name": "Vitesse moyenne en km/h"
+      },
+      "polestar_current_trip_meter_automatic": {
+        "name": "Compteur kilométrique automatique"
+      },
+      "polestar_current_trip_meter_manual": {
+        "name": "Compteur kilométrique manuel"
+      },
+      "polestar_battery_charge_level": {
+        "name": "Niveau de charge de la betterie"
+      },
+      "polestar_estimated_charging_time_to_full_minutes": {
+        "name": "Temps de recharge jusqu'à recharge complète"
+      },
+      "polestar_charging_status": {
+        "name": "État de la recharge"
+      },
+      "polestar_charging_power_watts": {
+        "name": "Puissance de recharge (watts)"
+      },
+      "polestar_charging_current_amps": {
+        "name": "Puissance de recharge (Amps)"
+      },
+      "polestar_charger_connection_status": {
+        "name": "État de connexion du chargeur"
+      },
+      "polestar_average_energy_consumption_kwh_per_100_km": {
+        "name": "Consommation d'énergie moyenne en kWh/100km"
+      },
+      "polestar_estimated_charging_time_minutes_to_target_distance": {
+        "name": "Temps de recharge restant pour la distance jusqu'à destination"
+      },
+      "polestar_vin": {
+        "name": "NIV"
+      },
+      "polestar_registration_number": {
+        "name": "Numéro d'enregistrement"
+      },
+      "polestar_estimated_fully_charged_time": {
+        "name": "Temps de recharge restant"
+      },
+      "polestar_model_name": {
+        "name": "Nom du modèle"
+      },
+      "polestar_last_updated_odometer_data": {
+        "name": "Dernière mise à jour des données d'odomètre"
+      },
+      "polestar_last_updated_battery_data": {
+        "name": "Dernière mise à jour des données de batterie"
+      },
+      "polestar_estimate_full_charge_range_miles": {
+        "name": "Estimé de l'autonomie complète en miles"
+      },
+      "polestar_estimate_full_charge_range": {
+        "name": "Estimé de l'autonomie complète en km"
+      },
+      "polestar_api_status_code": {
+        "name": "Code d'état de l'API"
+      },
+      "polestar_api_token_expires_at": {
+        "name": "Expiration du jeton d'API: "
+      }
+    }
+  }
+}

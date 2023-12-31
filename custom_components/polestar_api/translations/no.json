@@ -22,25 +22,25 @@
   "entity": {
     "sensor": {
       "polestar_estimate_distance_to_empty_miles": {
-        "name": "Avstand Miles gjenværende"
+        "name": "Rekkevidde (miles)"
       },
       "polestar_estimate_distance_to_empty_km": {
-        "name": "Avstand Km gjenværende"
+        "name": "Rekkevidde (km)"
       },
       "polestar_current_odometer_meters": {
         "name": "Kilometerstand"
       },
       "polestar_average_speed_km_per_hour": {
-        "name": "Gjennomsnittsfart Km/t"
+        "name": "Gjennomsnittsfart (km/t)"
       },
       "polestar_current_trip_meter_automatic": {
-        "name": "Trip Meter Automatisk"
+        "name": "Trippteller automatisk"
       },
       "polestar_current_trip_meter_manual": {
-        "name": "Trip Meter Manuell"
+        "name": "Trippteller manuell"
       },
       "polestar_battery_charge_level": {
-        "name": "Batteri Ladningsnivå"
+        "name": "Batterinivå"
       },
       "polestar_estimated_charging_time_to_full_minutes": {
         "name": "Estimert ladetid til fullt batteri"
@@ -49,16 +49,16 @@
         "name": "Ladestatus"
       },
       "polestar_charging_power_watts": {
-        "name": "Ladeeffekt Watt"
+        "name": "Ladeeffekt"
       },
       "polestar_charging_current_amps": {
-        "name": "Ladeeffekt Ampere"
+        "name": "Ladestrøm"
       },
       "polestar_charger_connection_status": {
-        "name": "Ladekobling"
+        "name": "Ladekabel tilkoblet"
       },
       "polestar_average_energy_consumption_kwh_per_100_km": {
-        "name": "Gjennomsnittlig energiforbruk kWh/100km"
+        "name": "Gjennomsnittlig energiforbruk (kWh/100km)"
       },
       "polestar_estimated_charging_time_minutes_to_target_distance": {
         "name": "Estimert ladetid til ønsket avstand"
@@ -79,10 +79,10 @@
         "name": "Sist oppdatert kilometerstand"
       },
       "polestar_last_updated_battery_data": {
-        "name": "Sist oppdatert batteridata"
+        "name": "Sist oppdatert batterinivå"
       },
       "polestar_estimate_full_charge_range_miles": {
-        "name": "Estimert rekkevidde ved fullt batteri Miles"
+        "name": "Estimert rekkevidde ved fullt batteri (miles)"
       },
       "polestar_estimate_full_charge_range": {
         "name": "Estimert rekkevidde ved fullt batteri"

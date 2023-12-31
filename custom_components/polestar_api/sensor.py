@@ -1,27 +1,24 @@
-import logging
-
-from datetime import datetime, timedelta
-from typing import Final
 from dataclasses import dataclass
-from .entity import PolestarEntity
-from homeassistant.helpers.typing import StateType
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant, callback
+from datetime import datetime, timedelta
+import logging
+from typing import Final
+
 from homeassistant.components.sensor import (
+    SensorDeviceClass,
     SensorEntity,
     SensorEntityDescription,
     SensorStateClass,
-    SensorDeviceClass
-
 )
-from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import PERCENTAGE
+from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import entity_platform
-from . import DOMAIN as POLESTAR_API_DOMAIN
-from .polestar import Polestar
-from homeassistant.const import (
-    PERCENTAGE,
-)
+from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.helpers.typing import StateType
 
+from . import DOMAIN as POLESTAR_API_DOMAIN
+from .entity import PolestarEntity
+from .polestar import Polestar
 
 _LOGGER = logging.getLogger(__name__)
 SCAN_INTERVAL = timedelta(seconds=15)
@@ -73,7 +70,7 @@ API_STATUS_DICT = {
 POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
     PolestarSensorDescription(
         key="estimate_distance_to_empty_miles",
-        name="Distance miles Remaining",
+        name="Distance Miles Remaining",
         icon="mdi:map-marker-distance",
         query="getBatteryData",
         field_name="estimatedDistanceToEmptyMiles",
@@ -86,7 +83,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
     ),
     PolestarSensorDescription(
         key="estimate_distance_to_empty_km",
-        name="Distance km Remaining",
+        name="Distance Km Remaining",
         icon="mdi:map-marker-distance",
         query="getBatteryData",
         field_name="estimatedDistanceToEmptyKm",
@@ -99,12 +96,12 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
     ),
     PolestarSensorDescription(
         key="current_odometer_meters",
-        name="Odometer Meter",
+        name="Odometer",
         icon="mdi:map-marker-distance",
         query="getOdometerData",
         field_name="odometerMeters",
         unit='km',
-        round_digits=None,
+        round_digits=0,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.DISTANCE,
         max_value=None,
@@ -112,11 +109,11 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
     ),
     PolestarSensorDescription(
         key="average_speed_km_per_hour",
-        name="Avg Speed Per Hour",
+        name="Avg. Speed",
         icon="mdi:speedometer",
         query="getOdometerData",
         field_name="averageSpeedKmPerHour",
-        unit='km',
+        unit='km/h',
         round_digits=None,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.DISTANCE,
@@ -151,7 +148,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
     ),
     PolestarSensorDescription(
         key="battery_charge_level",
-        name="Battery level",
+        name="Battery Level",
         query="getBatteryData",
         field_name="batteryChargeLevelPercentage",
         unit=PERCENTAGE,
@@ -163,7 +160,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
     ),
     PolestarSensorDescription(
         key="estimated_charging_time_to_full_minutes",
-        name="Charging time",
+        name="Charging Time",
         icon="mdi:battery-clock",
         query="getBatteryData",
         field_name="estimatedChargingTimeToFullMinutes",
@@ -174,7 +171,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
     ),
     PolestarSensorDescription(
         key="charging_status",
-        name="Charging status",
+        name="Charging Status",
         icon="mdi:ev-station",
         query="getBatteryData",
         field_name="chargingStatus",
@@ -224,11 +221,11 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
     ),
     PolestarSensorDescription(
         key="average_energy_consumption_kwh_per_100_km",
-        name="Avg. energy consumption",
+        name="Avg. Energy Consumption",
         icon="mdi:battery-clock",
         query="getBatteryData",
         field_name="averageEnergyConsumptionKwhPer100Km",
-        unit='Kwh/100km',
+        unit='kWh/100km',
         round_digits=None,
         max_value=None,
         state_class=SensorStateClass.MEASUREMENT,
@@ -237,7 +234,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
     ),
     PolestarSensorDescription(
         key="estimated_charging_time_minutes_to_target_distance",
-        name="Estimated charging time to target distance",
+        name="Estimated Charging Time To Target Distance",
         icon="mdi:battery-clock",
         query="getBatteryData",
         field_name="estimatedChargingTimeMinutesToTargetDistance",
@@ -261,7 +258,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
     ),
     PolestarSensorDescription(
         key="registration_number",
-        name="Registration number",
+        name="Registration Number",
         icon="mdi:numeric-1-box",
         query="getConsumerCarsV2",
         field_name="registrationNo",
@@ -272,7 +269,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
     ),
     PolestarSensorDescription(
         key="estimated_fully_charged_time",
-        name="Time Full charged",
+        name="Time Full Charged",
         icon="mdi:battery-clock",
         query="getBatteryData",
         field_name="estimatedChargingTimeToFullMinutes",
@@ -285,7 +282,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
     ),
     PolestarSensorDescription(
         key="model_name",
-        name="Model name",
+        name="Model Name",
         icon="mdi:car-electric",
         query="getConsumerCarsV2",
         field_name="content/model/name",
@@ -296,7 +293,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
     ),
     PolestarSensorDescription(
         key="last_updated_odometer_data",
-        name="Last updated odometer data",
+        name="Last Updated Odometer Data",
         icon="mdi:counter",
         query="getOdometerData",
         field_name="eventUpdatedTimestamp/iso",
@@ -309,7 +306,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
     ),
     PolestarSensorDescription(
         key="last_updated_battery_data",
-        name="Last updated battery data",
+        name="Last Updated Battery Data",
         query="getBatteryData",
         field_name="eventUpdatedTimestamp/iso",
         unit=None,
@@ -321,7 +318,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
     ),
     PolestarSensorDescription(
         key="estimate_full_charge_range_miles",
-        name="Calc. miles Full Charge",
+        name="Calc. Miles Full Charge",
         icon="mdi:map-marker-distance",
         query="getBatteryData",
         field_name="estimatedDistanceToEmptyMiles",
@@ -334,7 +331,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
     ),
     PolestarSensorDescription(
         key="estimate_full_charge_range",
-        name="Calc. km Full Charge",
+        name="Calc. Km Full Charge",
         icon="mdi:map-marker-distance",
         query="getBatteryData",
         field_name="estimatedDistanceToEmptyKm",
@@ -347,7 +344,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
     ),
     PolestarSensorDescription(
         key="api_status_code",
-        name="API status",
+        name="API Status",
         icon="mdi:heart",
         query=None,
         field_name=None,
@@ -358,7 +355,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
     ),
     PolestarSensorDescription(
         key="api_token_expires_at",
-        name="API token expired at",
+        name="API Token Expired At",
         icon="mdi:heart",
         query=None,
         field_name=None,
@@ -547,3 +544,4 @@ class PolestarSensor(PolestarEntity, SensorEntity):
                 self.description.query, self.description.field_name, self.get_skip_cache())
         except Exception:
             _LOGGER.warning("Failed to update sensor async update")
+            self._device.polestarApi.next_update = datetime.now() + timedelta(seconds=60)

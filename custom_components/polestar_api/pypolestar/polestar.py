@@ -18,6 +18,8 @@ class PolestarApi:
         self.cache_data = {}
         self.latest_call_code = None
         self._client_session = httpx.AsyncClient()
+        self.next_update = None
+
 
     async def init(self):
         try:
@@ -104,6 +106,10 @@ class PolestarApi:
 
     async def get_ev_data(self, vin: str):
         if self.updating:
+            return
+
+        if self.next_update is not None and self.next_update > datetime.now():
+            _LOGGER.debug("Skipping update, next update at %s", self.next_update)
             return
 
         self.updating = True

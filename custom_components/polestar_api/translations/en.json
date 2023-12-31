@@ -28,10 +28,10 @@
         "name": "Distance km Remaining"
       },
       "polestar_current_odometer_meters": {
-        "name": "Odometer Meters"
+        "name": "Odometer"
       },
       "polestar_average_speed_km_per_hour": {
-        "name": "Average Speed km/h"
+        "name": "Average Speed"
       },
       "polestar_current_trip_meter_automatic": {
         "name": "Trip Meter Automatic"

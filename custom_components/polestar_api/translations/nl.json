@@ -31,7 +31,7 @@
         "name": "Huidige kilometerstand"
       },
       "polestar_average_speed_km_per_hour": {
-        "name": "Gemiddelde snelheid (km/u)"
+        "name": "Gemiddelde snelheid"
       },
       "polestar_current_trip_meter_automatic": {
         "name": "Huidige trip meter (automatisch)"

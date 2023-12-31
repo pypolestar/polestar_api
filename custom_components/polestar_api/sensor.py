@@ -496,13 +496,6 @@ class PolestarSensor(PolestarEntity, SensorEntity):
                 return datetime.now().replace(second=0, microsecond=0) + timedelta(minutes=round(value))
             return 'Not charging'
 
-        # round the value
-        if self.entity_description.round_digits is not None:
-            # if the value is integer, remove the decimal
-            if self.entity_description.round_digits == 0 and isinstance(self._attr_native_value, int):
-                return int(self._attr_native_value)
-            return round(float(self._attr_native_value), self.entity_description.round_digits)
-
         if self.entity_description.key in ('estimate_full_charge_range', 'estimate_full_charge_range_miles'):
             battery_level = self._device.get_latest_data(
                 self.entity_description.query, 'batteryChargeLevelPercentage')
@@ -522,12 +515,17 @@ class PolestarSensor(PolestarEntity, SensorEntity):
 
             return estimate_range
 
-        if self.entity_description.key in 'current_odometer_meters' and int(self._attr_native_value) > 1000:
-            self._attr_native_value = int(self._attr_native_value)
-            km = round(self._attr_native_value / 1000,
-                       self.entity_description.round_digits if self.entity_description.round_digits is not None else 0)
+        if self.entity_description.key in ('current_odometer_meters'):
+            if int(self._attr_native_value) > 1000:
+                km = self._attr_native_value / 1000
+                self._attr_native_value = int(km)
 
-            return km
+        # round the value
+        if self.entity_description.round_digits is not None:
+            # if the value is integer, remove the decimal
+            if self.entity_description.round_digits == 0 and isinstance(self._attr_native_value, int):
+                return int(self._attr_native_value)
+            return round(float(self._attr_native_value), self.entity_description.round_digits)
 
         return self._attr_native_value
 

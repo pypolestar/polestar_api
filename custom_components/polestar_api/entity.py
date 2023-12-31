@@ -1,9 +1,9 @@
 import logging
 
-from .polestar import Polestar
+from homeassistant.helpers.entity import DeviceInfo, Entity
 
 from .const import DOMAIN as POLESTAR_API_DOMAIN
-from homeassistant.helpers.entity import DeviceInfo, Entity
+from .polestar import Polestar
 
 _LOGGER = logging.getLogger(__name__)
 

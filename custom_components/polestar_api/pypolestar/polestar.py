@@ -1,11 +1,16 @@
+from datetime import datetime, timedelta
 import logging
+
 import httpx
 
-from datetime import datetime, timedelta
-
-from .exception import PolestarApiException, PolestarAuthException, PolestarNoDataException, PolestarNotAuthorizedException
 from .auth import PolestarAuth
-from .const import CACHE_TIME, BATTERY_DATA, CAR_INFO_DATA, ODO_METER_DATA
+from .const import BATTERY_DATA, CACHE_TIME, CAR_INFO_DATA, ODO_METER_DATA
+from .exception import (
+    PolestarApiException,
+    PolestarAuthException,
+    PolestarNoDataException,
+    PolestarNotAuthorizedException,
+)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -172,7 +177,7 @@ class PolestarApi:
         if resultData.get('errors'):
             self.latest_call_code = 500
             error_message = resultData['errors'][0]['message']
-            if error_message == "User is not authorized":
+            if error_message == "User not authenticated":
                 raise PolestarNotAuthorizedException("Unauthorized Exception")
             _LOGGER.error(error_message)
 

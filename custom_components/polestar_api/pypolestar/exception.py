@@ -4,18 +4,18 @@ class PolestarApiException(Exception):
 
 class PolestarAuthException(Exception):
     """Base class for exceptions in Auth module."""
+
     error_code: int = None
     message: str = None
 
     def __init__(self, message, error_code) -> None:
         super().__init__(message)
         self.error_code = error_code
-        return None
 
 
 class PolestarNotAuthorizedException(Exception):
-    """Exception for unauthorized call"""
+    """Exception for unauthorized call."""
 
 
 class PolestarNoDataException(Exception):
-    """Exception for no data"""
+    """Exception for no data."""

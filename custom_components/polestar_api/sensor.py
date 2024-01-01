@@ -308,7 +308,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
     PolestarSensorDescription(
         key="last_updated_odometer_data",
         name="Last Updated Odometer Data",
-        icon="mdi:counter",
+        icon="mdi:clock",
         query="getOdometerData",
         field_name="eventUpdatedTimestamp/iso",
         unit=None,
@@ -321,6 +321,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
     PolestarSensorDescription(
         key="last_updated_battery_data",
         name="Last Updated Battery Data",
+        icon="mdi:clock",
         query="getBatteryData",
         field_name="eventUpdatedTimestamp/iso",
         unit=None,

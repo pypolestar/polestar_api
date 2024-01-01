@@ -10,7 +10,14 @@ from homeassistant.components.sensor import (
     SensorStateClass,
 )
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import PERCENTAGE
+from homeassistant.const import (
+    PERCENTAGE,
+    UnitOfElectricCurrent,
+    UnitOfLength,
+    UnitOfPower,
+    UnitOfSpeed,
+    UnitOfTime,
+)
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import entity_platform
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
@@ -46,6 +53,9 @@ class PolestarSensorDescription(
 CHARGING_CONNECTION_STATUS_DICT = {
     "CHARGER_CONNECTION_STATUS_CONNECTED": "Connected",
     "CHARGER_CONNECTION_STATUS_DISCONNECTED": "Disconnected",
+    "CHARGER_CONNECTION_STATUS_FAULT": "Fault",
+    "CHARGER_CONNECTION_STATUS_UNSPECIFIED": "Unspecified"
+
 }
 
 CHARGING_STATUS_DICT = {
@@ -55,6 +65,10 @@ CHARGING_STATUS_DICT = {
     "CHARGING_STATUS_FAULT": "Fault",
     "CHARGING_STATUS_UNSPECIFIED": "Unspecified",
     "CHARGING_STATUS_SCHEDULED": "Scheduled",
+    "CHARGING_STATUS_DISCHARGING": "Discharging",
+    "CHARGING_STATUS_ERROR": "Error",
+    "CHARGING_STATUS_SMART_CHARGING": "Smart Charging",
+
 
 }
 
@@ -74,11 +88,11 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         icon="mdi:map-marker-distance",
         query="getBatteryData",
         field_name="estimatedDistanceToEmptyMiles",
-        unit='miles',
+        unit=UnitOfLength.MILES,
         round_digits=None,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.DISTANCE,
-        max_value=None,
+        max_value=400,
         dict_data=None,
     ),
     PolestarSensorDescription(
@@ -87,11 +101,11 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         icon="mdi:map-marker-distance",
         query="getBatteryData",
         field_name="estimatedDistanceToEmptyKm",
-        unit='km',
+        unit=UnitOfLength.KILOMETERS,
         round_digits=None,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.DISTANCE,
-        max_value=None,
+        max_value=600,
         dict_data=None
     ),
     PolestarSensorDescription(
@@ -100,7 +114,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         icon="mdi:map-marker-distance",
         query="getOdometerData",
         field_name="odometerMeters",
-        unit='km',
+        unit=UnitOfLength.KILOMETERS,
         round_digits=0,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.DISTANCE,
@@ -113,11 +127,11 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         icon="mdi:speedometer",
         query="getOdometerData",
         field_name="averageSpeedKmPerHour",
-        unit='km/h',
+        unit=UnitOfSpeed.KILOMETERS_PER_HOUR,
         round_digits=None,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.DISTANCE,
-        max_value=None,
+        max_value=150,
         dict_data=None
     ),
     PolestarSensorDescription(
@@ -126,7 +140,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         icon="mdi:map-marker-distance",
         query="getOdometerData",
         field_name="tripMeterAutomaticKm",
-        unit='km',
+        unit=UnitOfLength.KILOMETERS,
         round_digits=None,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.DISTANCE,
@@ -139,7 +153,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         icon="mdi:map-marker-distance",
         query="getOdometerData",
         field_name="tripMeterManualKm",
-        unit='km',
+        unit=UnitOfLength.KILOMETERS,
         round_digits=None,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.DISTANCE,
@@ -155,7 +169,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         round_digits=0,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.BATTERY,
-        max_value=None,
+        max_value=100,
         dict_data=None
     ),
     PolestarSensorDescription(
@@ -164,9 +178,9 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         icon="mdi:battery-clock",
         query="getBatteryData",
         field_name="estimatedChargingTimeToFullMinutes",
-        unit='Minutes',
+        unit=UnitOfTime.MINUTES,
         round_digits=None,
-        max_value=None,
+        max_value=1500,
         dict_data=None
     ),
     PolestarSensorDescription(
@@ -186,7 +200,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         icon="mdi:lightning-bolt",
         query="getBatteryData",
         field_name="chargingPowerWatts",
-        unit='W',
+        unit=UnitOfPower.WATT,
         round_digits=None,
         max_value=None,
         state_class=SensorStateClass.MEASUREMENT,
@@ -199,7 +213,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         icon="mdi:current-ac",
         query="getBatteryData",
         field_name="chargingCurrentAmps",
-        unit='A',
+        unit=UnitOfElectricCurrent.AMPERE,
         round_digits=None,
         max_value=None,
         state_class=SensorStateClass.MEASUREMENT,
@@ -322,11 +336,11 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         icon="mdi:map-marker-distance",
         query="getBatteryData",
         field_name="estimatedDistanceToEmptyMiles",
-        unit='miles',
+        unit=UnitOfLength.MILES,
         round_digits=None,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.DISTANCE,
-        max_value=None,
+        max_value=400,
         dict_data=None
     ),
     PolestarSensorDescription(
@@ -335,11 +349,11 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         icon="mdi:map-marker-distance",
         query="getBatteryData",
         field_name="estimatedDistanceToEmptyKm",
-        unit='km',
+        unit=UnitOfLength.KILOMETERS,
         round_digits=None,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.DISTANCE,
-        max_value=None,
+        max_value=600,
         dict_data=None
     ),
     PolestarSensorDescription(

@@ -92,7 +92,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         round_digits=None,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.DISTANCE,
-        max_value=400,
+        max_value=410,
         dict_data=None,
     ),
     PolestarSensorDescription(
@@ -105,7 +105,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         round_digits=None,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.DISTANCE,
-        max_value=600,
+        max_value=660, # WLTP range max 655
         dict_data=None
     ),
     PolestarSensorDescription(
@@ -340,7 +340,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         round_digits=None,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.DISTANCE,
-        max_value=400,
+        max_value=410,
         dict_data=None
     ),
     PolestarSensorDescription(
@@ -353,7 +353,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         round_digits=None,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.DISTANCE,
-        max_value=600,
+        max_value=660, # WLTP range max 655
         dict_data=None
     ),
     PolestarSensorDescription(

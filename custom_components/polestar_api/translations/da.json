@@ -17,7 +17,6 @@
       "api_failed": "Uventet fejl under oprettelse af API.",
       "already_configured": "Polestar API er allerede konfigureret",
       "no_token": "Ingen token modtaget fra serveren. Kontroller venligst de indtastede oplysninger."
-
     }
   },
   "entity": {

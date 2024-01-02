@@ -41,6 +41,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> b
         hass, conf[CONF_USERNAME], conf[CONF_PASSWORD])
     try:
         await polestarApi.init()
+        polestarApi.set_config_unit(hass.config.units)
 
         hass.data.setdefault(DOMAIN, {})
         hass.data[DOMAIN][config_entry.entry_id] = polestarApi

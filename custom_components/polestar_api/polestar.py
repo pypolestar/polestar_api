@@ -6,6 +6,7 @@ import httpx
 from urllib3 import disable_warnings
 
 from homeassistant.core import HomeAssistant
+from homeassistant.util.unit_system import METRIC_SYSTEM, US_CUSTOMARY_SYSTEM, UnitSystem
 
 from .pypolestar.exception import PolestarApiException, PolestarAuthException
 from .pypolestar.polestar import PolestarApi
@@ -25,6 +26,7 @@ class Polestar:
         self.name = "Polestar "
         self.polestarApi = PolestarApi(username, password)
         self.vin = None
+        self.unit_system = METRIC_SYSTEM
         disable_warnings()
 
     async def init(self):
@@ -71,6 +73,11 @@ class Polestar:
             _LOGGER.error("Unexpected Error on update data %s", str(e))
             self.polestarApi.next_update = datetime.now() + timedelta(seconds=60)
 
+    def set_config_unit(self, unit:UnitSystem):
+        self.unit_system = unit
+
+    def get_config_unit(self):
+        return self.unit_system
 
     def get_value(self, query: str, field_name: str, skip_cache: bool = False):
         data = self.polestarApi.get_cache_data(query, field_name, skip_cache)

@@ -1,10 +1,11 @@
 """Polestar EV integration."""
 
 import asyncio
+from asyncio import timeout
 import logging
 
 from aiohttp import ClientConnectionError
-from async_timeout import timeout
+import httpx
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_PASSWORD, CONF_USERNAME, Platform
@@ -14,7 +15,7 @@ from homeassistant.helpers import config_validation as cv
 
 from .const import DOMAIN, TIMEOUT
 from .polestar import Polestar
-from .pypolestar.exception import PolestarApiException
+from .pypolestar.exception import PolestarApiException, PolestarAuthException
 from .pypolestar.polestar import PolestarApi
 
 PLATFORMS = [
@@ -48,8 +49,18 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> b
 
         return True
     except PolestarApiException as e:
-        _LOGGER.exception("API Exception %s", str(e))
-
+        _LOGGER.exception("API Exception on update data %s", str(e))
+    except PolestarAuthException as e:
+        _LOGGER.exception("Auth Exception on update data %s", str(e))
+    except httpx.ConnectTimeout as e:
+        _LOGGER.exception("Connection Timeout on update data %s", str(e))
+    except httpx.ConnectError as e:
+        _LOGGER.exception("Connection Error on update data %s", str(e))
+    except httpx.ReadTimeout as e:
+        _LOGGER.exception("Read Timeout on update data %s", str(e))
+    except Exception as e:
+        _LOGGER.exception("Unexpected Error on update data %s", str(e))
+    return False
 
 async def async_unload_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> bool:
     """Unload a config entry."""

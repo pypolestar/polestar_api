@@ -10,7 +10,7 @@ _LOGGER = logging.getLogger(__name__)
 
 
 class PolestarAuth:
-    """ base class for Polestar authentication"""
+    """base class for Polestar authentication."""
 
     def __init__(self, username: str, password: str) -> None:
         self.username = username
@@ -50,8 +50,7 @@ class PolestarAuth:
         self.latest_call_code = result.status_code
         resultData = result.json()
         if result.status_code != 200 or ("errors" in resultData and len(resultData["errors"])):
-            raise PolestarAuthException(
-                f"Error getting token", result.status_code)
+            raise PolestarAuthException("Error getting token", result.status_code)
         _LOGGER.debug(resultData)
 
         if resultData['data']:
@@ -68,11 +67,11 @@ class PolestarAuth:
 
         # check if code is in query_params
         if query_params.get('code'):
-            return query_params.get(('code'))[0]
+            return query_params.get('code')[0]
 
         # get the resumePath
         if query_params.get('resumePath'):
-            resumePath = query_params.get(('resumePath'))
+            resumePath = query_params.get('resumePath')
 
         if resumePath is None:
             return
@@ -91,8 +90,7 @@ class PolestarAuth:
         )
         self.latest_call_code = result.status_code
         if result.status_code != 302:
-            raise PolestarAuthException(
-                f"Error getting code", result.status_code)
+            raise PolestarAuthException("Error getting code", result.status_code)
 
         # get the realUrl
         url = result.url
@@ -103,8 +101,7 @@ class PolestarAuth:
         self.latest_call_code = result.status_code
 
         if result.status_code != 200:
-            raise PolestarAuthException(
-                f"Error getting code callback", result.status_code)
+            raise PolestarAuthException("Error getting code callback", result.status_code)
 
         # url encode the code
         result = await self._client_session.get(url)
@@ -121,6 +118,5 @@ class PolestarAuth:
         }
         result = await self._client_session.get("https://polestarid.eu.polestar.com/as/authorization.oauth2", params=params)
         if result.status_code != 303:
-            raise PolestarAuthException(
-                f"Error getting resume path ", result.status_code)
+            raise PolestarAuthException("Error getting resume path ", result.status_code)
         return result.next_request.url.params

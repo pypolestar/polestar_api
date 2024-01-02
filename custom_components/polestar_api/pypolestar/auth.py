@@ -4,6 +4,7 @@ import logging
 
 import httpx
 
+from .const import HTTPX_TIMEOUT
 from .exception import PolestarAuthException
 
 _LOGGER = logging.getLogger(__name__)
@@ -46,7 +47,7 @@ class PolestarAuth:
                 "operationName": operationName,
                 "variables": json.dumps({"token": token}),
             }
-        result = await self._client_session.get("https://pc-api.polestar.com/eu-north-1/auth/", params=params, headers=headers)
+        result = await self._client_session.get("https://pc-api.polestar.com/eu-north-1/auth/", params=params, headers=headers, timeout=HTTPX_TIMEOUT)
         self.latest_call_code = result.status_code
         resultData = result.json()
         if result.status_code != 200 or ("errors" in resultData and len(resultData["errors"])):
@@ -97,7 +98,7 @@ class PolestarAuth:
         code = result.next_request.url.params.get('code')
 
         # sign-in-callback
-        result = await self._client_session.get(result.next_request.url)
+        result = await self._client_session.get(result.next_request.url, timeout=HTTPX_TIMEOUT)
         self.latest_call_code = result.status_code
 
         if result.status_code != 200:
@@ -116,7 +117,7 @@ class PolestarAuth:
             "client_id": "polmystar",
             "redirect_uri": "https://www.polestar.com/sign-in-callback"
         }
-        result = await self._client_session.get("https://polestarid.eu.polestar.com/as/authorization.oauth2", params=params)
+        result = await self._client_session.get("https://polestarid.eu.polestar.com/as/authorization.oauth2", params=params, timeout=HTTPX_TIMEOUT)
         if result.status_code != 303:
             raise PolestarAuthException("Error getting resume path ", result.status_code)
         return result.next_request.url.params

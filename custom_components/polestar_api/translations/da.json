@@ -49,10 +49,10 @@
         "name": "Ladestatus"
       },
       "polestar_charging_power_watts": {
-        "name": "Ladeeffekt i Watt"
+        "name": "Ladeeffekt (W)"
       },
       "polestar_charging_current_amps": {
-        "name": "Ladeeffekt Ampere"
+        "name": "Ladestrøm (A)"
       },
       "polestar_charger_connection_status": {
         "name": "Ladekabel forbundet"

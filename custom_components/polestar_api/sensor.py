@@ -22,6 +22,7 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import entity_platform
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import StateType
+from homeassistant.util.unit_system import METRIC_SYSTEM
 
 from . import DOMAIN as POLESTAR_API_DOMAIN
 from .entity import PolestarEntity
@@ -83,31 +84,32 @@ API_STATUS_DICT = {
 
 POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
     PolestarSensorDescription(
-        key="estimate_distance_to_empty_miles",
-        name="Distance Miles Remaining",
-        icon="mdi:map-marker-distance",
-        query="getBatteryData",
-        field_name="estimatedDistanceToEmptyMiles",
-        unit=UnitOfLength.MILES,
-        round_digits=None,
-        state_class=SensorStateClass.MEASUREMENT,
-        device_class=SensorDeviceClass.DISTANCE,
-        max_value=410,
-        dict_data=None,
-    ),
-    PolestarSensorDescription(
-        key="estimate_distance_to_empty_km",
-        name="Distance Km Remaining",
+        key="estimate_range",
+        name="Range",
         icon="mdi:map-marker-distance",
         query="getBatteryData",
         field_name="estimatedDistanceToEmptyKm",
         unit=UnitOfLength.KILOMETERS,
-        round_digits=None,
+        round_digits=2,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.DISTANCE,
-        max_value=660, # WLTP range max 655
+        max_value=660,
         dict_data=None
     ),
+    # deprecated
+#    PolestarSensorDescription(
+#        key="estimate_distance_to_empty_miles",
+#        name="Distance Miles Remaining",
+#        icon="mdi:map-marker-distance",
+#        query="getBatteryData",
+#        field_name="estimatedDistanceToEmptyMiles",
+#        unit=UnitOfLength.MILES,
+#        round_digits=None,
+#        state_class=SensorStateClass.MEASUREMENT,
+#        device_class=SensorDeviceClass.DISTANCE,
+#        max_value=410,
+#        dict_data=None,
+#    ),
     PolestarSensorDescription(
         key="current_odometer_meters",
         name="Odometer",
@@ -122,7 +124,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         dict_data=None
     ),
     PolestarSensorDescription(
-        key="average_speed_km_per_hour",
+        key="average_speed_per_hour",
         name="Avg. Speed",
         icon="mdi:speedometer",
         query="getOdometerData",
@@ -234,7 +236,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         dict_data=CHARGING_CONNECTION_STATUS_DICT
     ),
     PolestarSensorDescription(
-        key="average_energy_consumption_kwh_per_100_km",
+        key="average_energy_consumption_kwh_per_100",
         name="Avg. Energy Consumption",
         icon="mdi:battery-clock",
         query="getBatteryData",
@@ -331,22 +333,10 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         max_value=None,
         dict_data=None
     ),
-    PolestarSensorDescription(
-        key="estimate_full_charge_range_miles",
-        name="Calc. Miles Full Charge",
-        icon="mdi:map-marker-distance",
-        query="getBatteryData",
-        field_name="estimatedDistanceToEmptyMiles",
-        unit=UnitOfLength.MILES,
-        round_digits=None,
-        state_class=SensorStateClass.MEASUREMENT,
-        device_class=SensorDeviceClass.DISTANCE,
-        max_value=410,
-        dict_data=None
-    ),
+
     PolestarSensorDescription(
         key="estimate_full_charge_range",
-        name="Calc. Km Full Charge",
+        name="Calc. Full Charge Range",
         icon="mdi:map-marker-distance",
         query="getBatteryData",
         field_name="estimatedDistanceToEmptyKm",
@@ -497,6 +487,26 @@ class PolestarSensor(PolestarEntity, SensorEntity):
                 self._attr_native_value = int(
                     self._attr_native_value.replace('.0', ''))
 
+        is_metric = self._device.get_config_unit() == METRIC_SYSTEM
+        if self.entity_description.key in ('estimate_full_charge_range', 'estimate_range', 'current_trip_meter_manual', 'current_trip_meter_automatic', 'current_odometer_meters', 'average_speed_per_hour', 'average_energy_consumption_kwh_per_100'):
+            if self.entity_description.key == "average_speed_per_hour":
+                self.entity_description.unit = UnitOfSpeed.KILOMETERS_PER_HOUR if is_metric else UnitOfSpeed.MILES_PER_HOUR
+            elif self.entity_description.key == "average_energy_consumption_kwh_per_100":
+                self.entity_description.unit = 'kWh/100km' if is_metric else 'kWh/100mi'
+            else:
+                self.entity_description.unit = UnitOfLength.KILOMETERS if is_metric  else UnitOfLength.MILES
+
+            if not is_metric:
+                # todo: need to check if current_trip should normally in KM
+                # todo: check if we need to convert current_odo_meter to miles
+                self._attr_native_value = self._attr_native_value * 0.621371
+
+        if self.entity_description.key == "estimate_range":
+            if not is_metric:
+                self.entity_description.max_value = 410
+            else:
+                self.entity_description.max_value = 660
+
         # prevent exponentianal value, we only give state value that is lower than the max value
         if self.entity_description.max_value is not None:
             if isinstance(self._attr_native_value, str):
@@ -511,7 +521,7 @@ class PolestarSensor(PolestarEntity, SensorEntity):
                 return datetime.now().replace(second=0, microsecond=0) + timedelta(minutes=round(value))
             return 'Not charging'
 
-        if self.entity_description.key in ('estimate_full_charge_range', 'estimate_full_charge_range_miles'):
+        if self.entity_description.key in ('estimate_full_charge_range'):
             battery_level = self._device.get_latest_data(
                 self.entity_description.query, 'batteryChargeLevelPercentage')
             estimate_range = self._device.get_latest_data(
@@ -529,6 +539,8 @@ class PolestarSensor(PolestarEntity, SensorEntity):
             estimate_range = round(estimate_range / battery_level * 100)
 
             return estimate_range
+
+
 
         if self.entity_description.key in ('current_odometer_meters'):
             if int(self._attr_native_value) > 1000:

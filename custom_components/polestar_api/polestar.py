@@ -6,7 +6,7 @@ import httpx
 from urllib3 import disable_warnings
 
 from homeassistant.core import HomeAssistant
-from homeassistant.util.unit_system import METRIC_SYSTEM, US_CUSTOMARY_SYSTEM, UnitSystem
+from homeassistant.util.unit_system import METRIC_SYSTEM, UnitSystem
 
 from .pypolestar.exception import PolestarApiException, PolestarAuthException
 from .pypolestar.polestar import PolestarApi

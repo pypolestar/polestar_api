@@ -467,6 +467,11 @@ class PolestarSensor(PolestarEntity, SensorEntity):
     @property
     def state(self) -> StateType:
         """Return the state of the sensor."""
+
+        if self._attr_native_value is None and self.entity_description.key in ('charging_current_amps', 'charging_power_watts', 'estimated_charging_time_minutes_to_target_distance'):
+            self.entity_description.unit = None
+            return "Not Supported Yet"
+
         if self.entity_description.dict_data is not None:
             # exception for api_status_code
             if self.entity_description.key == 'api_status_code':

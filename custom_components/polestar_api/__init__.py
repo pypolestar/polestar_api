@@ -34,17 +34,18 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
 
 
 async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> bool:
+    """Set up Polestar from a config entry."""
     conf = config_entry.data
 
     _LOGGER.debug("async_setup_entry: %s", config_entry)
-    polestarApi = Polestar(
+    polestar = Polestar(
         hass, conf[CONF_USERNAME], conf[CONF_PASSWORD])
     try:
-        await polestarApi.init()
-        polestarApi.set_config_unit(hass.config.units)
+        await polestar.init()
+        polestar.set_config_unit(hass.config.units)
 
         hass.data.setdefault(DOMAIN, {})
-        hass.data[DOMAIN][config_entry.entry_id] = polestarApi
+        hass.data[DOMAIN][config_entry.entry_id] = polestar
 
         await hass.config_entries.async_forward_entry_setups(config_entry, PLATFORMS)
 
@@ -61,6 +62,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> b
         _LOGGER.exception("Read Timeout on update data %s", str(e))
     except Exception as e:
         _LOGGER.exception("Unexpected Error on update data %s", str(e))
+    polestar.polestarApi.latest_call_code = 500
     return False
 
 async def async_unload_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> bool:

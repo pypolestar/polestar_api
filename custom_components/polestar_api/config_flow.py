@@ -1,9 +1,9 @@
 """Config flow for the Polestar EV platform."""
 import asyncio
+from asyncio import timeout
 import logging
 
 from aiohttp import ClientError
-from async_timeout import timeout
 import voluptuous as vol
 
 from homeassistant import config_entries

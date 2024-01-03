@@ -1,3 +1,4 @@
+"""Support for Polestar sensors."""
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 import logging
@@ -378,6 +379,7 @@ async def async_setup_platform(
         config: ConfigEntry,
         async_add_entities: AddEntitiesCallback,
         discovery_info=None):
+    """Set up the Polestar sensor."""
     pass
 
 
@@ -389,6 +391,7 @@ async def async_setup_entry(
     # get the device
     device: Polestar
     device = hass.data[POLESTAR_API_DOMAIN][entry.entry_id]
+    await device.init()
 
     # put data in cache
     await device.async_update()
@@ -570,8 +573,10 @@ class PolestarSensor(PolestarEntity, SensorEntity):
         """Get the latest data and updates the states."""
         try:
             await self._device.async_update()
-            self._attr_native_value = self._device.get_value(
+            value = self._device.get_value(
                 self.description.query, self.description.field_name, self.get_skip_cache())
+            if value is not None:
+                self._attr_native_value = value
         except Exception:
             _LOGGER.warning("Failed to update sensor async update")
             self._device.polestarApi.next_update = datetime.now() + timedelta(seconds=60)

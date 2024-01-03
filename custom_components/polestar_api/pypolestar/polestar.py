@@ -180,7 +180,8 @@ class PolestarApi:
             error_message = resultData['errors'][0]['message']
             if error_message == "User not authenticated":
                 raise PolestarNotAuthorizedException("Unauthorized Exception")
-            _LOGGER.error(error_message)
+            _LOGGER.error(resultData.get('errors'))
+            raise PolestarApiException(error_message)
 
         _LOGGER.debug(resultData)
         return resultData

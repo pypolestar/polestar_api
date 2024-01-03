@@ -14,6 +14,7 @@ class PolestarAuth:
     """base class for Polestar authentication."""
 
     def __init__(self, username: str, password: str) -> None:
+        """Initialize the Polestar authentication."""
         self.username = username
         self.password = password
         self.access_token = None
@@ -23,7 +24,7 @@ class PolestarAuth:
         self._client_session = httpx.AsyncClient()
 
     async def get_token(self, refresh=False) -> None:
-        # get access / refresh token
+        """Get the token from Polestar."""
         headers = {"Content-Type": "application/json"}
         operationName = "getAuthToken"
         if not refresh:
@@ -51,6 +52,7 @@ class PolestarAuth:
         self.latest_call_code = result.status_code
         resultData = result.json()
         if result.status_code != 200 or ("errors" in resultData and len(resultData["errors"])):
+            _LOGGER.error(result)
             raise PolestarAuthException("Error getting token", result.status_code)
         _LOGGER.debug(resultData)
 
@@ -68,7 +70,7 @@ class PolestarAuth:
 
         # check if code is in query_params
         if query_params.get('code'):
-            return query_params.get('code')[0]
+            return query_params.get('code')
 
         # get the resumePath
         if query_params.get('resumePath'):
@@ -102,6 +104,7 @@ class PolestarAuth:
         self.latest_call_code = result.status_code
 
         if result.status_code != 200:
+            _LOGGER.error(result)
             raise PolestarAuthException("Error getting code callback", result.status_code)
 
         # url encode the code
@@ -111,13 +114,16 @@ class PolestarAuth:
         return code
 
     async def _get_resume_path(self):
-        # Get Resume Path
+        """Get Resume Path from Polestar."""
         params = {
             "response_type": "code",
             "client_id": "polmystar",
             "redirect_uri": "https://www.polestar.com/sign-in-callback"
         }
         result = await self._client_session.get("https://polestarid.eu.polestar.com/as/authorization.oauth2", params=params, timeout=HTTPX_TIMEOUT)
-        if result.status_code != 303:
-            raise PolestarAuthException("Error getting resume path ", result.status_code)
-        return result.next_request.url.params
+        if result.status_code in (303, 302):
+            return result.next_request.url.params
+
+        _LOGGER.error(result.text)
+        raise PolestarAuthException("Error getting resume path ", result.status_code)
+

@@ -7,8 +7,7 @@
         "data": {
           "name": "Anzeigename",
           "username": "Benutzername",
-          "password": "Passwort",
-          "vin": "VIN"
+          "password": "Passwort"
         }
       }
     },
@@ -21,77 +20,71 @@
   },
   "entity": {
     "sensor": {
-      "polestar_estimate_distance_to_empty_miles": {
-        "name": "Reichweite (Meilen)"
-      },
-      "polestar_estimate_distance_to_empty_km": {
-        "name": "Reichweite (km)"
-      },
-      "polestar_current_odometer_meters": {
-        "name": "Kilometerstand"
-      },
-      "polestar_average_speed_km_per_hour": {
-        "name": "Durchschnittsgeschwindigkeit (km/h)"
-      },
-      "polestar_current_trip_meter_automatic": {
-        "name": "Kilometerzähler automatisch"
-      },
-      "polestar_current_trip_meter_manual": {
-        "name": "Kilometerzähler manuell"
-      },
-      "polestar_battery_charge_level": {
-        "name": "Batterieladestand"
-      },
-      "polestar_estimated_charging_time_to_full_minutes": {
-        "name": "Geschätzte Ladezeit bis zur vollen Batterie (Minuten)"
-      },
-      "polestar_charging_status": {
-        "name": "Ladestatus"
-      },
-      "polestar_charging_power_watts": {
-        "name": "Ladeleistung (W)"
-      },
-      "polestar_charging_current_amps": {
-        "name": "Ladestrom (A)"
-      },
-      "polestar_charger_connection_status": {
-        "name": "Verbindungsstatus Ladepunkt"
-      },
-      "polestar_average_energy_consumption_kwh_per_100_km": {
-        "name": "Durchschnittlicher Energieverbrauch (kWh/100km)"
-      },
-      "polestar_estimated_charging_time_minutes_to_target_distance": {
-        "name": "Geschätzte Ladezeit bis zur Zielreichweite"
-      },
-      "polestar_vin": {
-        "name": "VIN"
-      },
-      "polestar_registration_number": {
-        "name": "Kennzeichen"
-      },
-      "polestar_estimated_fully_charged_time": {
-        "name": "Geschätzte Zeit zur vollen Ladung"
-      },
-      "polestar_model_name": {
-        "name": "Modellname"
-      },
-      "polestar_last_updated_odometer_data": {
-        "name": "Letzte Aktualisierung des Kilometerstands"
-      },
-      "polestar_last_updated_battery_data": {
-        "name": "Letzte Aktualisierung der Batteriedaten"
-      },
-      "polestar_estimate_full_charge_range_miles": {
-        "name": "Geschätzte Reichweite bei voller Ladung (Meilen)"
-      },
-      "polestar_estimate_full_charge_range": {
-        "name": "Geschätzte Reichweite bei voller Ladung"
-      },
       "polestar_api_status_code": {
         "name": "API Status Code"
       },
       "polestar_api_token_expires_at": {
         "name": "API Token gültig bis"
+      },
+      "polestar_average_energy_consumption_kwh_per_100": {
+        "name": "Durchschnittlicher Energieverbrauch"
+      },
+      "polestar_average_speed_per_hour": {
+        "name": "Durchschnittsgeschwindigkeit"
+      },
+      "polestar_battery_charge_level": {
+        "name": "Batterieladestand"
+      },
+      "polestar_charger_connection_status": {
+        "name": "Verbindungsstatus Ladepunkt"
+      },
+      "polestar_charging_current_amps": {
+        "name": "Ladestrom"
+      },
+      "polestar_charging_power_watts": {
+        "name": "Ladeleistung"
+      },
+      "polestar_charging_status": {
+        "name": "Ladestatus"
+      },
+      "polestar_current_odometer_meters": {
+        "name": "Kilometerstand"
+      },
+      "polestar_current_trip_meter_automatic": {
+        "name": "Kilometerzähler (automatisch)"
+      },
+      "polestar_current_trip_meter_manual": {
+        "name": "Kilometerzähler (manuell)"
+      },
+      "polestar_estimated_charging_time_to_full_minutes": {
+        "name": "Geschätzte Ladezeit bis zur vollen Batterie"
+      },
+      "polestar_estimate_full_charge_range": {
+        "name": "Geschätzte Reichweite bei voller Ladung"
+      },
+      "polestar_estimate_range": {
+        "name": "Geschätzte Reichweite"
+      },
+      "polestar_estimated_charging_time_minutes_to_target_distance": {
+        "name": "Geschätzte Ladezeit bis zur Zielreichweite"
+      },
+      "polestar_estimated_fully_charged_time": {
+        "name": "Geschätzte Zeit zur vollen Ladung"
+      },
+      "polestar_last_updated_battery_data": {
+        "name": "Letzte Aktualisierung der Batteriedaten"
+      },
+      "polestar_last_updated_odometer_data": {
+        "name": "Letzte Aktualisierung des Kilometerstands"
+      },
+      "polestar_model_name": {
+        "name": "Modellname"
+      },
+      "polestar_registration_number": {
+        "name": "Kennzeichen"
+      },
+      "polestar_vin": {
+        "name": "Fahrgestellnummer"
       }
     }
   }

@@ -1,3 +1,4 @@
+"""Exceptions for Polestar API."""
 class PolestarApiException(Exception):
     """Base class for exceptions in this module."""
 
@@ -9,6 +10,7 @@ class PolestarAuthException(Exception):
     message: str = None
 
     def __init__(self, message, error_code) -> None:
+        """Initialize the Polestar API."""
         super().__init__(message)
         self.error_code = error_code
 

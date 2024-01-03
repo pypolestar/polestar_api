@@ -1,3 +1,4 @@
+"""Constants for Polestar."""
 CACHE_TIME = 30
 
 CAR_INFO_DATA = "getConsumerCarsV2"

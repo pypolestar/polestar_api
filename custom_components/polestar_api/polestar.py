@@ -52,8 +52,10 @@ class Polestar:
         return self.polestarApi.latest_call_code
 
     async def async_update(self) -> None:
+        """Update data from Polestar."""
         try:
             await self.polestarApi.get_ev_data(self.vin)
+            return
         except PolestarApiException as e:
             _LOGGER.warning("API Exception on update data %s", str(e))
             self.polestarApi.next_update = datetime.now() + timedelta(seconds=5)
@@ -72,14 +74,18 @@ class Polestar:
         except Exception as e:
             _LOGGER.error("Unexpected Error on update data %s", str(e))
             self.polestarApi.next_update = datetime.now() + timedelta(seconds=60)
+        self.polestarApi.latest_call_code = 500
 
     def set_config_unit(self, unit:UnitSystem):
+        """Set unit system for the device."""
         self.unit_system = unit
 
     def get_config_unit(self):
+        """Get unit system for the device."""
         return self.unit_system
 
     def get_value(self, query: str, field_name: str, skip_cache: bool = False):
+        """Get the latest value from the Polestar API."""
         data = self.polestarApi.get_cache_data(query, field_name, skip_cache)
         if data is None:
             return

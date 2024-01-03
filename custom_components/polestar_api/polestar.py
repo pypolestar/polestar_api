@@ -7,6 +7,7 @@ from urllib3 import disable_warnings
 
 from homeassistant.core import HomeAssistant
 from homeassistant.util.unit_system import METRIC_SYSTEM, UnitSystem
+
 from .pypolestar.exception import PolestarApiException, PolestarAuthException
 from .pypolestar.polestar import PolestarApi
 
@@ -80,6 +81,7 @@ class Polestar:
             _LOGGER.error("Unexpected Error on update data %s", str(e))
             self.polestarApi.next_update = datetime.now() + timedelta(seconds=60)
         self.polestarApi.latest_call_code = 500
+        self.polestarApi.updating = False
 
     def set_config_unit(self, unit:UnitSystem):
         """Set unit system for the device."""

@@ -1,3 +1,4 @@
+"""Asynchronous Python client for the Polestar API."""""
 from datetime import datetime, timedelta
 import logging
 
@@ -16,8 +17,10 @@ _LOGGER = logging.getLogger(__name__)
 
 
 class PolestarApi:
+    """Main class for handling connections with the Polestar API."""
 
     def __init__(self, username: str, password: str) -> None:
+        """Initialize the Polestar API."""
         self.auth = PolestarAuth(username, password)
         self.updating = False
         self.cache_data = {}
@@ -27,6 +30,7 @@ class PolestarApi:
 
 
     async def init(self):
+        """Initialize the Polestar API."""
         try:
             await self.auth.get_token()
 
@@ -39,6 +43,7 @@ class PolestarApi:
             _LOGGER.exception("Auth Exception: %s", str(e))
 
     def get_latest_data(self, query: str, field_name: str) -> dict or bool or None:
+        """Get the latest data from the Polestar API."""
         if self.cache_data and self.cache_data[query]:
             data = self.cache_data[query]['data']
             if data is None:
@@ -64,6 +69,7 @@ class PolestarApi:
         return None
 
     async def _get_odometer_data(self, vin: str):
+        """" Get the latest odometer data from the Polestar API."""
         params = {
             "query": "query GetOdometerData($vin: String!) { getOdometerData(vin: $vin) { averageSpeedKmPerHour eventUpdatedTimestamp { iso unix __typename } odometerMeters tripMeterAutomaticKm tripMeterManualKm __typename }}",
             "operationName": "GetOdometerData",
@@ -91,6 +97,7 @@ class PolestarApi:
                 'data': result['data'][BATTERY_DATA], 'timestamp': datetime.now()}
 
     async def _get_vehicle_data(self):
+        """" Get the latest vehicle data from the Polestar API."""
         # get Vehicle Data
         params = {
             "query": "query getCars {  getConsumerCarsV2 {    vin    internalVehicleIdentifier    modelYear    content {      model {        code        name        __typename      }      images {        studio {          url          angles          __typename        }        __typename      }      __typename    }    hasPerformancePackage    registrationNo    deliveryDate    currentPlannedDeliveryDate    __typename  }}",
@@ -110,6 +117,7 @@ class PolestarApi:
                 'data': result['data'][CAR_INFO_DATA][0], 'timestamp': datetime.now()}
 
     async def get_ev_data(self, vin: str):
+        """Get the latest ev data from the Polestar API."""
         if self.updating:
             return
 
@@ -121,7 +129,7 @@ class PolestarApi:
 
         try:
             if self.auth.token_expiry is None:
-                raise PolestarAuthException("No token expiry found")
+                raise PolestarAuthException("No token expiry found", 500)
             if (self.auth.token_expiry - datetime.now()).total_seconds() < 300:
                 await self.auth.get_token(refresh=True)
         except PolestarAuthException as e:
@@ -147,6 +155,7 @@ class PolestarApi:
         self.next_update = datetime.now() + timedelta(seconds=5)
 
     def get_cache_data(self, query: str, field_name: str, skip_cache: bool = False):
+        """" Get the latest data from the cache."""
         if query is None:
             return None
 
@@ -159,6 +168,7 @@ class PolestarApi:
         return None
 
     async def get_graph_ql(self, params: dict):
+        """Get the latest data from the Polestar API."""
         headers = {
             "Content-Type": "application/json",
             "authorization": f"Bearer {self.auth.access_token}"

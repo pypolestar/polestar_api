@@ -21,17 +21,11 @@
   },
   "entity": {
     "sensor": {
-      "polestar_estimate_distance_to_empty_miles": {
-        "name": "Distance restante en miles"
-      },
-      "polestar_estimate_distance_to_empty_km": {
-        "name": "Distance restante en km"
-      },
       "polestar_current_odometer_meters": {
         "name": "Odomètre"
       },
-      "polestar_average_speed_km_per_hour": {
-        "name": "Vitesse moyenne en km/h"
+      "polestar_average_speed_per_hour": {
+        "name": "Vitesse moyenne"
       },
       "polestar_current_trip_meter_automatic": {
         "name": "Compteur kilométrique automatique"
@@ -49,16 +43,16 @@
         "name": "État de la recharge"
       },
       "polestar_charging_power_watts": {
-        "name": "Puissance de recharge (watts)"
+        "name": "Puissance de recharge"
       },
       "polestar_charging_current_amps": {
-        "name": "Puissance de recharge (Amps)"
+        "name": "Puissance de recharge"
       },
       "polestar_charger_connection_status": {
         "name": "État de connexion du chargeur"
       },
-      "polestar_average_energy_consumption_kwh_per_100_km": {
-        "name": "Consommation d'énergie moyenne en kWh/100km"
+      "polestar_average_energy_consumption_kwh_per_100": {
+        "name": "Consommation d'énergie moyenne"
       },
       "polestar_estimated_charging_time_minutes_to_target_distance": {
         "name": "Temps de recharge restant pour la distance jusqu'à destination"
@@ -81,11 +75,11 @@
       "polestar_last_updated_battery_data": {
         "name": "Dernière mise à jour des données de batterie"
       },
-      "polestar_estimate_full_charge_range_miles": {
-        "name": "Estimé de l'autonomie complète en miles"
-      },
       "polestar_estimate_full_charge_range": {
-        "name": "Estimé de l'autonomie complète en km"
+        "name": "Estimé de l'autonomie complète"
+      },
+      "polestar_estimate_range": {
+        "name": "Estimé de l'autonomie"
       },
       "polestar_api_status_code": {
         "name": "Code d'état de l'API"

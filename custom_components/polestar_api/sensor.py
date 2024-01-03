@@ -548,19 +548,18 @@ class PolestarSensor(PolestarEntity, SensorEntity):
 
             return estimate_range
 
-
-
-        if self.entity_description.key in ('current_odometer_meters'):
-            if int(self._attr_native_value) > 1000:
-                km = self._attr_native_value / 1000
-                self._attr_native_value = int(km)
-
         # round the value
         if self.entity_description.round_digits is not None:
             # if the value is integer, remove the decimal
             if self.entity_description.round_digits == 0 and isinstance(self._attr_native_value, int):
                 return int(self._attr_native_value)
             return round(float(self._attr_native_value), self.entity_description.round_digits)
+
+        if self.entity_description.key in ('current_odometer_meters'):
+            _LOGGER.info("current_odometer_meters %s", self._attr_native_value)
+            if int(self._attr_native_value) > 1000:
+                return self._attr_native_value / 1000
+
 
         return self._attr_native_value
 

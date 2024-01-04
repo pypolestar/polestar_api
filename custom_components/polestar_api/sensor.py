@@ -118,7 +118,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         query="getOdometerData",
         field_name="odometerMeters",
         unit=UnitOfLength.KILOMETERS,
-        round_digits=0,
+        round_digits=2,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.DISTANCE,
         max_value=None,
@@ -548,17 +548,20 @@ class PolestarSensor(PolestarEntity, SensorEntity):
 
             return estimate_range
 
+        if self.entity_description.key in ('current_odometer_meters'):
+            _LOGGER.debug("current_odometer_meters %s", self._attr_native_value)
+            # convert m to km, if not int value then it has already convert to km
+            if isinstance(self._attr_native_value, int):
+                self._attr_native_value = self._attr_native_value / 1000
+
         # round the value
         if self.entity_description.round_digits is not None:
             # if the value is integer, remove the decimal
             if self.entity_description.round_digits == 0 and isinstance(self._attr_native_value, int):
-                return int(self._attr_native_value)
-            return round(float(self._attr_native_value), self.entity_description.round_digits)
+                self._attr_native_value =  int(self._attr_native_value)
+            self._attr_native_value = round(float(self._attr_native_value), self.entity_description.round_digits)
 
-        if self.entity_description.key in ('current_odometer_meters'):
-            _LOGGER.info("current_odometer_meters %s", self._attr_native_value)
-            if int(self._attr_native_value) > 1000:
-                return self._attr_native_value / 1000
+
 
 
         return self._attr_native_value

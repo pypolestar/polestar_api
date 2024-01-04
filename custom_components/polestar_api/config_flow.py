@@ -1,6 +1,6 @@
 """Config flow for the Polestar EV platform."""
+
 import asyncio
-from asyncio import timeout
 import logging
 
 from aiohttp import ClientError
@@ -9,7 +9,7 @@ import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
 
-from .const import DOMAIN, TIMEOUT
+from .const import DOMAIN
 from .polestar import Polestar
 
 _LOGGER = logging.getLogger(__name__)
@@ -40,8 +40,7 @@ class FlowHandler(config_entries.ConfigFlow):
                 self.hass,
                 username,
                 password)
-            with timeout(TIMEOUT):
-                await device.init()
+            await device.init()
 
             # check if we have a token, otherwise throw exception
             if device.polestarApi.auth.access_token is None:

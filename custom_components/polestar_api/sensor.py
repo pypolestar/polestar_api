@@ -112,7 +112,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
 #        dict_data=None,
 #    ),
     PolestarSensorDescription(
-        key="current_odometer_meters",
+        key="current_odometer",
         name="Odometer",
         icon="mdi:map-marker-distance",
         query="getOdometerData",
@@ -125,7 +125,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         dict_data=None
     ),
     PolestarSensorDescription(
-        key="average_speed_per_hour",
+        key="average_speed",
         name="Avg. Speed",
         icon="mdi:speedometer",
         query="getOdometerData",
@@ -176,7 +176,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         dict_data=None
     ),
     PolestarSensorDescription(
-        key="estimated_charging_time_to_full_minutes",
+        key="estimated_charging_time_to_full",
         name="Charging Time",
         icon="mdi:battery-clock",
         query="getBatteryData",
@@ -198,7 +198,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         dict_data=CHARGING_STATUS_DICT
     ),
     PolestarSensorDescription(
-        key="charging_power_watts",
+        key="charging_power",
         name="Charging Power",
         icon="mdi:lightning-bolt",
         query="getBatteryData",
@@ -211,7 +211,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         dict_data=None
     ),
     PolestarSensorDescription(
-        key="charging_current_amps",
+        key="charging_current",
         name="Charging Current",
         icon="mdi:current-ac",
         query="getBatteryData",

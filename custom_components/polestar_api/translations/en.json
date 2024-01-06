@@ -69,6 +69,9 @@
       "polestar_registration_number": {
         "name": "Registration Number"
       },
+      "polestar_software_version": {
+        "name": "Software Version"
+      },
       "polestar_estimated_fully_charged_time": {
         "name": "Estimated Fully Charged Time"
       },

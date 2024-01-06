@@ -274,6 +274,17 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         dict_data=None
     ),
     PolestarSensorDescription(
+        key="software_version",
+        name="Software Version",
+        icon="mdi:information-outline",
+        query="getConsumerCarsV2",
+        field_name="software/version",
+        unit=None,
+        round_digits=None,
+        max_value=None,
+        dict_data=None
+    ),
+    PolestarSensorDescription(
         key="registration_number",
         name="Registration Number",
         icon="mdi:numeric-1-box",

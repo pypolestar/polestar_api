@@ -68,7 +68,6 @@
       "polestar_estimated_charging_time_minutes_to_target_distance": {
         "name": "Estimeret ladetid til ønsket afstand"
       },
-
       "polestar_estimated_fully_charged_time": {
         "name": "Estimeret total ladetid"
       },

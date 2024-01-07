@@ -131,7 +131,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         query="getOdometerData",
         field_name="averageSpeedKmPerHour",
         unit=UnitOfSpeed.KILOMETERS_PER_HOUR,
-        round_digits=None,
+        round_digits=2,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.DISTANCE,
         max_value=150,
@@ -243,7 +243,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         query="getBatteryData",
         field_name="averageEnergyConsumptionKwhPer100Km",
         unit='kWh/100km',
-        round_digits=None,
+        round_digits=2,
         max_value=None,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.POWER,
@@ -496,18 +496,26 @@ class PolestarSensor(PolestarEntity, SensorEntity):
                     self._attr_native_value.replace('.0', ''))
 
         is_metric = self._device.get_config_unit() == METRIC_SYSTEM
-        if self.entity_description.key in ('estimate_full_charge_range', 'estimate_range', 'current_trip_meter_manual', 'current_trip_meter_automatic', 'current_odometer_meters', 'average_speed_per_hour', 'average_energy_consumption_kwh_per_100'):
-            if self.entity_description.key == "average_speed_per_hour":
+        if self.entity_description.key in ('estimate_full_charge_range', 'estimate_range', 'current_trip_meter_manual', 'current_trip_meter_automatic', 'current_odometer', 'average_speed', 'average_energy_consumption_kwh_per_100'):
+            if self.entity_description.key == "average_speed":
                 self.entity_description.unit = UnitOfSpeed.KILOMETERS_PER_HOUR if is_metric else UnitOfSpeed.MILES_PER_HOUR
             elif self.entity_description.key == "average_energy_consumption_kwh_per_100":
                 self.entity_description.unit = 'kWh/100km' if is_metric else 'kWh/100mi'
+            elif self.entity_description.key == "current_odometer":
+                if isinstance(self._attr_native_value, int):
+                    # convert m to km, if not int value then it has already convert to km
+                    self._attr_native_value = self._attr_native_value / 1000
+                self.entity_description.unit = UnitOfLength.KILOMETERS if is_metric  else UnitOfLength.MILES
             else:
                 self.entity_description.unit = UnitOfLength.KILOMETERS if is_metric  else UnitOfLength.MILES
 
             if not is_metric:
                 # todo: need to check if current_trip should normally in KM
                 # todo: check if we need to convert current_odo_meter to miles
-                self._attr_native_value = self._attr_native_value * 0.621371
+                if self.entity_description.key == "average_energy_consumption_kwh_per_100":
+                    self._attr_native_value = self._attr_native_value / 0.621371
+                else:
+                    self._attr_native_value = self._attr_native_value * 0.621371
 
         if self.entity_description.key == "estimate_range":
             if not is_metric:
@@ -547,12 +555,6 @@ class PolestarSensor(PolestarEntity, SensorEntity):
             estimate_range = round(estimate_range / battery_level * 100)
 
             return estimate_range
-
-        if self.entity_description.key in ('current_odometer_meters'):
-            _LOGGER.debug("current_odometer_meters %s", self._attr_native_value)
-            # convert m to km, if not int value then it has already convert to km
-            if isinstance(self._attr_native_value, int):
-                self._attr_native_value = self._attr_native_value / 1000
 
         # round the value
         if self.entity_description.round_digits is not None:

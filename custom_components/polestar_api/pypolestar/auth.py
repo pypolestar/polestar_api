@@ -27,7 +27,8 @@ class PolestarAuth:
         """Get the token from Polestar."""
         headers = {"Content-Type": "application/json"}
         operationName = "getAuthToken"
-        if not refresh:
+        # can't use refresh if the token is expired or not set even if refresh is True
+        if not refresh or self.token_expiry is None or self.token_expiry < datetime.now():
             code = await self._get_code()
             if code is None:
                 return

@@ -27,3 +27,4 @@ class PolestarEntity(Entity):
     async def async_added_to_hass(self) -> None:
         """Add listener for state changes."""
         await super().async_added_to_hass()
+

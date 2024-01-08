@@ -23,7 +23,7 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import entity_platform
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import StateType
-from homeassistant.util.unit_system import METRIC_SYSTEM
+from homeassistant.util.unit_conversion import DistanceConverter
 
 from . import DOMAIN as POLESTAR_API_DOMAIN
 from .entity import PolestarEntity
@@ -40,7 +40,6 @@ class PolestarSensorDescriptionMixin:
     query: str
     field_name: str
     round_digits: int | None
-    unit: str | None
     max_value: int | None
     dict_data: dict | None
 
@@ -90,7 +89,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         icon="mdi:map-marker-distance",
         query="getBatteryData",
         field_name="estimatedDistanceToEmptyKm",
-        unit=UnitOfLength.KILOMETERS,
+        native_unit_of_measurement=UnitOfLength.KILOMETERS,
         round_digits=2,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.DISTANCE,
@@ -104,7 +103,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
 #        icon="mdi:map-marker-distance",
 #        query="getBatteryData",
 #        field_name="estimatedDistanceToEmptyMiles",
-#        unit=UnitOfLength.MILES,
+#        native_unit_of_measurement=UnitOfLength.MILES,
 #        round_digits=None,
 #        state_class=SensorStateClass.MEASUREMENT,
 #        device_class=SensorDeviceClass.DISTANCE,
@@ -117,11 +116,11 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         icon="mdi:map-marker-distance",
         query="getOdometerData",
         field_name="odometerMeters",
-        unit=UnitOfLength.KILOMETERS,
+        native_unit_of_measurement=UnitOfLength.METERS,
         round_digits=2,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.DISTANCE,
-        max_value=None,
+        max_value=1000000,
         dict_data=None
     ),
     PolestarSensorDescription(
@@ -130,7 +129,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         icon="mdi:speedometer",
         query="getOdometerData",
         field_name="averageSpeedKmPerHour",
-        unit=UnitOfSpeed.KILOMETERS_PER_HOUR,
+        native_unit_of_measurement=UnitOfSpeed.KILOMETERS_PER_HOUR,
         round_digits=None,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.DISTANCE,
@@ -143,11 +142,11 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         icon="mdi:map-marker-distance",
         query="getOdometerData",
         field_name="tripMeterAutomaticKm",
-        unit=UnitOfLength.KILOMETERS,
-        round_digits=None,
+        native_unit_of_measurement=UnitOfLength.KILOMETERS,
+        round_digits=2,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.DISTANCE,
-        max_value=None,
+        max_value=100000,
         dict_data=None
     ),
     PolestarSensorDescription(
@@ -156,11 +155,11 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         icon="mdi:map-marker-distance",
         query="getOdometerData",
         field_name="tripMeterManualKm",
-        unit=UnitOfLength.KILOMETERS,
-        round_digits=None,
+        native_unit_of_measurement=UnitOfLength.KILOMETERS,
+        round_digits=2,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.DISTANCE,
-        max_value=None,
+        max_value=100000,
         dict_data=None
     ),
     PolestarSensorDescription(
@@ -168,7 +167,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         name="Battery Level",
         query="getBatteryData",
         field_name="batteryChargeLevelPercentage",
-        unit=PERCENTAGE,
+        native_unit_of_measurement=PERCENTAGE,
         round_digits=0,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.BATTERY,
@@ -181,7 +180,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         icon="mdi:battery-clock",
         query="getBatteryData",
         field_name="estimatedChargingTimeToFullMinutes",
-        unit=UnitOfTime.MINUTES,
+        native_unit_of_measurement=UnitOfTime.MINUTES,
         round_digits=None,
         max_value=1500,
         dict_data=None
@@ -192,7 +191,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         icon="mdi:ev-station",
         query="getBatteryData",
         field_name="chargingStatus",
-        unit=None,
+        native_unit_of_measurement=None,
         round_digits=None,
         max_value=None,
         dict_data=CHARGING_STATUS_DICT
@@ -203,7 +202,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         icon="mdi:lightning-bolt",
         query="getBatteryData",
         field_name="chargingPowerWatts",
-        unit=UnitOfPower.WATT,
+        native_unit_of_measurement=UnitOfPower.WATT,
         round_digits=None,
         max_value=None,
         state_class=SensorStateClass.MEASUREMENT,
@@ -216,7 +215,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         icon="mdi:current-ac",
         query="getBatteryData",
         field_name="chargingCurrentAmps",
-        unit=UnitOfElectricCurrent.AMPERE,
+        native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
         round_digits=None,
         max_value=None,
         state_class=SensorStateClass.MEASUREMENT,
@@ -229,11 +228,11 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         icon="mdi:connection",
         query="getBatteryData",
         field_name="chargerConnectionStatus",
-        unit=None,
+        native_unit_of_measurement=None,
         round_digits=None,
         max_value=None,
         state_class=SensorStateClass.MEASUREMENT,
-        device_class=SensorDeviceClass.POWER,
+        device_class=None,
         dict_data=CHARGING_CONNECTION_STATUS_DICT
     ),
     PolestarSensorDescription(
@@ -242,11 +241,11 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         icon="mdi:battery-clock",
         query="getBatteryData",
         field_name="averageEnergyConsumptionKwhPer100Km",
-        unit='kWh/100km',
+        native_unit_of_measurement='kWh/100km',
         round_digits=None,
         max_value=None,
         state_class=SensorStateClass.MEASUREMENT,
-        device_class=SensorDeviceClass.POWER,
+        device_class=None,
         dict_data=None
     ),
     PolestarSensorDescription(
@@ -255,7 +254,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         icon="mdi:battery-clock",
         query="getBatteryData",
         field_name="estimatedChargingTimeMinutesToTargetDistance",
-        unit=PERCENTAGE,
+        native_unit_of_measurement=PERCENTAGE,
         round_digits=None,
         max_value=None,
         state_class=SensorStateClass.MEASUREMENT,
@@ -268,7 +267,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         icon="mdi:card-account-details",
         query="getConsumerCarsV2",
         field_name="vin",
-        unit=None,
+        native_unit_of_measurement=None,
         round_digits=None,
         max_value=None,
         dict_data=None
@@ -279,7 +278,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         icon="mdi:information-outline",
         query="getConsumerCarsV2",
         field_name="software/version",
-        unit=None,
+        native_unit_of_measurement=None,
         round_digits=None,
         max_value=None,
         dict_data=None
@@ -290,7 +289,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         icon="mdi:numeric-1-box",
         query="getConsumerCarsV2",
         field_name="registrationNo",
-        unit=None,
+        native_unit_of_measurement=None,
         round_digits=None,
         max_value=None,
         dict_data=None
@@ -301,7 +300,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         icon="mdi:battery-clock",
         query="getBatteryData",
         field_name="estimatedChargingTimeToFullMinutes",
-        unit=None,
+        native_unit_of_measurement=None,
         round_digits=None,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.DURATION,
@@ -314,7 +313,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         icon="mdi:car-electric",
         query="getConsumerCarsV2",
         field_name="content/model/name",
-        unit=None,
+        native_unit_of_measurement=None,
         round_digits=None,
         max_value=None,
         dict_data=None
@@ -325,7 +324,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         icon="mdi:clock",
         query="getOdometerData",
         field_name="eventUpdatedTimestamp/iso",
-        unit=None,
+        native_unit_of_measurement=None,
         round_digits=None,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.TIMESTAMP,
@@ -338,22 +337,21 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         icon="mdi:clock",
         query="getBatteryData",
         field_name="eventUpdatedTimestamp/iso",
-        unit=None,
+        native_unit_of_measurement=None,
         round_digits=None,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.TIMESTAMP,
         max_value=None,
         dict_data=None
     ),
-
     PolestarSensorDescription(
         key="estimate_full_charge_range",
         name="Calc. Full Charge Range",
         icon="mdi:map-marker-distance",
         query="getBatteryData",
         field_name="estimatedDistanceToEmptyKm",
-        unit=UnitOfLength.KILOMETERS,
-        round_digits=None,
+        native_unit_of_measurement=UnitOfLength.KILOMETERS,
+        round_digits=2,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.DISTANCE,
         max_value=660, # WLTP range max 655
@@ -365,7 +363,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         icon="mdi:heart",
         query=None,
         field_name=None,
-        unit=None,
+        native_unit_of_measurement=None,
         round_digits=None,
         max_value=None,
         dict_data=API_STATUS_DICT
@@ -376,7 +374,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         icon="mdi:heart",
         query=None,
         field_name=None,
-        unit=None,
+        native_unit_of_measurement=None,
         round_digits=None,
         max_value=None,
         dict_data=None
@@ -418,6 +416,7 @@ class PolestarSensor(PolestarEntity, SensorEntity):
     """Representation of a Polestar Sensor."""
 
     entity_description: PolestarSensorDescription
+    attr_has_entity_name = True
 
     def __init__(self,
                  device: Polestar,
@@ -430,11 +429,17 @@ class PolestarSensor(PolestarEntity, SensorEntity):
         self.entity_id = f"{POLESTAR_API_DOMAIN}.'polestar_'.{unique_id}_{description.key}"
         #self._attr_name = f"{description.name}"
         self._attr_unique_id = f"polestar_{unique_id}-{description.key}"
-        self.description = description
-        self.attr_translation_key = f"polestar_{description.key}"
-        self.attr_has_entity_name = True
-
         self.entity_description = description
+        self.attr_translation_key = f"polestar_{description.key}"
+        self._attr_native_unit_of_measurement = description.native_unit_of_measurement
+        self._sensor_data = None
+        self._attr_unit_of_measurement = description.native_unit_of_measurement
+        self._attr_native_value = self._device.get_value(
+            self.entity_description.query, self.entity_description.field_name, self.get_skip_cache())
+
+        if description.round_digits is not None:
+            self.attr_suggested_display_precision = description.round_digits
+
         if description.state_class is not None:
             self._attr_state_class = description.state_class
         if description.device_class is not None:
@@ -448,18 +453,13 @@ class PolestarSensor(PolestarEntity, SensorEntity):
 
     def get_skip_cache(self) -> bool:
         """Get the skip cache."""
-        return self.description.key in ('vin', 'registration_number', 'model_name')
+        return self.entity_description.key in ('vin', 'registration_number', 'model_name')
 
     @callback
     def _async_update_attrs(self) -> None:
         """Update the state and attributes."""
-        self._attr_native_value = self._device.get_value(
-            self.description.query, self.description.field_name, self.get_skip_cache())
-
-    @property
-    def unique_id(self) -> str:
-        """Return a unique ID."""
-        return f"{self._device.id}-{self.entity_description.key}"
+        self._sensor_data= self._device.get_value(
+            self.entity_description.query, self.entity_description.field_name, self.get_skip_cache())
 
     @property
     def icon(self) -> str | None:
@@ -467,30 +467,18 @@ class PolestarSensor(PolestarEntity, SensorEntity):
         return self.entity_description.icon
 
     @property
-    def native_value(self) -> StateType:
-        """Return the state of the sensor."""
-        if self.entity_description.round_digits is not None:
-            return round(self.state, self.entity_description.round_digits)
-        return round(self.state, 2)
-
-    @property
-    def native_unit_of_measurement(self) -> str | None:
-        """Return the unit the value is expressed in."""
-        return self.entity_description.unit
-
-    @property
     def state(self) -> StateType:
         """Return the state of the sensor."""
-
-        if self._attr_native_value is None and self.entity_description.key in ('charging_current_amps', 'charging_power_watts', 'estimated_charging_time_minutes_to_target_distance'):
-            self.entity_description.unit = None
+        if self._attr_native_value is None and self.entity_description.key in ('charging_current', 'charging_power', 'estimated_charging_time_minutes_to_target_distance'):
+            #self.entity_description.native_unit_of_measurement = None
+            self._attr_native_unit_of_measurement = None
             return "Not Supported Yet"
 
         if self.entity_description.dict_data is not None:
             # exception for api_status_code
             if self.entity_description.key == 'api_status_code':
                 return self.entity_description.dict_data.get(self._device.get_latest_call_code(), "Error")
-            return self.entity_description.dict_data.get(
+            self._attr_native_value  =  self.entity_description.dict_data.get(
                 self._attr_native_value, self._attr_native_value)
 
         if self.entity_description.key == 'api_token_expires_at':
@@ -499,46 +487,6 @@ class PolestarSensor(PolestarEntity, SensorEntity):
             return self._device.get_token_expiry().strftime("%Y-%m-%d %H:%M:%S")
         if self._attr_native_value != 0 and self._attr_native_value in (None, False):
             return None
-
-        # battery charge level contain ".0" at the end, this should be removed
-        if self.entity_description.key == 'battery_charge_level':
-            if isinstance(self._attr_native_value, str):
-                self._attr_native_value = int(
-                    self._attr_native_value.replace('.0', ''))
-
-        is_metric = self._device.get_config_unit() == METRIC_SYSTEM
-        if self.entity_description.key in ('estimate_full_charge_range', 'estimate_range', 'current_trip_meter_manual', 'current_trip_meter_automatic', 'current_odometer_meters', 'average_speed_per_hour', 'average_energy_consumption_kwh_per_100'):
-            if self.entity_description.key == "average_speed_per_hour":
-                self.entity_description.unit = UnitOfSpeed.KILOMETERS_PER_HOUR if is_metric else UnitOfSpeed.MILES_PER_HOUR
-            elif self.entity_description.key == "average_energy_consumption_kwh_per_100":
-                self.entity_description.unit = 'kWh/100km' if is_metric else 'kWh/100mi'
-            else:
-                self.entity_description.unit = UnitOfLength.KILOMETERS if is_metric  else UnitOfLength.MILES
-
-            if not is_metric:
-                # todo: need to check if current_trip should normally in KM
-                # todo: check if we need to convert current_odo_meter to miles
-                self._attr_native_value = self._attr_native_value * 0.621371
-
-        if self.entity_description.key == "estimate_range":
-            if not is_metric:
-                self.entity_description.max_value = 410
-            else:
-                self.entity_description.max_value = 660
-
-        # prevent exponentianal value, we only give state value that is lower than the max value
-        if self.entity_description.max_value is not None:
-            if isinstance(self._attr_native_value, str):
-                self._attr_native_value = int(self._attr_native_value)
-            if self._attr_native_value > self.entity_description.max_value:
-                return None
-
-        # Custom state for estimated_fully_charged_time
-        if self.entity_description.key == 'estimated_fully_charged_time':
-            value = int(self._attr_native_value)
-            if value > 0:
-                return datetime.now().replace(second=0, microsecond=0) + timedelta(minutes=round(value))
-            return 'Not charging'
 
         if self.entity_description.key in ('estimate_full_charge_range'):
             battery_level = self._device.get_latest_data(
@@ -555,16 +503,37 @@ class PolestarSensor(PolestarEntity, SensorEntity):
             battery_level = int(battery_level)
             estimate_range = int(estimate_range)
 
-            estimate_range = round(estimate_range / battery_level * 100)
+            self._sensor_data = round(estimate_range / battery_level * 100)
 
-            return estimate_range
+        # Custom state for estimated_fully_charged_time
+        if self.entity_description.key == 'estimated_fully_charged_time':
+            value = int(self._attr_native_value)
+            if value > 0:
+                return datetime.now().replace(second=0, microsecond=0) + timedelta(minutes=round(value))
+            return 'Not charging'
 
-        if self.entity_description.key in ('current_odometer_meters'):
-            _LOGGER.debug("current_odometer_meters %s", self._attr_native_value)
-            # convert m to km, if not int value then it has already convert to km
-            if isinstance(self._attr_native_value, int):
-                self._attr_native_value = self._attr_native_value / 1000
+        # if GUI changed the unit, we need to convert the value
+        if self._sensor_option_unit_of_measurement is not None:
+            if self._sensor_option_unit_of_measurement in (UnitOfLength.MILES, UnitOfLength.KILOMETERS, UnitOfLength.METERS):
+                    self._attr_native_value = DistanceConverter.convert(
+                        self._sensor_data, self.entity_description.native_unit_of_measurement, self._sensor_option_unit_of_measurement
+                    )
+                    self._attr_native_unit_of_measurement = self._sensor_option_unit_of_measurement
+        if self.entity_description.key in ("estimate_range", "estimate_full_charge_range"):
+            if self._sensor_option_unit_of_measurement ==  UnitOfLength.MILES:
+                self.entity_description.max_value = 410
+            elif self._sensor_option_unit_of_measurement ==  UnitOfLength.KILOMETERS:
+                self.entity_description.max_value = 660
+            elif self._sensor_option_unit_of_measurement ==  UnitOfLength.METERS:
+                self.entity_description.max_value = 660000
 
+        # prevent exponentianal value, we only give state value that is lower than the max value
+        if self.entity_description.max_value is not None:
+            if isinstance(self._attr_native_value, str):
+                self._attr_native_value = int(self._attr_native_value)
+            if self._attr_native_value > self.entity_description.max_value:
+                _LOGGER.warning("%s: Value %s is higher than max value %s", self.entity_description.key, self._attr_native_value, self.entity_description.max_value)
+                return None
         # round the value
         if self.entity_description.round_digits is not None:
             # if the value is integer, remove the decimal
@@ -572,24 +541,23 @@ class PolestarSensor(PolestarEntity, SensorEntity):
                 self._attr_native_value =  int(self._attr_native_value)
             self._attr_native_value = round(float(self._attr_native_value), self.entity_description.round_digits)
 
-
-
-
         return self._attr_native_value
 
     @property
     def unit_of_measurement(self) -> str:
         """Return the unit of measurement."""
-        return self.entity_description.unit
+        return self.native_unit_of_measurement
 
     async def async_update(self) -> None:
         """Get the latest data and updates the states."""
         try:
             await self._device.async_update()
             value = self._device.get_value(
-                self.description.query, self.description.field_name, self.get_skip_cache())
+                self.entity_description.query, self.entity_description.field_name, self.get_skip_cache())
+
             if value is not None:
                 self._attr_native_value = value
         except Exception:
             _LOGGER.warning("Failed to update sensor async update")
             self._device.polestarApi.next_update = datetime.now() + timedelta(seconds=60)
+

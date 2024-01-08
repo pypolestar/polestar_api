@@ -21,16 +21,19 @@
   },
   "entity": {
     "sensor": {
+      "polestar_estimate_range": {
+        "name": "Resterende afstand"
+      },
       "polestar_distance_to_empty_miles": {
         "name": "Resterende afstand (mijl)"
       },
       "polestar_estimate_distance_to_empty_km": {
         "name": "Resterende afstand (km)"
       },
-      "polestar_current_odometer_meters": {
+      "polestar_current_odometer": {
         "name": "Huidige kilometerstand"
       },
-      "polestar_average_speed_km_per_hour": {
+      "polestar_average_speed": {
         "name": "Gemiddelde snelheid"
       },
       "polestar_current_trip_meter_automatic": {
@@ -42,22 +45,22 @@
       "polestar_battery_charge_level": {
         "name": "Batterij niveau"
       },
-      "polestar_estimated_charging_time_to_full_minutes": {
+      "polestar_estimated_charging_time_to_full": {
         "name": "Geschatte laadtijd tot vol (min)"
       },
       "polestar_charging_status": {
         "name": "Laadstatus"
       },
-      "polestar_charging_power_watts": {
+      "polestar_charging_power": {
         "name": "Laadvermogen (W)"
       },
-      "polestar_charging_current_amps": {
+      "polestar_charging_current": {
         "name": "Laadstroom (A)"
       },
       "polestar_charger_connection_status": {
         "name": "Laadkabel status"
       },
-      "polestar_average_energy_consumption_kwh_per_100_km": {
+      "polestar_average_energy_consumption_kwh_per_100": {
         "name": "Gemiddeld verbruik (kWh/100km)"
       },
       "polestar_estimated_charging_time_minutes_to_target_distance": {

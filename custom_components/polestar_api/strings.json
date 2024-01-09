@@ -5,10 +5,8 @@
         "title": "Configure Polestar EV",
         "description": "Enter Authentication of Polestar EV",
         "data": {
-          "name": "Friendly name",
           "username": "Username",
-          "password": "Password",
-          "vin": "VIN"
+          "password": "Password"
         }
       }
     },
@@ -17,6 +15,79 @@
       "api_failed": "Unexpected error creating api.",
       "already_configured": "Polestar API is already configured",
       "no_token": "No token found in response. Please check your credentials."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "polestar_estimate_range": {
+        "name": "Range"
+      },
+      "polestar_current_odometer": {
+        "name": "Odometer"
+      },
+      "polestar_average_speed": {
+        "name": "Average Speed"
+      },
+      "polestar_current_trip_meter_automatic": {
+        "name": "Trip Meter Automatic"
+      },
+      "polestar_current_trip_meter_manual": {
+        "name": "Trip Meter Manual"
+      },
+      "polestar_battery_charge_level": {
+        "name": "Battery Charge Level"
+      },
+      "polestar_estimated_charging_time_to_full": {
+        "name": "Charging Time"
+      },
+      "polestar_charging_status": {
+        "name": "Charging Status"
+      },
+      "polestar_charging_power": {
+        "name": "Charging Power"
+      },
+      "polestar_charging_current": {
+        "name": "Charging Current"
+      },
+      "polestar_charger_connection_status": {
+        "name": "Charger Connection Status"
+      },
+      "polestar_average_energy_consumption_kwh_per_100": {
+        "name": "Avg. Energy Consumption"
+      },
+      "polestar_estimated_charging_time_minutes_to_target_distance": {
+        "name": "Estimated Charging Time Minutes to Target Distance"
+      },
+      "polestar_vin": {
+        "name": "VIN"
+      },
+      "polestar_registration_number": {
+        "name": "Registration Number"
+      },
+      "polestar_software_version": {
+        "name": "Software Version"
+      },
+      "polestar_estimated_fully_charged_time": {
+        "name": "Estimated Fully Charged Time"
+      },
+      "polestar_model_name": {
+        "name": "Model Name"
+      },
+      "polestar_last_updated_odometer_data": {
+        "name": "Last Updated Odometer Data"
+      },
+      "polestar_last_updated_battery_data": {
+        "name": "Last Updated Battery Data"
+      },
+      "polestar_estimate_full_charge_range": {
+        "name": "Estimate Full Charge Range"
+      },
+      "polestar_api_status_code": {
+        "name": "API Status Code"
+      },
+      "polestar_api_token_expires_at": {
+        "name": "API Token Expires At"
+      }
     }
   }
 }

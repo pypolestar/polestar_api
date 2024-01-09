@@ -2,13 +2,11 @@
   "config": {
     "step": {
       "user": {
-        "title": "Configure Polestar EV",
-        "description": "Enter Authentication of Polestar EV",
+        "title": "Configureer Polestar API",
+        "description": "Vul authenticatie voor Polestar EV",
         "data": {
-          "name": "Friendly name",
-          "username": "Username",
-          "password": "Password",
-          "vin": "VIN"
+          "username": "Gebruikersnaam",
+          "password": "Wachtwoord"
         }
       }
     },
@@ -23,12 +21,6 @@
     "sensor": {
       "polestar_estimate_range": {
         "name": "Resterende afstand"
-      },
-      "polestar_distance_to_empty_miles": {
-        "name": "Resterende afstand (mijl)"
-      },
-      "polestar_estimate_distance_to_empty_km": {
-        "name": "Resterende afstand (km)"
       },
       "polestar_current_odometer": {
         "name": "Huidige kilometerstand"
@@ -52,10 +44,10 @@
         "name": "Laadstatus"
       },
       "polestar_charging_power": {
-        "name": "Laadvermogen (W)"
+        "name": "Laadvermogen"
       },
       "polestar_charging_current": {
-        "name": "Laadstroom (A)"
+        "name": "Laadstroom"
       },
       "polestar_charger_connection_status": {
         "name": "Laadkabel status"
@@ -72,6 +64,9 @@
       "polestar_registration_number": {
         "name": "Registratienummer"
       },
+      "polestar_software_version": {
+        "name": "Software Versie"
+      },
       "polestar_estimated_fully_charged_time": {
         "name": "Geschatte volledig opgeladen tijd"
       },
@@ -84,11 +79,8 @@
       "polestar_last_updated_battery_data": {
         "name": "Laatst geüpdatete batterijgegevens"
       },
-      "polestar_estimate_full_charge_range_miles": {
-        "name": "Geschatte volledige laadafstand (mijl)"
-      },
       "polestar_estimate_full_charge_range": {
-        "name": "Geschatte volledige laadafstand (km)"
+        "name": "Geschatte volledige laadafstand"
       },
       "polestar_api_status_code": {
         "name": "API Status Code"

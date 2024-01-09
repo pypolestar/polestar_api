@@ -120,7 +120,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         round_digits=2,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.DISTANCE,
-        max_value=1000000,
+        max_value=100000000,
         dict_data=None
     ),
     PolestarSensorDescription(
@@ -557,6 +557,7 @@ class PolestarSensor(PolestarEntity, SensorEntity):
 
             if value is not None:
                 self._attr_native_value = value
+                self._sensor_data = value
         except Exception:
             _LOGGER.warning("Failed to update sensor async update")
             self._device.polestarApi.next_update = datetime.now() + timedelta(seconds=60)

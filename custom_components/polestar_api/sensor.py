@@ -416,7 +416,7 @@ class PolestarSensor(PolestarEntity, SensorEntity):
     """Representation of a Polestar Sensor."""
 
     entity_description: PolestarSensorDescription
-    attr_has_entity_name = True
+    _attr_has_entity_name = True
 
     def __init__(self,
                  device: Polestar,
@@ -430,7 +430,7 @@ class PolestarSensor(PolestarEntity, SensorEntity):
         #self._attr_name = f"{description.name}"
         self._attr_unique_id = f"polestar_{unique_id}-{description.key}"
         self.entity_description = description
-        self.attr_translation_key = f"polestar_{description.key}"
+        self._attr_translation_key = f"polestar_{description.key}"
         self._attr_native_unit_of_measurement = description.native_unit_of_measurement
         self._sensor_data = None
         self._attr_unit_of_measurement = description.native_unit_of_measurement

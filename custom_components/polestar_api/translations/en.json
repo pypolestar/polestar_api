@@ -5,10 +5,8 @@
         "title": "Configure Polestar EV",
         "description": "Enter Authentication of Polestar EV",
         "data": {
-          "name": "Friendly name",
           "username": "Username",
-          "password": "Password",
-          "vin": "VIN"
+          "password": "Password"
         }
       }
     },
@@ -21,16 +19,13 @@
   },
   "entity": {
     "sensor": {
-      "polestar_estimate_distance_to_empty_miles": {
-        "name": "Distance Miles Remaining"
+      "polestar_estimate_range": {
+        "name": "Range"
       },
-      "polestar_estimate_distance_to_empty_km": {
-        "name": "Distance km Remaining"
-      },
-      "polestar_current_odometer_meters": {
+      "polestar_current_odometer": {
         "name": "Odometer"
       },
-      "polestar_average_speed_km_per_hour": {
+      "polestar_average_speed": {
         "name": "Average Speed"
       },
       "polestar_current_trip_meter_automatic": {
@@ -42,23 +37,23 @@
       "polestar_battery_charge_level": {
         "name": "Battery Charge Level"
       },
-      "polestar_estimated_charging_time_to_full_minutes": {
-        "name": "Estimated Charging Time to Full Minutes"
+      "polestar_estimated_charging_time_to_full": {
+        "name": "Charging Time"
       },
       "polestar_charging_status": {
         "name": "Charging Status"
       },
-      "polestar_charging_power_watts": {
-        "name": "Charging Power Watts"
+      "polestar_charging_power": {
+        "name": "Charging Power"
       },
-      "polestar_charging_current_amps": {
-        "name": "Charging Current Amps"
+      "polestar_charging_current": {
+        "name": "Charging Current"
       },
       "polestar_charger_connection_status": {
         "name": "Charger Connection Status"
       },
-      "polestar_average_energy_consumption_kwh_per_100_km": {
-        "name": "Average Energy Consumption kWh/100km"
+      "polestar_average_energy_consumption_kwh_per_100": {
+        "name": "Avg. Energy Consumption"
       },
       "polestar_estimated_charging_time_minutes_to_target_distance": {
         "name": "Estimated Charging Time Minutes to Target Distance"
@@ -83,9 +78,6 @@
       },
       "polestar_last_updated_battery_data": {
         "name": "Last Updated Battery Data"
-      },
-      "polestar_estimate_full_charge_range_miles": {
-        "name": "Estimate Full Charge Range Miles"
       },
       "polestar_estimate_full_charge_range": {
         "name": "Estimate Full Charge Range"

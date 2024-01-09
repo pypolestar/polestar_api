@@ -6,9 +6,8 @@
         "description": "Enter Authentication of Polestar EV",
         "data": {
           "name": "Friendly name",
-          "username": "Username",
-          "password": "Password",
-          "vin": "VIN"
+          "username": "Username OG",
+          "password": "Password OG"
         }
       }
     },

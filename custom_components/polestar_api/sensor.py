@@ -23,7 +23,7 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import entity_platform
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import StateType
-from homeassistant.util.unit_conversion import DistanceConverter
+from homeassistant.util.unit_conversion import DistanceConverter, SpeedConverter
 
 from . import DOMAIN as POLESTAR_API_DOMAIN
 from .entity import PolestarEntity
@@ -130,9 +130,9 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         query="getOdometerData",
         field_name="averageSpeedKmPerHour",
         native_unit_of_measurement=UnitOfSpeed.KILOMETERS_PER_HOUR,
-        round_digits=None,
+        round_digits=2,
         state_class=SensorStateClass.MEASUREMENT,
-        device_class=SensorDeviceClass.DISTANCE,
+        device_class=SensorDeviceClass.SPEED,
         max_value=150,
         dict_data=None
     ),
@@ -516,6 +516,11 @@ class PolestarSensor(PolestarEntity, SensorEntity):
         if self._sensor_option_unit_of_measurement is not None:
             if self._sensor_option_unit_of_measurement in (UnitOfLength.MILES, UnitOfLength.KILOMETERS, UnitOfLength.METERS):
                     self._attr_native_value = DistanceConverter.convert(
+                        self._sensor_data, self.entity_description.native_unit_of_measurement, self._sensor_option_unit_of_measurement
+                    )
+                    self._attr_native_unit_of_measurement = self._sensor_option_unit_of_measurement
+            elif self._sensor_option_unit_of_measurement in (UnitOfSpeed.MILES_PER_HOUR, UnitOfSpeed.KILOMETERS_PER_HOUR):
+                    self._attr_native_value = SpeedConverter.convert(
                         self._sensor_data, self.entity_description.native_unit_of_measurement, self._sensor_option_unit_of_measurement
                     )
                     self._attr_native_unit_of_measurement = self._sensor_option_unit_of_measurement

@@ -20,6 +20,7 @@ from .pypolestar.polestar import PolestarApi
 
 PLATFORMS = [
     Platform.SENSOR,
+    Platform.IMAGE
 ]
 
 CONFIG_SCHEMA = cv.removed(DOMAIN, raise_if_present=False)

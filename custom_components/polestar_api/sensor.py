@@ -504,6 +504,7 @@ class PolestarSensor(PolestarEntity, SensorEntity):
             estimate_range = int(estimate_range)
 
             self._sensor_data = round(estimate_range / battery_level * 100)
+            self._attr_native_value = self._sensor_data
 
         # Custom state for estimated_fully_charged_time
         if self.entity_description.key == 'estimated_fully_charged_time':

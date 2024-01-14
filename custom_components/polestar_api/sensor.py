@@ -14,6 +14,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     PERCENTAGE,
     UnitOfElectricCurrent,
+    UnitOfEnergy,
     UnitOfLength,
     UnitOfPower,
     UnitOfSpeed,
@@ -23,7 +24,7 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import entity_platform
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import StateType
-from homeassistant.util.unit_conversion import DistanceConverter, SpeedConverter
+from homeassistant.util.unit_conversion import DistanceConverter, EnergyConverter, SpeedConverter
 
 from . import DOMAIN as POLESTAR_API_DOMAIN
 from .entity import PolestarEntity
@@ -379,7 +380,30 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         max_value=None,
         dict_data=None
     ),
-
+    PolestarSensorDescription(
+        key="torque",
+        name="Torque",
+        icon="mdi:card-account-details",
+        query="getConsumerCarsV2",
+        field_name="content/specification/torque",
+        native_unit_of_measurement=None,
+        round_digits=None,
+        max_value=None,
+        dict_data=None
+    ),
+    PolestarSensorDescription(
+        key="battery_capacity",
+        name="Battery Capacity",
+        icon="mdi:battery-check",
+        query="getConsumerCarsV2",
+        field_name="content/specification/battery",
+        native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
+        round_digits=2,
+        max_value=None,
+        dict_data=None,
+        state_class=SensorStateClass.TOTAL,
+        device_class=SensorDeviceClass.ENERGY,
+    ),
 )
 
 
@@ -513,18 +537,30 @@ class PolestarSensor(PolestarEntity, SensorEntity):
                 return datetime.now().replace(second=0, microsecond=0) + timedelta(minutes=round(value))
             return 'Not charging'
 
+        if self.entity_description.key == 'battery_capacity':
+            # remove the kWh from the value
+            if isinstance(self._sensor_data, str):
+                self._sensor_data = self._sensor_data.replace(" kWh", "")
+            self._attr_native_value = self._sensor_data
+
         # if GUI changed the unit, we need to convert the value
         if self._sensor_option_unit_of_measurement is not None:
-            if self._sensor_option_unit_of_measurement in (UnitOfLength.MILES, UnitOfLength.KILOMETERS, UnitOfLength.METERS):
-                    self._attr_native_value = DistanceConverter.convert(
-                        self._sensor_data, self.entity_description.native_unit_of_measurement, self._sensor_option_unit_of_measurement
-                    )
-                    self._attr_native_unit_of_measurement = self._sensor_option_unit_of_measurement
-            elif self._sensor_option_unit_of_measurement in (UnitOfSpeed.MILES_PER_HOUR, UnitOfSpeed.KILOMETERS_PER_HOUR):
-                    self._attr_native_value = SpeedConverter.convert(
-                        self._sensor_data, self.entity_description.native_unit_of_measurement, self._sensor_option_unit_of_measurement
-                    )
-                    self._attr_native_unit_of_measurement = self._sensor_option_unit_of_measurement
+            if self._sensor_option_unit_of_measurement in (UnitOfLength.MILES, UnitOfLength.KILOMETERS, UnitOfLength.METERS, UnitOfLength.CENTIMETERS, UnitOfLength.MILLIMETERS, UnitOfLength.INCHES, UnitOfLength.FEET, UnitOfLength.YARDS):
+                self._attr_native_value = DistanceConverter.convert(
+                    self._sensor_data, self.entity_description.native_unit_of_measurement, self._sensor_option_unit_of_measurement
+                )
+                self._attr_native_unit_of_measurement = self._sensor_option_unit_of_measurement
+            elif self._sensor_option_unit_of_measurement in (UnitOfSpeed.MILES_PER_HOUR, UnitOfSpeed.KILOMETERS_PER_HOUR, UnitOfSpeed.METERS_PER_SECOND, UnitOfSpeed.KNOTS):
+                self._attr_native_value = SpeedConverter.convert(
+                    self._sensor_data, self.entity_description.native_unit_of_measurement, self._sensor_option_unit_of_measurement
+                )
+                self._attr_native_unit_of_measurement = self._sensor_option_unit_of_measurement
+            elif self._sensor_option_unit_of_measurement in (UnitOfEnergy.WATT_HOUR, UnitOfEnergy.KILO_WATT_HOUR, UnitOfEnergy.MEGA_WATT_HOUR, UnitOfEnergy.GIGA_JOULE, UnitOfEnergy.MEGA_JOULE):
+                self._attr_native_value = EnergyConverter.convert(
+                    float(self._sensor_data), self.entity_description.native_unit_of_measurement, self._sensor_option_unit_of_measurement
+                )
+                self._attr_native_unit_of_measurement = self._sensor_option_unit_of_measurement
+
         if self.entity_description.key in ("estimate_range", "estimate_full_charge_range"):
             if self._sensor_option_unit_of_measurement ==  UnitOfLength.MILES:
                 self.entity_description.max_value = 410
@@ -535,9 +571,9 @@ class PolestarSensor(PolestarEntity, SensorEntity):
 
         # prevent exponentianal value, we only give state value that is lower than the max value
         if self.entity_description.max_value is not None:
-            if isinstance(self._attr_native_value, str):
+            if isinstance(self._sensor_data, str):
                 self._attr_native_value = int(self._attr_native_value)
-            if self._attr_native_value > self.entity_description.max_value:
+            if self._sensor_data > self.entity_description.max_value:
                 _LOGGER.warning("%s: Value %s is higher than max value %s", self.entity_description.key, self._attr_native_value, self.entity_description.max_value)
                 return None
         # round the value

@@ -544,22 +544,23 @@ class PolestarSensor(PolestarEntity, SensorEntity):
             self._attr_native_value = self._sensor_data
 
         # if GUI changed the unit, we need to convert the value
-        if self._sensor_option_unit_of_measurement is not None:
-            if self._sensor_option_unit_of_measurement in (UnitOfLength.MILES, UnitOfLength.KILOMETERS, UnitOfLength.METERS, UnitOfLength.CENTIMETERS, UnitOfLength.MILLIMETERS, UnitOfLength.INCHES, UnitOfLength.FEET, UnitOfLength.YARDS):
-                self._attr_native_value = DistanceConverter.convert(
-                    self._sensor_data, self.entity_description.native_unit_of_measurement, self._sensor_option_unit_of_measurement
-                )
-                self._attr_native_unit_of_measurement = self._sensor_option_unit_of_measurement
-            elif self._sensor_option_unit_of_measurement in (UnitOfSpeed.MILES_PER_HOUR, UnitOfSpeed.KILOMETERS_PER_HOUR, UnitOfSpeed.METERS_PER_SECOND, UnitOfSpeed.KNOTS):
-                self._attr_native_value = SpeedConverter.convert(
-                    self._sensor_data, self.entity_description.native_unit_of_measurement, self._sensor_option_unit_of_measurement
-                )
-                self._attr_native_unit_of_measurement = self._sensor_option_unit_of_measurement
-            elif self._sensor_option_unit_of_measurement in (UnitOfEnergy.WATT_HOUR, UnitOfEnergy.KILO_WATT_HOUR, UnitOfEnergy.MEGA_WATT_HOUR, UnitOfEnergy.GIGA_JOULE, UnitOfEnergy.MEGA_JOULE):
-                self._attr_native_value = EnergyConverter.convert(
-                    float(self._sensor_data), self.entity_description.native_unit_of_measurement, self._sensor_option_unit_of_measurement
-                )
-                self._attr_native_unit_of_measurement = self._sensor_option_unit_of_measurement
+        if self._sensor_data:
+            if self._sensor_option_unit_of_measurement is not None:
+                if self._sensor_option_unit_of_measurement in (UnitOfLength.MILES, UnitOfLength.KILOMETERS, UnitOfLength.METERS, UnitOfLength.CENTIMETERS, UnitOfLength.MILLIMETERS, UnitOfLength.INCHES, UnitOfLength.FEET, UnitOfLength.YARDS):
+                    self._attr_native_value = DistanceConverter.convert(
+                        self._sensor_data, self.entity_description.native_unit_of_measurement, self._sensor_option_unit_of_measurement
+                    )
+                    self._attr_native_unit_of_measurement = self._sensor_option_unit_of_measurement
+                elif self._sensor_option_unit_of_measurement in (UnitOfSpeed.MILES_PER_HOUR, UnitOfSpeed.KILOMETERS_PER_HOUR, UnitOfSpeed.METERS_PER_SECOND, UnitOfSpeed.KNOTS):
+                    self._attr_native_value = SpeedConverter.convert(
+                        self._sensor_data, self.entity_description.native_unit_of_measurement, self._sensor_option_unit_of_measurement
+                    )
+                    self._attr_native_unit_of_measurement = self._sensor_option_unit_of_measurement
+                elif self._sensor_option_unit_of_measurement in (UnitOfEnergy.WATT_HOUR, UnitOfEnergy.KILO_WATT_HOUR, UnitOfEnergy.MEGA_WATT_HOUR, UnitOfEnergy.GIGA_JOULE, UnitOfEnergy.MEGA_JOULE):
+                    self._attr_native_value = EnergyConverter.convert(
+                        float(self._sensor_data), self.entity_description.native_unit_of_measurement, self._sensor_option_unit_of_measurement
+                    )
+                    self._attr_native_unit_of_measurement = self._sensor_option_unit_of_measurement
 
         if self.entity_description.key in ("estimate_range", "estimate_full_charge_range"):
             if self._sensor_option_unit_of_measurement ==  UnitOfLength.MILES:

@@ -75,7 +75,7 @@ class PolestarApi:
             "operationName": "GetOdometerData",
             "variables": "{\"vin\":\"" + vin + "\"}"
         }
-        result = await self.get_graph_ql(params)
+        result = await self.get_graph_ql(params, 'https://pc-api.polestar.com/eu-north-1/mystar-v2/')
 
         if result and result['data']:
             # put result in cache
@@ -89,7 +89,8 @@ class PolestarApi:
             "variables": "{\"vin\":\"" + vin + "\"}"
         }
 
-        result = await self.get_graph_ql(params)
+        result = await self.get_graph_ql(params, 'https://pc-api.polestar.com/eu-north-1/mystar-v2/')
+
 
         if result and result['data']:
             # put result in cache
@@ -102,7 +103,7 @@ class PolestarApi:
         params = {
             "query": "query GetConsumerCarsV2($locale: String) {   getConsumerCarsV2(locale: $locale) {     vin     internalVehicleIdentifier     registrationNo     market     hasPerformancePackage     software {       performanceOptimization {         value         __typename       }       __typename     }     content {       exterior {         name         __typename       }       interior {         name         __typename       }       wheels {         name         __typename       }       dimensions {         wheelbase {           label           value           __typename         }         groundClearanceWithPerformance {           value           label           __typename         }         groundClearanceWithoutPerformance {           value           label           __typename         }         dimensions {           label           value           __typename         }         __typename       }       specification {         totalHp         torque         totalKw         battery         trunkCapacity {           value           label           __typename         }         __typename       }       motor {         name         __typename       }       performanceOptimizationSpecification {         power {           value           unit           __typename         }         torqueMax {           value           unit           __typename         }         acceleration {           value           unit           description           __typename         }         __typename       }       __typename     }     modelYear     numberOfDoors     features {       code       description       name       type       __typename     }     fuelType     originalMarket  energy {elecRange  elecRangeUnit   elecEnergyConsumption   elecEnergyUnit  weightedCombinedCO2 weightedCombinedCO2Unit weightedCombinedFuelConsumption weightedCombinedFuelConsumptionUnit }  __typename   } }",
             "operationName": "GetConsumerCarsV2",
-            "variables": "{}"
+            "variables": "{\"local\":\"en_GB\"}"
         }
 
         result = await self.get_graph_ql(params)
@@ -167,14 +168,13 @@ class PolestarApi:
                     return self._get_field_name_value(field_name, data)
         return None
 
-    async def get_graph_ql(self, params: dict):
+    async def get_graph_ql(self, params: dict, url:str = "https://pc-api.polestar.com/eu-north-1/my-star/"):
         """Get the latest data from the Polestar API."""
         headers = {
             "Content-Type": "application/json",
             "authorization": f"Bearer {self.auth.access_token}"
         }
 
-        url = "https://pc-api.polestar.com/eu-north-1/my-star/"
         result = await self._client_session.get(url, params=params, headers=headers)
         self.latest_call_code = result.status_code
 

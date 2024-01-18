@@ -577,12 +577,15 @@ class PolestarSensor(PolestarEntity, SensorEntity):
             if self._sensor_data > self.entity_description.max_value:
                 _LOGGER.warning("%s: Value %s is higher than max value %s", self.entity_description.key, self._attr_native_value, self.entity_description.max_value)
                 return None
-        # round the value
-        if self.entity_description.round_digits is not None:
-            # if the value is integer, remove the decimal
-            if self.entity_description.round_digits == 0 and isinstance(self._attr_native_value, int):
-                self._attr_native_value =  int(self._attr_native_value)
-            self._attr_native_value = round(float(self._attr_native_value), self.entity_description.round_digits)
+
+        # only round value if native value is not None
+        if self._attr_native_value:
+            # round the value
+            if self.entity_description.round_digits is not None:
+                # if the value is integer, remove the decimal
+                if self.entity_description.round_digits == 0 and isinstance(self._attr_native_value, int):
+                    self._attr_native_value =  int(self._attr_native_value)
+                self._attr_native_value = round(float(self._attr_native_value), self.entity_description.round_digits)
 
         return self._attr_native_value
 

@@ -57,7 +57,7 @@ class FlowHandler(config_entries.ConfigFlow):
             _LOGGER.exception("Unexpected error creating device")
             return self.async_abort(reason="api_failed")
 
-        return await self._create_entry(username, password, )
+        return await self._create_entry(username, password)
 
     async def async_step_user(self, user_input: dict = None) -> None:
         """User initiated config flow."""

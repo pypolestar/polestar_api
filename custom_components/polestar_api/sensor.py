@@ -24,7 +24,11 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import entity_platform
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import StateType
-from homeassistant.util.unit_conversion import DistanceConverter, EnergyConverter, SpeedConverter
+from homeassistant.util.unit_conversion import (
+    DistanceConverter,
+    EnergyConverter,
+    SpeedConverter,
+)
 
 from . import DOMAIN as POLESTAR_API_DOMAIN
 from .entity import PolestarEntity

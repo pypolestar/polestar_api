@@ -125,7 +125,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         round_digits=2,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.DISTANCE,
-        max_value=100000000,
+        max_value=1000000000,
         dict_data=None
     ),
     PolestarSensorDescription(

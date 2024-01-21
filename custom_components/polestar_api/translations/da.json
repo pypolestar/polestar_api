@@ -26,11 +26,14 @@
       "polestar_api_token_expires_at": {
         "name": "API token udløber"
       },
+      "polestar_average_speed": {
+        "name": "Gennemsnitsfart"
+      },
       "polestar_average_energy_consumption_kwh_per_100": {
         "name": "Gennemsnitligt energiforbrug"
       },
-      "polestar_average_speed": {
-        "name": "Gennemsnitsfart"
+      "polestar_battery_capacity": {
+        "name": "Batterikapacitet"
       },
       "polestar_battery_charge_level": {
         "name": "Batteriniveau"
@@ -71,6 +74,12 @@
       "polestar_estimated_fully_charged_time": {
         "name": "Estimeret total ladetid"
       },
+      "polestar_factory_complete": {
+        "name": "Færdigsamlet dato"
+      },
+      "polestar_internal_vebicle_id": {
+        "name": "Internt køretøjs ID"
+      },
       "polestar_last_updated_battery_data": {
         "name": "Sidst opdateret batteriniveau"
       },
@@ -80,11 +89,20 @@
       "polestar_model_name": {
         "name": "Modelnavn"
       },
+      "polestar_registration_date": {
+        "name": "Registreringsdato"
+      },
       "polestar_registration_number": {
         "name": "Registreringsnummer"
       },
       "polestar_software_version": {
         "name": "Software version"
+      },
+      "polestar_software_version_release": {
+        "name": "Software dato"
+      },
+      "polestar_torque": {
+        "name": "Moment"
       },
       "polestar_vin": {
         "name": "Stelnummer"

@@ -71,11 +71,11 @@ class PolestarApi:
     async def _get_odometer_data(self, vin: str):
         """" Get the latest odometer data from the Polestar API."""
         params = {
-            "query": "query GetOdometerData($vin: String!) { getOdometerData(vin: $vin) { averageSpeedKmPerHour eventUpdatedTimestamp { iso unix __typename } odometerMeters tripMeterAutomaticKm tripMeterManualKm __typename }}",
+            "query": "query GetOdometerData($vin:String!){getOdometerData(vin:$vin){averageSpeedKmPerHour eventUpdatedTimestamp{iso unix}odometerMeters tripMeterAutomaticKm tripMeterManualKm}}",
             "operationName": "GetOdometerData",
             "variables": "{\"vin\":\"" + vin + "\"}"
         }
-        result = await self.get_graph_ql(params)
+        result = await self.get_graph_ql(params, 'https://pc-api.polestar.com/eu-north-1/mystar-v2/')
 
         if result and result['data']:
             # put result in cache
@@ -84,12 +84,13 @@ class PolestarApi:
 
     async def _get_battery_data(self, vin: str):
         params = {
-            "query": "query GetBatteryData($vin: String!) {  getBatteryData(vin: $vin) {    averageEnergyConsumptionKwhPer100Km    batteryChargeLevelPercentage    chargerConnectionStatus    chargingCurrentAmps    chargingPowerWatts    chargingStatus    estimatedChargingTimeMinutesToTargetDistance    estimatedChargingTimeToFullMinutes    estimatedDistanceToEmptyKm    estimatedDistanceToEmptyMiles    eventUpdatedTimestamp {      iso      unix      __typename    }    __typename  }}",
+            "query": "query GetBatteryData($vin:String!){getBatteryData(vin:$vin){averageEnergyConsumptionKwhPer100Km batteryChargeLevelPercentage chargerConnectionStatus chargingCurrentAmps chargingPowerWatts chargingStatus estimatedChargingTimeMinutesToTargetDistance estimatedChargingTimeToFullMinutes estimatedDistanceToEmptyKm estimatedDistanceToEmptyMiles eventUpdatedTimestamp{iso unix}}}",
             "operationName": "GetBatteryData",
             "variables": "{\"vin\":\"" + vin + "\"}"
         }
 
-        result = await self.get_graph_ql(params)
+        result = await self.get_graph_ql(params, 'https://pc-api.polestar.com/eu-north-1/mystar-v2/')
+
 
         if result and result['data']:
             # put result in cache
@@ -100,9 +101,9 @@ class PolestarApi:
         """" Get the latest vehicle data from the Polestar API."""
         # get Vehicle Data
         params = {
-            "query": "query getCars {  getConsumerCarsV2 {    vin    internalVehicleIdentifier    modelYear    content {      model {        code        name        __typename      }      images {        studio {          url          angles          __typename        }        __typename      }      __typename    }    hasPerformancePackage    registrationNo    deliveryDate    currentPlannedDeliveryDate    software    {    version    __typename    }    __typename  }}",
-            "operationName": "getCars",
-            "variables": "{}"
+            "query": "query GetConsumerCarsV2($locale:String){getConsumerCarsV2(locale:$locale){vin internalVehicleIdentifier salesType currentPlannedDeliveryDate market originalMarket pno34 modelYear belongsToFleet registrationNo metaOrderNumber factoryCompleteDate registrationDate deliveryDate serviceHistory{claimType market mileage mileageUnit operations{id code description quantity performedDate}orderEndDate orderNumber orderStartDate parts{id code description quantity performedDate} statusDMS symptomCode vehicleAge workshopId}content{exterior{code name description excluded}exteriorDetails{code name description excluded}interior{code name description excluded}performancePackage{code name description excluded}performanceOptimizationSpecification{power{value unit}torqueMax{value unit}acceleration{value unit description}}wheels{code name description excluded}plusPackage{code name description excluded}pilotPackage{code name description excluded}motor{name description excluded}model{name code}images{studio{url angles resolutions}location{url angles resolutions}interior{url angles resolutions}}specification{battery bodyType brakes combustionEngine electricMotors performance suspension tireSizes torque totalHp totalKw trunkCapacity{label value}}dimensions{wheelbase{label value}groundClearanceWithPerformance{label value}groundClearanceWithoutPerformance{label value}dimensions{label value}}towbar{code name description excluded}}primaryDriver primaryDriverRegistrationTimestamp owners{id registeredAt information{polestarId ownerType}}wltpNedcData{wltpCO2Unit wltpElecEnergyConsumption wltpElecEnergyUnit wltpElecRange wltpElecRangeUnit wltpWeightedCombinedCO2 wltpWeightedCombinedFuelConsumption wltpWeightedCombinedFuelConsumptionUnit}energy{elecRange elecRangeUnit elecEnergyConsumption elecEnergyUnit weightedCombinedCO2 weightedCombinedCO2Unit weightedCombinedFuelConsumption weightedCombinedFuelConsumptionUnit}fuelType drivetrain numberOfDoors numberOfSeats motor{description code}maxTrailerWeight{value unit}curbWeight{value unit}hasPerformancePackage numberOfCylinders cylinderVolume cylinderVolumeUnit transmission numberOfGears structureWeek hardware{nodeAddress partNo description{text short}software{partNo}}software{version versionTimestamp performanceOptimization{value description timestamp}}claims{type validFromDate validUntilDate validUntilMileage performedJobs{repairDate}}performedClaims{claimType workshopId market orderNumber claimPerformedManually orderEndDate mileage mileageUnit vehicleAge symptomCode parts{code}operations{code}}latestClaimStatus{mileage mileageUnit registeredDate vehicleAge}internalCar{origin registeredAt}edition commonStatusPoint{code timestamp description}brandStatus{code timestamp description}intermediateDestinationCode partnerDestinationCode features{type code name description excluded galleryImage{url alt}thumbnail{url alt}}electricalEngineNumbers{number placement}}}",
+            "operationName": "GetConsumerCarsV2",
+            "variables": "{\"locale\":\"en_GB\"}"
         }
 
         result = await self.get_graph_ql(params)
@@ -167,14 +168,13 @@ class PolestarApi:
                     return self._get_field_name_value(field_name, data)
         return None
 
-    async def get_graph_ql(self, params: dict):
+    async def get_graph_ql(self, params: dict, url:str = "https://pc-api.polestar.com/eu-north-1/my-star/"):
         """Get the latest data from the Polestar API."""
         headers = {
             "Content-Type": "application/json",
             "authorization": f"Bearer {self.auth.access_token}"
         }
 
-        url = "https://pc-api.polestar.com/eu-north-1/my-star/"
         result = await self._client_session.get(url, params=params, headers=headers)
         self.latest_call_code = result.status_code
 

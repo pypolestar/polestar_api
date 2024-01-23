@@ -5,7 +5,14 @@ import logging
 import httpx
 
 from .auth import PolestarAuth
-from .const import BATTERY_DATA, CACHE_TIME, CAR_INFO_DATA, ODO_METER_DATA
+from .const import (
+    BASE_URL,
+    BASE_URL_V2,
+    BATTERY_DATA,
+    CACHE_TIME,
+    CAR_INFO_DATA,
+    ODO_METER_DATA,
+)
 from .exception import (
     PolestarApiException,
     PolestarAuthException,
@@ -25,6 +32,7 @@ class PolestarApi:
         self.updating = False
         self.cache_data = {}
         self.latest_call_code = None
+        self.latest_call_code_2 = None
         self._client_session = httpx.AsyncClient()
         self.next_update = None
 
@@ -75,7 +83,7 @@ class PolestarApi:
             "operationName": "GetOdometerData",
             "variables": "{\"vin\":\"" + vin + "\"}"
         }
-        result = await self.get_graph_ql(params, 'https://pc-api.polestar.com/eu-north-1/mystar-v2/')
+        result = await self.get_graph_ql(params, BASE_URL_V2)
 
         if result and result['data']:
             # put result in cache
@@ -89,7 +97,7 @@ class PolestarApi:
             "variables": "{\"vin\":\"" + vin + "\"}"
         }
 
-        result = await self.get_graph_ql(params, 'https://pc-api.polestar.com/eu-north-1/mystar-v2/')
+        result = await self.get_graph_ql(params, BASE_URL_V2)
 
 
         if result and result['data']:
@@ -134,7 +142,7 @@ class PolestarApi:
             if (self.auth.token_expiry - datetime.now()).total_seconds() < 300:
                 await self.auth.get_token(refresh=True)
         except PolestarAuthException as e:
-            self.latest_call_code = 500
+            self._set_latest_call_code(BASE_URL, 500)
             _LOGGER.warning("Auth Exception: %s", str(e))
             self.updating = False
             return
@@ -145,7 +153,7 @@ class PolestarApi:
             except PolestarNotAuthorizedException:
                 await self.auth.get_token()
             except PolestarApiException as e:
-                self.latest_call_code = 500
+                self._set_latest_call_code(BASE_URL, 500)
                 _LOGGER.warning('Failed to get %s data %s',
                                 func.__name__, str(e))
 
@@ -168,7 +176,15 @@ class PolestarApi:
                     return self._get_field_name_value(field_name, data)
         return None
 
-    async def get_graph_ql(self, params: dict, url:str = "https://pc-api.polestar.com/eu-north-1/my-star/"):
+    def _set_latest_call_code(self, url:str, code: int):
+        if url == BASE_URL:
+            self.latest_call_code = code
+        else:
+            self.latest_call_code_2 = code
+
+
+
+    async def get_graph_ql(self, params: dict, url:str = BASE_URL):
         """Get the latest data from the Polestar API."""
         headers = {
             "Content-Type": "application/json",
@@ -176,7 +192,7 @@ class PolestarApi:
         }
 
         result = await self._client_session.get(url, params=params, headers=headers)
-        self.latest_call_code = result.status_code
+        self._set_latest_call_code(url, result.status_code)
 
         if result.status_code == 401:
             raise PolestarNotAuthorizedException("Unauthorized Exception")
@@ -186,7 +202,7 @@ class PolestarApi:
 
         resultData = result.json()
         if resultData.get('errors'):
-            self.latest_call_code = 500
+            self._set_latest_call_code(url, 500)
             error_message = resultData['errors'][0]['message']
             if error_message == "User not authenticated":
                 raise PolestarNotAuthorizedException("Unauthorized Exception")

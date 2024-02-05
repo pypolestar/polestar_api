@@ -236,7 +236,6 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         native_unit_of_measurement=None,
         round_digits=None,
         max_value=None,
-        state_class=SensorStateClass.MEASUREMENT,
         device_class=None,
         dict_data=CHARGING_CONNECTION_STATUS_DICT
     ),

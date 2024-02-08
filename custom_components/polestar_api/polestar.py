@@ -48,13 +48,27 @@ class Polestar:
         """ Get the latest data from the Polestar API."""
         return self.polestarApi.get_latest_data(query, field_name)
 
+    def get_latest_call_code_v1(self):
+        """Get the latest call code mystar API."""
+        return self.polestarApi.latest_call_code
+
+    def get_latest_call_code_v2(self):
+        """Get the latest call code mystar-v2 API."""
+        return self.polestarApi.latest_call_code_2
+
+    def get_latest_call_code_auth(self):
+        """Get the latest call code mystar API."""
+        return self.polestarApi.auth.latest_call_code
+
     def get_latest_call_code(self):
         """Get the latest call code."""
         # if AUTH code last code is not 200 then we return that error code,
-        # otherwise just give the call_code in API
+        # otherwise just give the call_code in API from v1 and then v2
         if self.polestarApi.auth.latest_call_code != 200:
             return self.polestarApi.auth.latest_call_code
-        return self.polestarApi.latest_call_code
+        if self.polestarApi.latest_call_code != 200:
+            return self.polestarApi.latest_call_code
+        return self.polestarApi.latest_call_code_2
 
     async def async_update(self) -> None:
         """Update data from Polestar."""

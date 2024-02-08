@@ -236,7 +236,6 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         native_unit_of_measurement=None,
         round_digits=None,
         max_value=None,
-        state_class=SensorStateClass.MEASUREMENT,
         device_class=None,
         dict_data=CHARGING_CONNECTION_STATUS_DICT
     ),
@@ -410,7 +409,29 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
     ),
     PolestarSensorDescription(
         key="api_status_code",
-        name="API Status",
+        name="API Status Code V1",
+        icon="mdi:heart",
+        query=None,
+        field_name=None,
+        native_unit_of_measurement=None,
+        round_digits=None,
+        max_value=None,
+        dict_data=API_STATUS_DICT
+    ),
+    PolestarSensorDescription(
+        key="api_status_code_v2",
+        name="API Status Code V2",
+        icon="mdi:heart",
+        query=None,
+        field_name=None,
+        native_unit_of_measurement=None,
+        round_digits=None,
+        max_value=None,
+        dict_data=API_STATUS_DICT
+    ),
+    PolestarSensorDescription(
+        key="api_status_code_auth",
+        name="Auth API Status Code",
         icon="mdi:heart",
         query=None,
         field_name=None,
@@ -421,8 +442,8 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
     ),
     PolestarSensorDescription(
         key="api_token_expires_at",
-        name="API Token Expired At",
-        icon="mdi:heart",
+        name="Auth Token Expired At",
+        icon="mdi:clock-time-eight",
         query=None,
         field_name=None,
         native_unit_of_measurement=None,
@@ -551,7 +572,11 @@ class PolestarSensor(PolestarEntity, SensorEntity):
         if self.entity_description.dict_data is not None:
             # exception for api_status_code
             if self.entity_description.key == 'api_status_code':
-                return self.entity_description.dict_data.get(self._device.get_latest_call_code(), "Error")
+                return self.entity_description.dict_data.get(self._device.get_latest_call_code_v1(), "Error")
+            elif self.entity_description.key == 'api_status_code_v2':
+                return self.entity_description.dict_data.get(self._device.get_latest_call_code_v2(), "Error")
+            elif self.entity_description.key == 'api_status_code_auth':
+                return self.entity_description.dict_data.get(self._device.get_latest_call_code_auth(), "Error")
             self._attr_native_value  =  self.entity_description.dict_data.get(
                 self._attr_native_value, self._attr_native_value)
 

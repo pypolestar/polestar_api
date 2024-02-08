@@ -5,10 +5,8 @@
         "title": "Configuration Polestar VE",
         "description": "Entrez les paramètres d'authentification pour Polestar",
         "data": {
-          "name": "Nom personnalisé",
           "username": "Nom d'utilisateur",
-          "password": "Mot de passe",
-          "vin": "NIV"
+          "password": "Mot de passe"
         }
       }
     },
@@ -21,10 +19,13 @@
   },
   "entity": {
     "sensor": {
-      "polestar_current_odometer_meters": {
+      "polestar_estimate_range": {
+        "name": "Estimé de l'autonomie"
+      },
+      "polestar_current_odometer": {
         "name": "Odomètre"
       },
-      "polestar_average_speed_per_hour": {
+      "polestar_average_speed": {
         "name": "Vitesse moyenne"
       },
       "polestar_current_trip_meter_automatic": {
@@ -34,19 +35,19 @@
         "name": "Compteur kilométrique manuel"
       },
       "polestar_battery_charge_level": {
-        "name": "Niveau de charge de la betterie"
+        "name": "Niveau de charge de la batterie"
       },
-      "polestar_estimated_charging_time_to_full_minutes": {
+      "polestar_estimated_charging_time_to_full": {
         "name": "Temps de recharge jusqu'à recharge complète"
       },
       "polestar_charging_status": {
         "name": "État de la recharge"
       },
-      "polestar_charging_power_watts": {
+      "polestar_charging_power": {
         "name": "Puissance de recharge"
       },
-      "polestar_charging_current_amps": {
-        "name": "Puissance de recharge"
+      "polestar_charging_current": {
+        "name": "Courant de recharge"
       },
       "polestar_charger_connection_status": {
         "name": "État de connexion du chargeur"
@@ -63,6 +64,9 @@
       "polestar_registration_number": {
         "name": "Numéro d'enregistrement"
       },
+      "polestar_software_version": {
+        "name": "Version du logiciel"
+      },
       "polestar_estimated_fully_charged_time": {
         "name": "Temps de recharge restant"
       },
@@ -77,9 +81,6 @@
       },
       "polestar_estimate_full_charge_range": {
         "name": "Estimé de l'autonomie complète"
-      },
-      "polestar_estimate_range": {
-        "name": "Estimé de l'autonomie"
       },
       "polestar_api_status_code": {
         "name": "Code d'état de l'API"

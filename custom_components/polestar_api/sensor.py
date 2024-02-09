@@ -637,14 +637,6 @@ class PolestarSensor(PolestarEntity, SensorEntity):
                     )
                     self._attr_native_unit_of_measurement = self._sensor_option_unit_of_measurement
 
-        if self.entity_description.key in ("estimate_range", "estimate_full_charge_range"):
-            if self._sensor_option_unit_of_measurement ==  UnitOfLength.MILES:
-                self.entity_description.max_value = 410
-            elif self._sensor_option_unit_of_measurement ==  UnitOfLength.KILOMETERS:
-                self.entity_description.max_value = 660
-            elif self._sensor_option_unit_of_measurement ==  UnitOfLength.METERS:
-                self.entity_description.max_value = 660000
-
         # prevent exponentianal value, we only give state value that is lower than the max value
         if self.entity_description.max_value is not None:
             if isinstance(self._sensor_data, str):

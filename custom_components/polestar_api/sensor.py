@@ -648,8 +648,8 @@ class PolestarSensor(PolestarEntity, SensorEntity):
         # prevent exponentianal value, we only give state value that is lower than the max value
         if self.entity_description.max_value is not None:
             if isinstance(self._sensor_data, str):
-                self._attr_native_value = int(self._attr_native_value)
-            if self._sensor_data > self.entity_description.max_value:
+                self._attr_native_value = int(self._sensor_data)
+            if self._attr_native_value > self.entity_description.max_value:
                 _LOGGER.warning("%s: Value %s is higher than max value %s", self.entity_description.key, self._attr_native_value, self.entity_description.max_value)
                 return None
 

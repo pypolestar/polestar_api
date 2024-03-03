@@ -187,7 +187,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         field_name="estimatedChargingTimeToFullMinutes",
         native_unit_of_measurement=UnitOfTime.MINUTES,
         round_digits=None,
-        max_value=1500,
+        max_value=None,
         dict_data=None
     ),
     PolestarSensorDescription(

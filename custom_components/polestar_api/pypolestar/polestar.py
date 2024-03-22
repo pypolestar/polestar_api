@@ -153,7 +153,7 @@ class PolestarApi:
             except PolestarNotAuthorizedException:
                 await self.auth.get_token()
             except PolestarApiException as e:
-                self._set_latest_call_code(BASE_URL, 500)
+                self._set_latest_call_code(BASE_URL_V2, 500)
                 _LOGGER.warning('Failed to get %s data %s',
                                 func.__name__, str(e))
 

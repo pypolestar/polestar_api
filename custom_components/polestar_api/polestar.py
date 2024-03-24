@@ -94,7 +94,7 @@ class Polestar:
         except Exception as e:
             _LOGGER.error("Unexpected Error on update data %s", str(e))
             self.polestarApi.next_update = datetime.now() + timedelta(seconds=60)
-        self.polestarApi.latest_call_code = 500
+        self.polestarApi.latest_call_code_v2 = 500
         self.polestarApi.updating = False
 
     def set_config_unit(self, unit:UnitSystem):

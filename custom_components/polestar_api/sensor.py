@@ -224,7 +224,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         round_digits=None,
         max_value=None,
         state_class=SensorStateClass.MEASUREMENT,
-        device_class=SensorDeviceClass.POWER,
+        device_class=SensorDeviceClass.CURRENT,
         dict_data=None
     ),
     PolestarSensorDescription(
@@ -564,13 +564,12 @@ class PolestarSensor(PolestarEntity, SensorEntity):
     @property
     def state(self) -> StateType:
         """Return the state of the sensor."""
-        if self._attr_native_value is None and self.entity_description.key in ('charging_current', 'charging_power', 'estimated_charging_time_minutes_to_target_distance'):
+        if self._attr_native_value is None and self.entity_description.key in ('estimated_charging_time_minutes_to_target_distance'):
             #self.entity_description.native_unit_of_measurement = None
             self._attr_native_unit_of_measurement = None
             return "Not Supported Yet"
 
         if self.entity_description.dict_data is not None:
-            # exception for api_status_code
             if self.entity_description.key == 'api_status_code':
                 return self.entity_description.dict_data.get(self._device.get_latest_call_code_v1(), "Error")
             elif self.entity_description.key == 'api_status_code_v2':

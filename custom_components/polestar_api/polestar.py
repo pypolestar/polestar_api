@@ -109,5 +109,8 @@ class Polestar:
         """Get the latest value from the Polestar API."""
         data = self.polestarApi.get_cache_data(query, field_name, skip_cache)
         if data is None:
+            # if amp and voltage can be null, so we will return 0
+            if field_name in ('chargingCurrentAmps', 'chargingPowerWatts'):
+                return 0
             return
         return data

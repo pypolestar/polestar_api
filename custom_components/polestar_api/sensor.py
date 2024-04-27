@@ -678,6 +678,8 @@ class PolestarSensor(PolestarEntity, SensorEntity):
             if value is not None:
                 self._attr_native_value = value
                 self._sensor_data = value
+
+
         except Exception:
             _LOGGER.warning("Failed to update sensor async update")
             self._device.polestarApi.next_update = datetime.now() + timedelta(seconds=60)

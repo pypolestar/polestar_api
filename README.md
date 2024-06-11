@@ -4,6 +4,10 @@ Polestar API
 This application is not an official app affiliated with Polestar.
 
 
+## Update
+Update 11/06/2024: I'm no longer an owner of a Polestar (return of my lease car). So extra features should not be possible. (unless my new lease car is also a Polestar) Thanks everyone for the support!
+
+
 ## Use your Polestar account
 This is the account that you also use in the polestar APP on your mobile phone
 try here to login if it works or not:

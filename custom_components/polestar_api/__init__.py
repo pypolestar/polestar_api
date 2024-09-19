@@ -18,10 +18,7 @@ from .polestar import Polestar
 from .pypolestar.exception import PolestarApiException, PolestarAuthException
 from .pypolestar.polestar import PolestarApi
 
-PLATFORMS = [
-    Platform.SENSOR,
-    Platform.IMAGE
-]
+PLATFORMS = [Platform.IMAGE, Platform.SENSOR]
 
 CONFIG_SCHEMA = cv.removed(DOMAIN, raise_if_present=False)
 
@@ -39,17 +36,26 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> b
     conf = config_entry.data
 
     _LOGGER.debug("async_setup_entry: %s", config_entry)
-    polestar = Polestar(
-        hass, conf[CONF_USERNAME], conf[CONF_PASSWORD])
+    polestar = Polestar(hass, conf[CONF_USERNAME], conf[CONF_PASSWORD])
+
     try:
         await polestar.init()
-        polestar.set_config_unit(hass.config.units)
-
+        number_of_cars = polestar.get_number_of_cars()
         hass.data.setdefault(DOMAIN, {})
-        hass.data[DOMAIN][config_entry.entry_id] = polestar
 
-        await hass.config_entries.async_forward_entry_setups(config_entry, PLATFORMS)
+        # for each number of car we are going to create a new entry
+        entities = []
+        for index in range(number_of_cars):
+            polestar = Polestar(hass, conf[CONF_USERNAME], conf[CONF_PASSWORD])
+            await polestar.init()
+            polestar.set_car_data(index)
+            polestar.set_vin()
+            polestar.set_config_unit(hass.config.units)
+            entities.append(polestar)
 
+        hass.data[DOMAIN][config_entry.entry_id] = entities
+
+        await hass.config_entries.async_forward_entry_setup(config_entry, "sensor")
         return True
     except PolestarApiException as e:
         _LOGGER.exception("API Exception on update data %s", str(e))
@@ -66,11 +72,14 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> b
     polestar.polestarApi.latest_call_code = 500
     return False
 
+
 async def async_unload_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> bool:
     """Unload a config entry."""
     _LOGGER.debug("async_unload_entry: %s", config_entry)
 
-    unload_ok = await hass.config_entries.async_unload_platforms(config_entry, PLATFORMS)
+    unload_ok = await hass.config_entries.async_unload_platforms(
+        config_entry, PLATFORMS
+    )
 
     hass.data[DOMAIN].pop(config_entry.entry_id)
 
@@ -80,7 +89,9 @@ async def async_unload_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> 
     return unload_ok
 
 
-async def polestar_setup(hass: HomeAssistant, name: str, username: str, password: str) -> PolestarApi | None:
+async def polestar_setup(
+    hass: HomeAssistant, name: str, username: str, password: str
+) -> PolestarApi | None:
     """Create a Polestar instance only once."""
 
     try:

@@ -1,4 +1,5 @@
 """Polestar API for Polestar integration."""
+
 from datetime import datetime, timedelta
 import logging
 
@@ -18,11 +19,9 @@ _LOGGER = logging.getLogger(__name__)
 
 class Polestar:
     """Polestar EV integration."""
-    def __init__(self,
-                 hass: HomeAssistant,
-                 username: str,
-                 password: str
-                 ) -> None:
+
+    def __init__(self, hass: HomeAssistant, username: str, password: str) -> None:
+        """Initialize the Polestar API."""
         self.id = None
         self.name = "Polestar "
         self.polestarApi = PolestarApi(username, password)
@@ -33,19 +32,30 @@ class Polestar:
     async def init(self):
         """Initialize the Polestar API."""
         await self.polestarApi.init()
-        vin = self.get_value('getConsumerCarsV2', 'vin', True)
+
+    def set_car_data(self, index: int = 0):
+        """Set the car data."""
+        self.polestarApi.set_car_data(index)
+
+    def set_vin(self):
+        """Set the VIN number."""
+        vin = self.get_value("getConsumerCarsV2", "vin", True)
         if vin:
             # fill the vin and id in the constructor
             self.vin = vin
             self.id = vin[:8]
             self.name = "Polestar " + vin[-4:]
 
+    def get_number_of_cars(self):
+        """Get the number of cars."""
+        return self.polestarApi.get_number_of_cars()
+
     def get_token_expiry(self):
         """Get the token expiry time."""
         return self.polestarApi.auth.token_expiry
 
     def get_latest_data(self, query: str, field_name: str):
-        """ Get the latest data from the Polestar API."""
+        """Get the latest data from the Polestar API."""
         return self.polestarApi.get_latest_data(query, field_name)
 
     def get_latest_call_code_v1(self):
@@ -97,7 +107,7 @@ class Polestar:
         self.polestarApi.latest_call_code_v2 = 500
         self.polestarApi.updating = False
 
-    def set_config_unit(self, unit:UnitSystem):
+    def set_config_unit(self, unit: UnitSystem):
         """Set unit system for the device."""
         self.unit_system = unit
 

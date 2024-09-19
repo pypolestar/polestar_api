@@ -35,6 +35,7 @@ class PolestarApi:
         self.latest_call_code_2 = None
         self._client_session = httpx.AsyncClient()
         self.next_update = None
+        self.car_data = None
 
     async def init(self):
         """Initialize the Polestar API."""
@@ -44,10 +45,27 @@ class PolestarApi:
             if self.auth.access_token is None:
                 return
 
-            await self._get_vehicle_data()
+            carData = await self._get_vehicle_data()
+            if carData is None:
+                return
+
+            self.car_data = carData
 
         except PolestarAuthException as e:
             _LOGGER.exception("Auth Exception: %s", str(e))
+
+    def set_car_data(self, index: int = 0):
+        """Set the car data."""
+        self.cache_data[CAR_INFO_DATA] = {
+            "data": self.car_data[index],
+            "timestamp": datetime.now(),
+        }
+
+    def get_number_of_cars(self) -> int:
+        """Get the number of cars."""
+        if self.car_data:
+            return len(self.car_data)
+        return 0
 
     def get_latest_data(self, query: str, field_name: str) -> dict or bool or None:
         """Get the latest data from the Polestar API."""
@@ -56,6 +74,7 @@ class PolestarApi:
             if data is None:
                 return False
             return self._get_field_name_value(field_name, data)
+        return None
 
     def _get_field_name_value(self, field_name: str, data: dict) -> str or bool or None:
         if field_name is None or data is None:
@@ -76,7 +95,7 @@ class PolestarApi:
         return None
 
     async def _get_odometer_data(self, vin: str):
-        """ " Get the latest odometer data from the Polestar API."""
+        """Get the latest odometer data from the Polestar API."""
         params = {
             "query": "query GetOdometerData($vin:String!){getOdometerData(vin:$vin){averageSpeedKmPerHour eventUpdatedTimestamp{iso unix}odometerMeters tripMeterAutomaticKm tripMeterManualKm}}",
             "operationName": "GetOdometerData",
@@ -108,7 +127,7 @@ class PolestarApi:
             }
 
     async def _get_vehicle_data(self):
-        """ " Get the latest vehicle data from the Polestar API."""
+        """Get the latest vehicle data from the Polestar API."""
         # get Vehicle Data
         params = {
             "query": "query GetConsumerCarsV2 { getConsumerCarsV2 { vin internalVehicleIdentifier salesType currentPlannedDeliveryDate market originalMarket pno34 modelYear registrationNo metaOrderNumber factoryCompleteDate registrationDate deliveryDate serviceHistory { claimType market mileage mileageUnit operations { id code description quantity performedDate } orderEndDate orderNumber orderStartDate parts { id code description quantity performedDate } statusDMS symptomCode vehicleAge workshopId } content { exterior { code name description excluded } exteriorDetails { code name description excluded } interior { code name description excluded } performancePackage { code name description excluded } performanceOptimizationSpecification { power { value unit } torqueMax { value unit } acceleration { value unit description } } wheels { code name description excluded } plusPackage { code name description excluded } pilotPackage { code name description excluded } motor { name description excluded } model { name code } images { studio { url angles resolutions } location { url angles resolutions } interior { url angles resolutions } } specification { battery bodyType brakes combustionEngine electricMotors performance suspension tireSizes torque totalHp totalKw trunkCapacity { label value } } dimensions { wheelbase { label value } groundClearanceWithPerformance { label value } groundClearanceWithoutPerformance { label value } dimensions { label value } } towbar { code name description excluded } } primaryDriver primaryDriverRegistrationTimestamp owners { id registeredAt information { polestarId ownerType } } wltpNedcData { wltpCO2Unit wltpElecEnergyConsumption wltpElecEnergyUnit wltpElecRange wltpElecRangeUnit wltpWeightedCombinedCO2 wltpWeightedCombinedFuelConsumption wltpWeightedCombinedFuelConsumptionUnit } energy { elecRange elecRangeUnit elecEnergyConsumption elecEnergyUnit weightedCombinedCO2 weightedCombinedCO2Unit weightedCombinedFuelConsumption weightedCombinedFuelConsumptionUnit } fuelType drivetrain numberOfDoors numberOfSeats motor { description code } maxTrailerWeight { value unit } curbWeight { value unit } hasPerformancePackage numberOfCylinders cylinderVolume cylinderVolumeUnit transmission numberOfGears structureWeek software { version versionTimestamp performanceOptimization { value description timestamp } } latestClaimStatus { mileage mileageUnit registeredDate vehicleAge } internalCar { origin registeredAt } edition commonStatusPoint { code timestamp description } brandStatus { code timestamp description } intermediateDestinationCode partnerDestinationCode features { type code name description excluded galleryImage { url alt } thumbnail { url alt } } electricalEngineNumbers { number placement } } }",
@@ -127,10 +146,12 @@ class PolestarApi:
                 # throw new exception
                 raise PolestarNoDataException("No cars found in account")
 
-            self.cache_data[CAR_INFO_DATA] = {
-                "data": result["data"][CAR_INFO_DATA][0],
-                "timestamp": datetime.now(),
-            }
+            return result["data"][CAR_INFO_DATA]
+            # self.cache_data[CAR_INFO_DATA] = {
+            #     "data": result["data"][CAR_INFO_DATA][0],
+            #     "timestamp": datetime.now(),
+            # }
+        return None
 
     async def get_ev_data(self, vin: str):
         """Get the latest ev data from the Polestar API."""
@@ -170,7 +191,7 @@ class PolestarApi:
         self.next_update = datetime.now() + timedelta(seconds=5)
 
     def get_cache_data(self, query: str, field_name: str, skip_cache: bool = False):
-        """ " Get the latest data from the cache."""
+        """Get the latest data from the cache."""
         if query is None:
             return None
 

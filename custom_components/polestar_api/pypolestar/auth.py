@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 import json
 import logging
 
-import httpx
+from homeassistant.helpers.httpx_client import httpx
 
 from .const import HTTPX_TIMEOUT
 from .exception import PolestarAuthException
@@ -28,7 +28,11 @@ class PolestarAuth:
         headers = {"Content-Type": "application/json"}
         operationName = "getAuthToken"
         # can't use refresh if the token is expired or not set even if refresh is True
-        if not refresh or self.token_expiry is None or self.token_expiry < datetime.now():
+        if (
+            not refresh
+            or self.token_expiry is None
+            or self.token_expiry < datetime.now()
+        ):
             code = await self._get_code()
             if code is None:
                 return
@@ -49,19 +53,27 @@ class PolestarAuth:
                 "operationName": operationName,
                 "variables": json.dumps({"token": token}),
             }
-        result = await self._client_session.get("https://pc-api.polestar.com/eu-north-1/auth/", params=params, headers=headers, timeout=HTTPX_TIMEOUT)
+        result = await self._client_session.get(
+            "https://pc-api.polestar.com/eu-north-1/auth/",
+            params=params,
+            headers=headers,
+            timeout=HTTPX_TIMEOUT,
+        )
         self.latest_call_code = result.status_code
         resultData = result.json()
-        if result.status_code != 200 or ("errors" in resultData and len(resultData["errors"])):
+        if result.status_code != 200 or (
+            "errors" in resultData and len(resultData["errors"])
+        ):
             _LOGGER.error(result)
             raise PolestarAuthException("Error getting token", result.status_code)
         _LOGGER.debug(resultData)
 
-        if resultData['data']:
-            self.access_token = resultData['data'][operationName]['access_token']
-            self.refresh_token = resultData['data'][operationName]['refresh_token']
-            self.token_expiry = datetime.now(
-            ) + timedelta(seconds=resultData['data'][operationName]['expires_in'])
+        if resultData["data"]:
+            self.access_token = resultData["data"][operationName]["access_token"]
+            self.refresh_token = resultData["data"][operationName]["refresh_token"]
+            self.token_expiry = datetime.now() + timedelta(
+                seconds=resultData["data"][operationName]["expires_in"]
+            )
             # ID Token
 
         _LOGGER.debug(f"Response {self.access_token}")
@@ -70,27 +82,22 @@ class PolestarAuth:
         query_params = await self._get_resume_path()
 
         # check if code is in query_params
-        if query_params.get('code'):
-            return query_params.get('code')
+        if query_params.get("code"):
+            return query_params.get("code")
 
         # get the resumePath
-        if query_params.get('resumePath'):
-            resumePath = query_params.get('resumePath')
+        if query_params.get("resumePath"):
+            resumePath = query_params.get("resumePath")
 
         if resumePath is None:
             return
 
-        params = {
-            'client_id': 'polmystar'
-        }
-        data = {
-            'pf.username': self.username,
-            'pf.pass': self.password
-        }
+        params = {"client_id": "polmystar"}
+        data = {"pf.username": self.username, "pf.pass": self.password}
         result = await self._client_session.post(
             f"https://polestarid.eu.polestar.com/as/{resumePath}/resume/as/authorization.ping",
             params=params,
-            data=data
+            data=data,
         )
         self.latest_call_code = result.status_code
         if result.status_code != 302:
@@ -98,15 +105,19 @@ class PolestarAuth:
 
         # get the realUrl
         url = result.url
-        code = result.next_request.url.params.get('code')
+        code = result.next_request.url.params.get("code")
 
         # sign-in-callback
-        result = await self._client_session.get(result.next_request.url, timeout=HTTPX_TIMEOUT)
+        result = await self._client_session.get(
+            result.next_request.url, timeout=HTTPX_TIMEOUT
+        )
         self.latest_call_code = result.status_code
 
         if result.status_code != 200:
             _LOGGER.error(result)
-            raise PolestarAuthException("Error getting code callback", result.status_code)
+            raise PolestarAuthException(
+                "Error getting code callback", result.status_code
+            )
 
         # url encode the code
         result = await self._client_session.get(url)
@@ -119,12 +130,15 @@ class PolestarAuth:
         params = {
             "response_type": "code",
             "client_id": "polmystar",
-            "redirect_uri": "https://www.polestar.com/sign-in-callback"
+            "redirect_uri": "https://www.polestar.com/sign-in-callback",
         }
-        result = await self._client_session.get("https://polestarid.eu.polestar.com/as/authorization.oauth2", params=params, timeout=HTTPX_TIMEOUT)
+        result = await self._client_session.get(
+            "https://polestarid.eu.polestar.com/as/authorization.oauth2",
+            params=params,
+            timeout=HTTPX_TIMEOUT,
+        )
         if result.status_code in (303, 302):
             return result.next_request.url.params
 
         _LOGGER.error(result.text)
         raise PolestarAuthException("Error getting resume path ", result.status_code)
-

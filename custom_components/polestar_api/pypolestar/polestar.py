@@ -198,13 +198,12 @@ class PolestarApi:
         if self.cache_data and self.cache_data.get(query):
             cache_entry = self.cache_data[query]
             data = cache_entry["data"]
-            if data is not None:
-                if (
-                    skip_cache is True
-                    or cache_entry["timestamp"] + timedelta(seconds=CACHE_TIME)
-                    > datetime.now()
-                ):
-                    return self._get_field_name_value(field_name, data)
+            if data is not None and (
+                skip_cache is True
+                or cache_entry["timestamp"] + timedelta(seconds=CACHE_TIME)
+                > datetime.now()
+            ):
+                return self._get_field_name_value(field_name, data)
         return None
 
     def _set_latest_call_code(self, url: str, code: int):

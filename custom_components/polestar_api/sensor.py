@@ -1,6 +1,7 @@
 """Support for Polestar sensors."""
 
 import logging
+from contextlib import suppress
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from typing import Final
@@ -641,7 +642,7 @@ class PolestarSensor(PolestarEntity, SensorEntity):
             self._attr_native_value = self._sensor_data
 
         # if GUI changed the unit, we need to convert the value
-        if self._sensor_data:
+        if self._sensor_data:  # noqa
             if self._sensor_option_unit_of_measurement is not None:
                 if self._sensor_option_unit_of_measurement in (
                     UnitOfLength.MILES,
@@ -716,21 +717,19 @@ class PolestarSensor(PolestarEntity, SensorEntity):
                 return None
 
         # only round value if native value is not None
-        if self._attr_native_value:
+        if self._attr_native_value:  # noqa
             # round the value
-            if self.entity_description.round_digits is not None:
+            if self.entity_description.round_digits is not None:  # noqa
                 # if the value is integer, remove the decimal
                 if self.entity_description.round_digits == 0 and isinstance(
                     self._attr_native_value, int
                 ):
                     self._attr_native_value = int(self._attr_native_value)
-                    try:
+                    with suppress(ValueError):
                         self._attr_native_value = round(
                             float(self._attr_native_value),
                             self.entity_description.round_digits,
                         )
-                    except ValueError:
-                        pass
 
         return self._attr_native_value
 

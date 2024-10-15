@@ -1,8 +1,8 @@
 """Support for Polestar sensors."""
 
+import logging
 from dataclasses import dataclass
 from datetime import datetime, timedelta
-import logging
 from typing import Final
 
 from homeassistant.components.sensor import (
@@ -752,7 +752,6 @@ class PolestarSensor(PolestarEntity, SensorEntity):
             if value is not None:
                 self._attr_native_value = value
                 self._sensor_data = value
-
 
         except Exception:
             _LOGGER.warning("Failed to update sensor async update")

@@ -1,13 +1,12 @@
 """Polestar API for Polestar integration."""
 
-from datetime import datetime, timedelta
 import logging
+from datetime import datetime, timedelta
 
 import httpx
-from urllib3 import disable_warnings
-
 from homeassistant.core import HomeAssistant
 from homeassistant.util.unit_system import METRIC_SYSTEM, UnitSystem
+from urllib3 import disable_warnings
 
 from .pypolestar.exception import PolestarApiException, PolestarAuthException
 from .pypolestar.polestar import PolestarApi
@@ -120,7 +119,7 @@ class Polestar:
         data = self.polestarApi.get_cache_data(query, field_name, skip_cache)
         if data is None:
             # if amp and voltage can be null, so we will return 0
-            if field_name in ('chargingCurrentAmps', 'chargingPowerWatts'):
+            if field_name in ("chargingCurrentAmps", "chargingPowerWatts"):
                 return 0
             return
         return data

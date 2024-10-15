@@ -3,9 +3,8 @@
 import asyncio
 import logging
 
-from aiohttp import ClientError
 import voluptuous as vol
-
+from aiohttp import ClientError
 from homeassistant import config_entries
 from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
 
@@ -25,27 +24,25 @@ class FlowHandler(config_entries.ConfigFlow):
     async def _create_entry(self, username: str, password: str) -> None:
         """Register new entry."""
         return self.async_create_entry(
-            title='Polestar EV',
+            title="Polestar EV",
             data={
                 CONF_USERNAME: username,
                 CONF_PASSWORD: password,
-            }
+            },
         )
 
     async def _create_device(self, username: str, password: str) -> None:
         """Create device."""
 
         try:
-            device = Polestar(
-                self.hass,
-                username,
-                password)
+            device = Polestar(self.hass, username, password)
             await device.init()
 
             # check if we have a token, otherwise throw exception
             if device.polestarApi.auth.access_token is None:
                 _LOGGER.exception(
-                    "No token, Could be wrong credentials (invalid email or password))")
+                    "No token, Could be wrong credentials (invalid email or password))"
+                )
                 return self.async_abort(reason="no_token")
 
         except asyncio.TimeoutError:
@@ -63,13 +60,17 @@ class FlowHandler(config_entries.ConfigFlow):
         """User initiated config flow."""
         if user_input is None:
             return self.async_show_form(
-                step_id="user", data_schema=vol.Schema({
-                    vol.Required(CONF_USERNAME): str,
-                    vol.Required(CONF_PASSWORD): str
-                })
+                step_id="user",
+                data_schema=vol.Schema(
+                    {vol.Required(CONF_USERNAME): str, vol.Required(CONF_PASSWORD): str}
+                ),
             )
-        return await self._create_device(user_input[CONF_USERNAME], user_input[CONF_PASSWORD])
+        return await self._create_device(
+            user_input[CONF_USERNAME], user_input[CONF_PASSWORD]
+        )
 
     async def async_step_import(self, user_input: dict) -> None:
         """Import a config entry."""
-        return await self._create_device(user_input[CONF_USERNAME], user_input[CONF_PASSWORD])
+        return await self._create_device(
+            user_input[CONF_USERNAME], user_input[CONF_PASSWORD]
+        )

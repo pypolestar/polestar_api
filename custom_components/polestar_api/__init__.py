@@ -1,12 +1,11 @@
 """Polestar EV integration."""
 
 import asyncio
-from asyncio import timeout
 import logging
+from asyncio import timeout
 
-from aiohttp import ClientConnectionError
 import httpx
-
+from aiohttp import ClientConnectionError
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_PASSWORD, CONF_USERNAME, Platform
 from homeassistant.core import HomeAssistant

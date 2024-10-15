@@ -50,7 +50,7 @@ class FlowHandler(config_entries.ConfigFlow):
         except ClientError:
             _LOGGER.exception("ClientError")
             return self.async_abort(reason="api_failed")
-        except Exception as e:  # pylint: disable=broad-except
+        except Exception:  # pylint: disable=broad-except
             _LOGGER.exception("Unexpected error creating device")
             return self.async_abort(reason="api_failed")
 

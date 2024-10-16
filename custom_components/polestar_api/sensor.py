@@ -333,7 +333,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         dict_data=None,
     ),
     PolestarSensorDescription(
-        key="internal_vebicle_id",
+        key="internal_vehicle_id",
         name="Internal Vehicle ID",
         icon="mdi:numeric-1-box",
         query="getConsumerCarsV2",

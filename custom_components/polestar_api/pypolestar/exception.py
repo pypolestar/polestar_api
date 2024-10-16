@@ -1,4 +1,6 @@
 """Exceptions for Polestar API."""
+
+
 class PolestarApiException(Exception):
     """Base class for exceptions in this module."""
 

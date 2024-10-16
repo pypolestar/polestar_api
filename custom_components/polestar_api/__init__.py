@@ -1,12 +1,11 @@
 """Polestar EV integration."""
 
 import asyncio
-from asyncio import timeout
 import logging
+from asyncio import timeout
 
-from aiohttp import ClientConnectionError
 import httpx
-
+from aiohttp import ClientConnectionError
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_PASSWORD, CONF_USERNAME, Platform
 from homeassistant.core import HomeAssistant
@@ -95,17 +94,17 @@ async def polestar_setup(
     """Create a Polestar instance only once."""
 
     try:
-        with timeout(TIMEOUT):
+        async with timeout(TIMEOUT):
             device = Polestar(hass, name, username, password)
             await device.init()
-    except asyncio.TimeoutError:
+    except asyncio.TimeoutError as exc:
         _LOGGER.debug("Connection to %s timed out", name)
-        raise ConfigEntryNotReady
-    except ClientConnectionError as e:
-        _LOGGER.debug("ClientConnectionError to %s %s", name, str(e))
-        raise ConfigEntryNotReady
-    except Exception as e:  # pylint: disable=broad-except
-        _LOGGER.error("Unexpected error creating device %s %s", name, str(e))
+        raise ConfigEntryNotReady from exc
+    except ClientConnectionError as exc:
+        _LOGGER.debug("ClientConnectionError to %s %s", name, str(exc))
+        raise ConfigEntryNotReady from exc
+    except Exception as exc:  # pylint: disable=broad-except
+        _LOGGER.error("Unexpected error creating device %s %s", name, str(exc))
         return None
 
     return device

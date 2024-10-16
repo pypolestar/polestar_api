@@ -1,9 +1,10 @@
 """Support Polestar image."""
+
 from __future__ import annotations
 
-from dataclasses import dataclass
 import datetime
 import logging
+from dataclasses import dataclass
 from typing import Final
 
 from homeassistant.components.image import Image, ImageEntity, ImageEntityDescription
@@ -18,6 +19,7 @@ from .polestar import Polestar
 
 _LOGGER = logging.getLogger(__name__)
 
+
 @dataclass
 class PolestarImageDescriptionMixin:
     """A mixin class for image entities."""
@@ -25,10 +27,9 @@ class PolestarImageDescriptionMixin:
     query: str
     field_name: str
 
+
 @dataclass
-class PolestarImageDescription(
-    ImageEntityDescription,  PolestarImageDescriptionMixin
-):
+class PolestarImageDescription(ImageEntityDescription, PolestarImageDescriptionMixin):
     """A class that describes image entities."""
 
 
@@ -41,12 +42,12 @@ POLESTAR_IMAGE_TYPES: Final[tuple[PolestarImageDescription, ...]] = (
     ),
 )
 
+
 async def async_setup_entry(
-        hass: HomeAssistant,
-        entry: ConfigEntry,
-        async_add_entities: AddEntitiesCallback) -> None:
+    hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
+) -> None:
     """Set up Polestar image entities based on a config entry."""
-     # get the device
+    # get the device
     device: Polestar
     device = hass.data[POLESTAR_API_DOMAIN][entry.entry_id]
     await device.init()
@@ -59,6 +60,7 @@ async def async_setup_entry(
     ]
     async_add_entities(images)
     entity_platform.current_platform.get()
+
 
 class PolestarImage(PolestarEntity, ImageEntity):
     """Representation of a Polestar image."""
@@ -77,17 +79,20 @@ class PolestarImage(PolestarEntity, ImageEntity):
         self._device = device
         # get the last 4 character of the id
         unique_id = device.vin[-4:]
-        self.entity_id = f"{POLESTAR_API_DOMAIN}.'polestar_'.{unique_id}_{description.key}"
+        self.entity_id = (
+            f"{POLESTAR_API_DOMAIN}.'polestar_'.{unique_id}_{description.key}"
+        )
         self._attr_unique_id = f"polestar_{unique_id}-{description.key}"
         self.entity_description = description
         self._attr_translation_key = f"polestar_{description.key}"
         self._attr_image_last_updated = datetime.datetime.now()
 
-
     @property
     def image_url(self) -> str | None:
         """Return the image URL."""
-        return self._device.get_value(self.entity_description.query, self.entity_description.field_name)
+        return self._device.get_value(
+            self.entity_description.query, self.entity_description.field_name
+        )
 
     async def async_load_image(self) -> Image | None:
         """Load an image."""
@@ -96,7 +101,8 @@ class PolestarImage(PolestarEntity, ImageEntity):
 
         await self._device.async_update()
         value = self._device.get_value(
-            self.entity_description.query, self.entity_description.field_name, True)
+            self.entity_description.query, self.entity_description.field_name, True
+        )
 
         return Image(
             content=value,

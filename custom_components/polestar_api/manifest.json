@@ -8,7 +8,7 @@
   "config_flow": true,
   "dependencies": [],
   "documentation": "https://github.com/pypolestar/polestar_api",
-  "issue_tracker": "https://github.com/pypolestar/polestar_api/issues",
   "iot_class": "cloud_polling",
+  "issue_tracker": "https://github.com/pypolestar/polestar_api/issues",
   "version": "1.1.0"
 }

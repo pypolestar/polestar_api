@@ -1,10 +1,14 @@
 {
   "domain": "polestar_api",
   "name": "Polestar API",
-  "codeowners": ["@leeyuentuen"],
+  "codeowners": [
+    "@leeyuentuen",
+    "@jschlyter"
+  ],
   "config_flow": true,
   "dependencies": [],
-  "documentation": "https://github.com/leeyuentuen/polestar_api",
+  "documentation": "https://github.com/pypolestar/polestar_api",
   "iot_class": "cloud_polling",
+  "issue_tracker": "https://github.com/pypolestar/polestar_api/issues",
   "version": "1.1.0"
 }

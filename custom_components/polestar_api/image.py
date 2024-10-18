@@ -47,18 +47,16 @@ async def async_setup_entry(
     hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
 ) -> None:
     """Set up Polestar image entities based on a config entry."""
-    # get the device
-    device: Polestar
-    device = hass.data[POLESTAR_API_DOMAIN][entry.entry_id]
-    await device.init()
 
-    # put data in cache
-    await device.async_update()
-
-    images = [
-        PolestarImage(device, description, hass) for description in POLESTAR_IMAGE_TYPES
-    ]
-    async_add_entities(images)
+    devices = hass.data[POLESTAR_API_DOMAIN][entry.entry_id]
+    for device in devices:
+        # put data in cache
+        await device.async_update()
+        images = [
+            PolestarImage(device, description, hass)
+            for description in POLESTAR_IMAGE_TYPES
+        ]
+        async_add_entities(images)
     entity_platform.current_platform.get()
 
 
@@ -74,7 +72,7 @@ class PolestarImage(PolestarEntity, ImageEntity):
         hass: HomeAssistant,
     ) -> None:
         """Initialize the Polestar image."""
-        super().__init__(device)
+        super().__init__()
         ImageEntity.__init__(self, hass)
         self._device = device
         # get the last 4 character of the id

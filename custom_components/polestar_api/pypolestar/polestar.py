@@ -34,8 +34,8 @@ class PolestarApi:
         client_session: httpx.AsyncClient | None = None,
     ) -> None:
         """Initialize the Polestar API."""
-        self._client_session = client_session or httpx.AsyncClient()
-        self.auth = PolestarAuth(username, password, client_session)
+        self.client_session = client_session or httpx.AsyncClient()
+        self.auth = PolestarAuth(username, password, self.client_session)
         self.updating = False
         self.cache_data = {}
         self.latest_call_code = None
@@ -225,7 +225,7 @@ class PolestarApi:
             "authorization": f"Bearer {self.auth.access_token}",
         }
 
-        result = await self._client_session.get(url, params=params, headers=headers)
+        result = await self.client_session.get(url, params=params, headers=headers)
         self._set_latest_call_code(url, result.status_code)
 
         if result.status_code == 401:

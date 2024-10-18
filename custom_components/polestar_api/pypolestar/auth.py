@@ -14,19 +14,16 @@ class PolestarAuth:
     """base class for Polestar authentication."""
 
     def __init__(
-        self,
-        username: str,
-        password: str,
-        client_session: httpx.AsyncClient | None = None,
+        self, username: str, password: str, client_session: httpx.AsyncClient
     ) -> None:
         """Initialize the Polestar authentication."""
         self.username = username
         self.password = password
+        self.client_session = client_session
         self.access_token = None
         self.refresh_token = None
         self.token_expiry = None
         self.latest_call_code = None
-        self._client_session = client_session or httpx.AsyncClient()
 
     async def get_token(self, refresh=False) -> None:
         """Get the token from Polestar."""
@@ -58,7 +55,7 @@ class PolestarAuth:
                 "operationName": operationName,
                 "variables": json.dumps({"token": token}),
             }
-        result = await self._client_session.get(
+        result = await self.client_session.get(
             "https://pc-api.polestar.com/eu-north-1/auth/",
             params=params,
             headers=headers,
@@ -99,7 +96,7 @@ class PolestarAuth:
 
         params = {"client_id": "polmystar"}
         data = {"pf.username": self.username, "pf.pass": self.password}
-        result = await self._client_session.post(
+        result = await self.client_session.post(
             f"https://polestarid.eu.polestar.com/as/{resumePath}/resume/as/authorization.ping",
             params=params,
             data=data,
@@ -113,7 +110,7 @@ class PolestarAuth:
         code = result.next_request.url.params.get("code")
 
         # sign-in-callback
-        result = await self._client_session.get(
+        result = await self.client_session.get(
             result.next_request.url, timeout=HTTPX_TIMEOUT
         )
         self.latest_call_code = result.status_code
@@ -125,7 +122,7 @@ class PolestarAuth:
             )
 
         # url encode the code
-        result = await self._client_session.get(url)
+        result = await self.client_session.get(url)
         self.latest_call_code = result.status_code
 
         return code
@@ -137,7 +134,7 @@ class PolestarAuth:
             "client_id": "polmystar",
             "redirect_uri": "https://www.polestar.com/sign-in-callback",
         }
-        result = await self._client_session.get(
+        result = await self.client_session.get(
             "https://polestarid.eu.polestar.com/as/authorization.oauth2",
             params=params,
             timeout=HTTPX_TIMEOUT,

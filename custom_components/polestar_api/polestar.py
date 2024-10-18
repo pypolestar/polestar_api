@@ -3,8 +3,9 @@
 import logging
 from datetime import datetime, timedelta
 
+import httpx
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.httpx_client import httpx
+from homeassistant.helpers.httpx_client import get_async_client
 from homeassistant.util.unit_system import METRIC_SYSTEM, UnitSystem
 from urllib3 import disable_warnings
 
@@ -23,7 +24,7 @@ class Polestar:
         """Initialize the Polestar API."""
         self.id = None
         self.name = "Polestar "
-        self.polestarApi = PolestarApi(username, password, httpx.AsyncClient())
+        self.polestarApi = PolestarApi(username, password, get_async_client(hass))
         self.vin = None
         self.unit_system = METRIC_SYSTEM
         disable_warnings()

@@ -1,4 +1,5 @@
 """Asynchronous Python client for the Polestar API.""" ""
+
 import logging
 from datetime import datetime, timedelta
 
@@ -26,14 +27,19 @@ _LOGGER = logging.getLogger(__name__)
 class PolestarApi:
     """Main class for handling connections with the Polestar API."""
 
-    def __init__(self, username: str, password: str) -> None:
+    def __init__(
+        self,
+        username: str,
+        password: str,
+        client_session: httpx.AsyncClient | None = None,
+    ) -> None:
         """Initialize the Polestar API."""
-        self.auth = PolestarAuth(username, password)
+        self._client_session = client_session or httpx.AsyncClient()
+        self.auth = PolestarAuth(username, password, client_session)
         self.updating = False
         self.cache_data = {}
         self.latest_call_code = None
         self.latest_call_code_2 = None
-        self._client_session = httpx.AsyncClient()
         self.next_update = None
         self.car_data = None
 

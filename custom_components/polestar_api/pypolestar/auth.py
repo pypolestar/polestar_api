@@ -2,7 +2,7 @@ import json
 import logging
 from datetime import datetime, timedelta
 
-from homeassistant.helpers.httpx_client import httpx
+import httpx
 
 from .const import HTTPX_TIMEOUT
 from .exception import PolestarAuthException
@@ -13,7 +13,12 @@ _LOGGER = logging.getLogger(__name__)
 class PolestarAuth:
     """base class for Polestar authentication."""
 
-    def __init__(self, username: str, password: str) -> None:
+    def __init__(
+        self,
+        username: str,
+        password: str,
+        client_session: httpx.AsyncClient | None = None,
+    ) -> None:
         """Initialize the Polestar authentication."""
         self.username = username
         self.password = password
@@ -21,7 +26,7 @@ class PolestarAuth:
         self.refresh_token = None
         self.token_expiry = None
         self.latest_call_code = None
-        self._client_session = httpx.AsyncClient()
+        self._client_session = client_session or httpx.AsyncClient()
 
     async def get_token(self, refresh=False) -> None:
         """Get the token from Polestar."""

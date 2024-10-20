@@ -491,10 +491,7 @@ async def async_setup_entry(
     hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
 ):
     """Set up using config_entry."""
-    # get the device
-    device: Polestar
-
-    devices = hass.data[POLESTAR_API_DOMAIN][entry.entry_id]
+    devices: list[Polestar] = hass.data[POLESTAR_API_DOMAIN][entry.entry_id]
     for device in devices:
         # put data in cache
         await device.async_update()
@@ -518,8 +515,7 @@ class PolestarSensor(PolestarEntity, SensorEntity):
         """Initialize the sensor."""
         super().__init__()
         self.set_device(device)
-        # get the last 4 character of the id
-        unique_id = device.vin[-4:]
+        unique_id = device.get_unique_id()
         self.entity_id = (
             f"{POLESTAR_API_DOMAIN}.'polestar_'.{unique_id}_{description.key}"
         )

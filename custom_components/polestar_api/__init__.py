@@ -43,7 +43,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> b
         hass.data.setdefault(DOMAIN, {})
 
         # for each number of car we are going to create a new entry
-        entities = []
+        entities: list[Polestar] = []
         for index in range(number_of_cars):
             polestar = Polestar(hass, conf[CONF_USERNAME], conf[CONF_PASSWORD])
             await polestar.init()

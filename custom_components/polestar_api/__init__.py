@@ -54,8 +54,9 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> b
 
         hass.data[DOMAIN][config_entry.entry_id] = entities
 
-        await hass.config_entries.async_forward_entry_setup(config_entry, "sensor")
-        await hass.config_entries.async_forward_entry_setup(config_entry, "image")
+        await hass.config_entries.async_forward_entry_setups(
+            config_entry, ["sensor", "image"]
+        )
         return True
     except PolestarApiException as e:
         _LOGGER.exception("API Exception on update data %s", str(e))

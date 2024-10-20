@@ -5,9 +5,10 @@ from __future__ import annotations
 import datetime
 import logging
 from dataclasses import dataclass
+from functools import cached_property
 from typing import Final
 
-from homeassistant.components.image import Image, ImageEntity, ImageEntityDescription
+from homeassistant.components.image import ImageEntity, ImageEntityDescription
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_platform
@@ -84,24 +85,9 @@ class PolestarImage(PolestarEntity, ImageEntity):
         self._attr_translation_key = f"polestar_{description.key}"
         self._attr_image_last_updated = datetime.datetime.now()
 
-    @property
+    @cached_property
     def image_url(self) -> str | None:
         """Return the image URL."""
         return self._device.get_value(
             self.entity_description.query, self.entity_description.field_name
-        )
-
-    async def async_load_image(self) -> Image | None:
-        """Load an image."""
-        if self.image_url is None:
-            return None
-
-        await self._device.async_update()
-        value = self._device.get_value(
-            self.entity_description.query, self.entity_description.field_name, True
-        )
-
-        return Image(
-            content=value,
-            content_type="image/png",
         )

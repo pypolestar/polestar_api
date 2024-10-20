@@ -1,10 +1,17 @@
 import json
 import logging
 from datetime import datetime, timedelta
+from urllib.parse import urljoin
 
 import httpx
 
-from .const import HTTPX_TIMEOUT
+from .const import (
+    API_AUTH_URL,
+    HTTPX_TIMEOUT,
+    OPENID_CLIENT_ID,
+    OPENID_PROVIDER_BASE_URL,
+    OPENID_REDIRECT_URI,
+)
 from .exception import PolestarAuthException
 
 _LOGGER = logging.getLogger(__name__)
@@ -24,6 +31,17 @@ class PolestarAuth:
         self.refresh_token = None
         self.token_expiry = None
         self.latest_call_code = None
+        self.oidc_configuration = {}
+
+    async def init(self) -> None:
+        await self.update_oidc_configuration()
+
+    async def update_oidc_configuration(self) -> None:
+        result = await self.client_session.get(
+            urljoin(OPENID_PROVIDER_BASE_URL, "/.well-known/openid-configuration")
+        )
+        result.raise_for_status()
+        self.oidc_configuration = result.json()
 
     async def get_token(self, refresh=False) -> None:
         """Get the token from Polestar."""
@@ -56,7 +74,7 @@ class PolestarAuth:
                 "variables": json.dumps({"token": token}),
             }
         result = await self.client_session.get(
-            "https://pc-api.polestar.com/eu-north-1/auth/",
+            API_AUTH_URL,
             params=params,
             headers=headers,
             timeout=HTTPX_TIMEOUT,
@@ -94,10 +112,13 @@ class PolestarAuth:
         if resumePath is None:
             return
 
-        params = {"client_id": "polmystar"}
+        params = {"client_id": OPENID_CLIENT_ID}
         data = {"pf.username": self.username, "pf.pass": self.password}
         result = await self.client_session.post(
-            f"https://polestarid.eu.polestar.com/as/{resumePath}/resume/as/authorization.ping",
+            urljoin(
+                OPENID_PROVIDER_BASE_URL,
+                f"/as/{resumePath}/resume/as/authorization.ping",
+            ),
             params=params,
             data=data,
         )
@@ -131,11 +152,11 @@ class PolestarAuth:
         """Get Resume Path from Polestar."""
         params = {
             "response_type": "code",
-            "client_id": "polmystar",
-            "redirect_uri": "https://www.polestar.com/sign-in-callback",
+            "client_id": OPENID_CLIENT_ID,
+            "redirect_uri": OPENID_REDIRECT_URI,
         }
         result = await self.client_session.get(
-            "https://polestarid.eu.polestar.com/as/authorization.oauth2",
+            self.oidc_configuration["authorization_endpoint"],
             params=params,
             timeout=HTTPX_TIMEOUT,
         )

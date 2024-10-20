@@ -29,6 +29,12 @@ class Polestar:
         self.unit_system = METRIC_SYSTEM
         disable_warnings()
 
+    def get_unique_id(self) -> str:
+        """Last 4 character of the VIN"""
+        if self.vin is None:
+            raise ValueError("VIN unknown")
+        return self.vin[-4:]
+
     async def init(self):
         """Initialize the Polestar API."""
         await self.polestarApi.init()
@@ -44,7 +50,7 @@ class Polestar:
             # fill the vin and id in the constructor
             self.vin = vin
             self.id = vin[:8]
-            self.name = "Polestar " + vin[-4:]
+            self.name = "Polestar " + self.get_unique_id()
 
     def get_number_of_cars(self):
         """Get the number of cars."""

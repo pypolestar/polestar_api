@@ -8,9 +8,9 @@ import httpx
 from .const import (
     API_AUTH_URL,
     HTTPX_TIMEOUT,
-    OPENID_CLIENT_ID,
-    OPENID_PROVIDER_BASE_URL,
-    OPENID_REDIRECT_URI,
+    OIDC_CLIENT_ID,
+    OIDC_PROVIDER_BASE_URL,
+    OIDC_REDIRECT_URI,
 )
 from .exception import PolestarAuthException
 
@@ -38,7 +38,7 @@ class PolestarAuth:
 
     async def update_oidc_configuration(self) -> None:
         result = await self.client_session.get(
-            urljoin(OPENID_PROVIDER_BASE_URL, "/.well-known/openid-configuration")
+            urljoin(OIDC_PROVIDER_BASE_URL, "/.well-known/openid-configuration")
         )
         result.raise_for_status()
         self.oidc_configuration = result.json()
@@ -112,11 +112,11 @@ class PolestarAuth:
         if resumePath is None:
             return
 
-        params = {"client_id": OPENID_CLIENT_ID}
+        params = {"client_id": OIDC_CLIENT_ID}
         data = {"pf.username": self.username, "pf.pass": self.password}
         result = await self.client_session.post(
             urljoin(
-                OPENID_PROVIDER_BASE_URL,
+                OIDC_PROVIDER_BASE_URL,
                 f"/as/{resumePath}/resume/as/authorization.ping",
             ),
             params=params,
@@ -152,8 +152,8 @@ class PolestarAuth:
         """Get Resume Path from Polestar."""
         params = {
             "response_type": "code",
-            "client_id": OPENID_CLIENT_ID,
-            "redirect_uri": OPENID_REDIRECT_URI,
+            "client_id": OIDC_CLIENT_ID,
+            "redirect_uri": OIDC_REDIRECT_URI,
         }
         result = await self.client_session.get(
             self.oidc_configuration["authorization_endpoint"],

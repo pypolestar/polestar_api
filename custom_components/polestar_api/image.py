@@ -73,9 +73,8 @@ class PolestarImage(PolestarEntity, ImageEntity):
         hass: HomeAssistant,
     ) -> None:
         """Initialize the Polestar image."""
-        super().__init__()
+        super().__init__(device)
         ImageEntity.__init__(self, hass)
-        self._device = device
         unique_id = device.get_unique_id()
         self.entity_id = (
             f"{POLESTAR_API_DOMAIN}.'polestar_'.{unique_id}_{description.key}"
@@ -88,6 +87,6 @@ class PolestarImage(PolestarEntity, ImageEntity):
     @cached_property
     def image_url(self) -> str | None:
         """Return the image URL."""
-        return self._device.get_value(
+        return self.device.get_value(
             self.entity_description.query, self.entity_description.field_name
         )

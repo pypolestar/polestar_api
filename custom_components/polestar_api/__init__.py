@@ -39,11 +39,9 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> b
 
         # for each number of car we are going to create a new entry
         entities: list[Polestar] = []
-        for index in range(number_of_cars):
+        for car_index in range(number_of_cars):
             polestar = Polestar(hass, conf[CONF_USERNAME], conf[CONF_PASSWORD])
-            await polestar.init()
-            polestar.set_car_data(index)
-            polestar.set_vin()
+            await polestar.init(car_index)
             polestar.set_config_unit(hass.config.units)
             entities.append(polestar)
             _LOGGER.debug("Added entity for %s", polestar.vin)

@@ -66,7 +66,7 @@ class Polestar:
             manufacturer="Polestar",
             model=self.model,
             name=self.name,
-            sw_version=None,
+            serial_number=self.vin,
         )
 
     def get_number_of_cars(self):

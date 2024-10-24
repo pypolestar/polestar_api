@@ -513,8 +513,7 @@ class PolestarSensor(PolestarEntity, SensorEntity):
         self, device: Polestar, description: PolestarSensorDescription
     ) -> None:
         """Initialize the sensor."""
-        super().__init__()
-        self.set_device(device)
+        super().__init__(device)
         unique_id = device.get_unique_id()
         self.entity_id = (
             f"{POLESTAR_API_DOMAIN}.'polestar_'.{unique_id}_{description.key}"
@@ -541,10 +540,6 @@ class PolestarSensor(PolestarEntity, SensorEntity):
             self._attr_device_class = description.device_class
         if self.device is not None and self.device.get_latest_call_code() == 200:
             self._async_update_attrs()
-
-    def _get_current_value(self) -> StateType | None:
-        """Get the current value."""
-        return self.async_update()
 
     def get_skip_cache(self) -> bool:
         """Get the skip cache."""

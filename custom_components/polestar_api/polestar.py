@@ -5,10 +5,12 @@ from datetime import datetime, timedelta
 
 import httpx
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.httpx_client import get_async_client
 from homeassistant.util.unit_system import METRIC_SYSTEM, UnitSystem
 from urllib3 import disable_warnings
 
+from .const import DOMAIN as POLESTAR_API_DOMAIN
 from .pypolestar.exception import PolestarApiException, PolestarAuthException
 from .pypolestar.polestar import PolestarApi
 
@@ -17,40 +19,55 @@ POST_HEADER_JSON = {"Content-Type": "application/json"}
 _LOGGER = logging.getLogger(__name__)
 
 
+class UnknownVIN(ValueError):
+    pass
+
+
 class Polestar:
     """Polestar EV integration."""
 
     def __init__(self, hass: HomeAssistant, username: str, password: str) -> None:
         """Initialize the Polestar API."""
-        self.id = None
-        self.name = "Polestar "
         self.polestarApi = PolestarApi(username, password, get_async_client(hass))
+        self.name = "Polestar UNKNOWN"
+        self.car = None
         self.vin = None
+        self.model = None
         self.unit_system = METRIC_SYSTEM
         disable_warnings()
+
+    async def init(self, car: int = 0):
+        """Initialize the Polestar API."""
+        await self.polestarApi.init()
+        self.car = car
+        self.polestarApi.set_car_data(car)
+
+        if vin := self.get_value("getConsumerCarsV2", "vin", True):
+            # fill the vin and id in the constructor
+            self.vin = vin
+            self.name = "Polestar " + self.get_unique_id()
+        else:
+            _LOGGER.warning("No VIN for car index %d", self.car)
+
+        self.model = self.get_value("getConsumerCarsV2", "content/model/name")
 
     def get_unique_id(self) -> str:
         """Last 4 character of the VIN"""
         if self.vin is None:
-            raise ValueError("VIN unknown")
+            raise UnknownVIN
         return self.vin[-4:]
 
-    async def init(self):
-        """Initialize the Polestar API."""
-        await self.polestarApi.init()
-
-    def set_car_data(self, index: int = 0):
-        """Set the car data."""
-        self.polestarApi.set_car_data(index)
-
-    def set_vin(self):
-        """Set the VIN number."""
-        vin = self.get_value("getConsumerCarsV2", "vin", True)
-        if vin:
-            # fill the vin and id in the constructor
-            self.vin = vin
-            self.id = vin[:8]
-            self.name = "Polestar " + self.get_unique_id()
+    def get_device_info(self) -> DeviceInfo:
+        """Return DeviceInfo for current device"""
+        if self.vin is None:
+            raise UnknownVIN
+        return DeviceInfo(
+            identifiers={(POLESTAR_API_DOMAIN, self.vin)},
+            manufacturer="Polestar",
+            model=self.model,
+            name=self.name,
+            sw_version=None,
+        )
 
     def get_number_of_cars(self):
         """Get the number of cars."""

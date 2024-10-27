@@ -44,7 +44,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> b
             await polestar.init(car_index)
             polestar.set_config_unit(hass.config.units)
             entities.append(polestar)
-            _LOGGER.debug("Added entity for %s", polestar.vin)
+            _LOGGER.debug("Added entity for VIN %s", polestar.vin)
 
         hass.data[DOMAIN][config_entry.entry_id] = entities
 

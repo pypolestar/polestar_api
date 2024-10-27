@@ -35,13 +35,17 @@ class PolestarApi:
     ) -> None:
         """Initialize the Polestar API."""
         self.client_session = client_session or httpx.AsyncClient()
+        self.username = username
         self.auth = PolestarAuth(username, password, self.client_session)
         self.updating = False
         self.cache_data = {}
+        self.vin_cache_data = {}
         self.latest_call_code = None
         self.latest_call_code_2 = None
         self.next_update = None
         self.car_data = None
+        self.car_data_by_vin = {}
+        self.vin_by_index: dict[int, str] = {}
 
     async def init(self):
         """Initialize the Polestar API."""
@@ -50,11 +54,17 @@ class PolestarApi:
             await self.auth.get_token()
 
             if self.auth.access_token is None:
+                _LOGGER.warning("No access token %s", self.username)
                 return
 
-            carData = await self._get_vehicle_data()
-            if carData is None:
+            if not (carData := await self._get_vehicle_data()):
+                _LOGGER.warning("No cars found for %s", self.username)
                 return
+
+            for index, data in enumerate(carData):
+                vin = data["vin"]
+                self.vin_by_index[index] = vin
+                self.car_data_by_vin[vin] = data
 
             self.car_data = carData
 
@@ -70,9 +80,7 @@ class PolestarApi:
 
     def get_number_of_cars(self) -> int:
         """Get the number of cars."""
-        if self.car_data:
-            return len(self.car_data)
-        return 0
+        return len(self.car_data_by_vin)
 
     def get_latest_data(self, query: str, field_name: str) -> dict or bool or None:
         """Get the latest data from the Polestar API."""

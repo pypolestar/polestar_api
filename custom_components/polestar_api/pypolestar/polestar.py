@@ -1,6 +1,7 @@
 """Asynchronous Python client for the Polestar API.""" ""
 
 import logging
+from collections import defaultdict
 from datetime import datetime, timedelta
 
 import httpx
@@ -38,14 +39,11 @@ class PolestarApi:
         self.username = username
         self.auth = PolestarAuth(username, password, self.client_session)
         self.updating = False
-        self.cache_data = {}
-        self.vin_cache_data = {}
         self.latest_call_code = None
         self.latest_call_code_2 = None
         self.next_update = None
-        self.car_data = None
-        self.car_data_by_vin = {}
-        self.vin_by_index: dict[int, str] = {}
+        self.car_data_by_vin: dict[str, dict] = {}
+        self.cache_data_by_vin: dict[str, dict] = defaultdict(dict)
 
     async def init(self):
         """Initialize the Polestar API."""
@@ -57,35 +55,32 @@ class PolestarApi:
                 _LOGGER.warning("No access token %s", self.username)
                 return
 
-            if not (carData := await self._get_vehicle_data()):
+            if not (car_data := await self._get_vehicle_data()):
                 _LOGGER.warning("No cars found for %s", self.username)
                 return
 
-            for index, data in enumerate(carData):
+            for data in car_data:
                 vin = data["vin"]
-                self.vin_by_index[index] = vin
                 self.car_data_by_vin[vin] = data
-
-            self.car_data = carData
+                self.cache_data_by_vin[vin][CAR_INFO_DATA] = {
+                    "data": self.car_data_by_vin[vin],
+                    "timestamp": datetime.now(),
+                }
+                _LOGGER.debug("API setup for VIN %s", vin)
 
         except PolestarAuthException as e:
             _LOGGER.exception("Auth Exception: %s", str(e))
 
-    def set_car_data(self, index: int = 0):
-        """Set the car data."""
-        self.cache_data[CAR_INFO_DATA] = {
-            "data": self.car_data[index],
-            "timestamp": datetime.now(),
-        }
+    @property
+    def vins(self) -> list[str]:
+        return list(self.car_data_by_vin.keys())
 
-    def get_number_of_cars(self) -> int:
-        """Get the number of cars."""
-        return len(self.car_data_by_vin)
-
-    def get_latest_data(self, query: str, field_name: str) -> dict or bool or None:
+    def get_latest_data(
+        self, vin: str, query: str, field_name: str
+    ) -> dict or bool or None:
         """Get the latest data from the Polestar API."""
-        if self.cache_data and self.cache_data[query]:
-            data = self.cache_data[query]["data"]
+        if self.cache_data_by_vin and self.cache_data_by_vin[vin][query]:
+            data = self.cache_data_by_vin[vin][query]["data"]
             if data is None:
                 return False
             return self._get_field_name_value(field_name, data)
@@ -128,13 +123,15 @@ class PolestarApi:
         self.updating = False
         self.next_update = datetime.now() + timedelta(seconds=5)
 
-    def get_cache_data(self, query: str, field_name: str, skip_cache: bool = False):
+    def get_cache_data(
+        self, vin: str, query: str, field_name: str, skip_cache: bool = False
+    ):
         """Get the latest data from the cache."""
         if query is None:
             return None
-
-        if self.cache_data and self.cache_data.get(query):
-            cache_entry = self.cache_data[query]
+        _LOGGER.debug("get_cache_data %s %s", query, field_name)
+        if self.cache_data_by_vin and self.cache_data_by_vin[vin].get(query):
+            cache_entry = self.cache_data_by_vin[vin][query]
             data = cache_entry["data"]
             if data is not None and (
                 skip_cache is True
@@ -173,7 +170,7 @@ class PolestarApi:
 
         if result and result["data"]:
             # put result in cache
-            self.cache_data[ODO_METER_DATA] = {
+            self.cache_data_by_vin[vin][ODO_METER_DATA] = {
                 "data": result["data"][ODO_METER_DATA],
                 "timestamp": datetime.now(),
             }
@@ -189,7 +186,7 @@ class PolestarApi:
 
         if result and result["data"]:
             # put result in cache
-            self.cache_data[BATTERY_DATA] = {
+            self.cache_data_by_vin[vin][BATTERY_DATA] = {
                 "data": result["data"][BATTERY_DATA],
                 "timestamp": datetime.now(),
             }
@@ -215,10 +212,6 @@ class PolestarApi:
                 raise PolestarNoDataException("No cars found in account")
 
             return result["data"][CAR_INFO_DATA]
-            # self.cache_data[CAR_INFO_DATA] = {
-            #     "data": result["data"][CAR_INFO_DATA][0],
-            #     "timestamp": datetime.now(),
-            # }
         return None
 
     def _set_latest_call_code(self, url: str, code: int):

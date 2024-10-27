@@ -9,7 +9,7 @@ from homeassistant import config_entries
 from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
 
 from .const import DOMAIN
-from .polestar import Polestar
+from .polestar import PolestarCoordinator
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -35,11 +35,11 @@ class FlowHandler(config_entries.ConfigFlow):
         """Create device."""
 
         try:
-            device = Polestar(self.hass, username, password)
+            device = PolestarCoordinator(self.hass, username, password)
             await device.init()
 
             # check if we have a token, otherwise throw exception
-            if device.polestarApi.auth.access_token is None:
+            if device.polestar_api.auth.access_token is None:
                 _LOGGER.exception(
                     "No token, Could be wrong credentials (invalid email or password))"
                 )

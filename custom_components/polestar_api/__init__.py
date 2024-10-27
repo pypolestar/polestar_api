@@ -9,7 +9,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers import config_validation as cv
 
 from .const import DOMAIN
-from .polestar import Polestar
+from .polestar import PolestarCar, PolestarCoordinator
 from .pypolestar.exception import PolestarApiException, PolestarAuthException
 
 PLATFORMS = [Platform.IMAGE, Platform.SENSOR]
@@ -30,24 +30,20 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> b
     conf = config_entry.data
 
     _LOGGER.debug("async_setup_entry: %s", config_entry)
-    polestar = Polestar(hass, conf[CONF_USERNAME], conf[CONF_PASSWORD])
+    coordinator = PolestarCoordinator(hass, conf[CONF_USERNAME], conf[CONF_PASSWORD])
+
+    hass.data.setdefault(DOMAIN, {})
 
     try:
-        await polestar.init()
-        number_of_cars = polestar.get_number_of_cars()
-        hass.data.setdefault(DOMAIN, {})
+        await coordinator.init()
 
-        # for each number of car we are going to create a new entry
-        entities: list[Polestar] = []
-        for car_index in range(number_of_cars):
-            polestar = Polestar(hass, conf[CONF_USERNAME], conf[CONF_PASSWORD])
-            await polestar.init(car_index)
-            polestar.set_config_unit(hass.config.units)
-            entities.append(polestar)
-            _LOGGER.debug("Added entity for VIN %s", polestar.vin)
+        entities: list[PolestarCar] = []
+        for car in coordinator.get_cars():
+            await car.async_update()
+            entities.append(car)
+            _LOGGER.debug("Added entity for VIN %s", car.vin)
 
         hass.data[DOMAIN][config_entry.entry_id] = entities
-
         await hass.config_entries.async_forward_entry_setups(
             config_entry, ["sensor", "image"]
         )
@@ -64,7 +60,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> b
         _LOGGER.exception("Read Timeout on update data %s", str(e))
     except Exception as e:
         _LOGGER.exception("Unexpected Error on update data %s", str(e))
-    polestar.polestarApi.latest_call_code = 500
+    coordinator.polestar_api.latest_call_code = 500
     return False
 
 

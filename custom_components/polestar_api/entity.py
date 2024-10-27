@@ -4,7 +4,7 @@ import logging
 
 from homeassistant.helpers.entity import Entity
 
-from .polestar import Polestar
+from .polestar import PolestarCar
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -12,7 +12,7 @@ _LOGGER = logging.getLogger(__name__)
 class PolestarEntity(Entity):
     """Base class for Polestar entities."""
 
-    def __init__(self, device: Polestar) -> None:
+    def __init__(self, device: PolestarCar) -> None:
         """Initialize the Polestar entity."""
         self.device = device
         self._attr_device_info = device.get_device_info()

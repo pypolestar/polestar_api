@@ -141,7 +141,8 @@ class PolestarApi:
                 return self._get_field_name_value(field_name, data)
         return None
 
-    def _get_field_name_value(self, field_name: str, data: dict) -> str or bool or None:
+    @staticmethod
+    def _get_field_name_value(field_name: str, data: dict) -> str or bool or None:
         if field_name is None or data is None:
             return None
 

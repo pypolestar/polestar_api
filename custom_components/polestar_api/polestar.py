@@ -12,8 +12,6 @@ from .const import DOMAIN as POLESTAR_API_DOMAIN
 from .pypolestar.exception import PolestarApiException, PolestarAuthException
 from .pypolestar.polestar import PolestarApi
 
-POST_HEADER_JSON = {"Content-Type": "application/json"}
-
 _LOGGER = logging.getLogger(__name__)
 
 

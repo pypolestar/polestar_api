@@ -126,6 +126,11 @@ class PolestarCoordinator:
         self, hass: HomeAssistant, username: str, password: str, vin: str | None
     ) -> None:
         """Initialize the Polestar API."""
+        if vin:
+            _LOGGER.debug("Configure Polestar API client for car with VIN %s", vin)
+        else:
+            _LOGGER.debug("Configure Polestar API client for all cars")
+
         self.polestar_api = PolestarApi(
             username=username,
             password=password,

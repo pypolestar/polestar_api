@@ -28,6 +28,7 @@ class PolestarAuth:
         self.password = password
         self.client_session = client_session
         self.access_token = None
+        self.id_token = None
         self.refresh_token = None
         self.token_expiry = None
         self.latest_call_code = None
@@ -84,19 +85,17 @@ class PolestarAuth:
         if result.status_code != 200 or (
             "errors" in resultData and len(resultData["errors"])
         ):
-            _LOGGER.error(result)
+            _LOGGER.error("Auth Token Error: %s", result)
             raise PolestarAuthException("Error getting token", result.status_code)
-        _LOGGER.debug(resultData)
+        _LOGGER.debug("Auth Token Result: %s", json.dumps(resultData))
 
         if resultData["data"]:
             self.access_token = resultData["data"][operationName]["access_token"]
+            self.id_token = resultData["data"][operationName]["id_token"]
             self.refresh_token = resultData["data"][operationName]["refresh_token"]
             self.token_expiry = datetime.now() + timedelta(
                 seconds=resultData["data"][operationName]["expires_in"]
             )
-            # ID Token
-
-        _LOGGER.debug(f"Response {self.access_token}")
 
     async def _get_code(self) -> None:
         query_params = await self._get_resume_path()
@@ -137,7 +136,7 @@ class PolestarAuth:
         self.latest_call_code = result.status_code
 
         if result.status_code != 200:
-            _LOGGER.error(result)
+            _LOGGER.error("Auth Code Error: %s", result)
             raise PolestarAuthException(
                 "Error getting code callback", result.status_code
             )
@@ -163,5 +162,5 @@ class PolestarAuth:
         if result.status_code in (303, 302):
             return result.next_request.url.params
 
-        _LOGGER.error(result.text)
+        _LOGGER.error("Error: %s", result.text)
         raise PolestarAuthException("Error getting resume path ", result.status_code)

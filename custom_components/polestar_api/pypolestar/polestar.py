@@ -1,5 +1,6 @@
 """Asynchronous Python client for the Polestar API.""" ""
 
+import json
 import logging
 from collections import defaultdict
 from datetime import datetime, timedelta
@@ -233,6 +234,9 @@ class PolestarApi:
             "authorization": f"Bearer {self.auth.access_token}",
         }
 
+        _LOGGER.debug("GraphQL URL: %s", url)
+        _LOGGER.debug("GraphQL Query: %s", json.dumps(params))
+
         result = await self.client_session.get(url, params=params, headers=headers)
         self._set_latest_call_code(url, result.status_code)
 
@@ -248,8 +252,8 @@ class PolestarApi:
             error_message = resultData["errors"][0]["message"]
             if error_message == "User not authenticated":
                 raise PolestarNotAuthorizedException("Unauthorized Exception")
-            _LOGGER.error(resultData.get("errors"))
+            _LOGGER.error("Error: %s", resultData.get("errors"))
             raise PolestarApiException(error_message)
 
-        _LOGGER.debug(resultData)
+        _LOGGER.debug("GraphQL Result: %s", json.dumps(resultData))
         return resultData

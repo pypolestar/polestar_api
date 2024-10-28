@@ -88,7 +88,7 @@ class PolestarApi:
             return self._get_field_name_value(field_name, data)
         return None
 
-    async def get_ev_data(self, vin: str):
+    async def get_ev_data(self, vin: str) -> None:
         """Get the latest ev data from the Polestar API."""
         if self.updating:
             return
@@ -127,7 +127,7 @@ class PolestarApi:
 
     def get_cache_data(
         self, vin: str, query: str, field_name: str, skip_cache: bool = False
-    ):
+    ) -> dict | None:
         """Get the latest data from the cache."""
         if query is None:
             return None
@@ -161,7 +161,7 @@ class PolestarApi:
 
         return None
 
-    async def _get_odometer_data(self, vin: str):
+    async def _get_odometer_data(self, vin: str) -> None:
         """Get the latest odometer data from the Polestar API."""
         params = {
             "query": "query GetOdometerData($vin:String!){getOdometerData(vin:$vin){averageSpeedKmPerHour eventUpdatedTimestamp{iso unix}odometerMeters tripMeterAutomaticKm tripMeterManualKm}}",
@@ -177,7 +177,7 @@ class PolestarApi:
                 "timestamp": datetime.now(),
             }
 
-    async def _get_battery_data(self, vin: str):
+    async def _get_battery_data(self, vin: str) -> None:
         params = {
             "query": "query GetBatteryData($vin:String!){getBatteryData(vin:$vin){averageEnergyConsumptionKwhPer100Km batteryChargeLevelPercentage chargerConnectionStatus chargingCurrentAmps chargingPowerWatts chargingStatus estimatedChargingTimeMinutesToTargetDistance estimatedChargingTimeToFullMinutes estimatedDistanceToEmptyKm estimatedDistanceToEmptyMiles eventUpdatedTimestamp{iso unix}}}",
             "operationName": "GetBatteryData",
@@ -193,7 +193,7 @@ class PolestarApi:
                 "timestamp": datetime.now(),
             }
 
-    async def _get_vehicle_data(self):
+    async def _get_vehicle_data(self) -> dict | None:
         """Get the latest vehicle data from the Polestar API."""
         # get Vehicle Data
         params = {
@@ -216,7 +216,7 @@ class PolestarApi:
             return result["data"][CAR_INFO_DATA]
         return None
 
-    def _set_latest_call_code(self, url: str, code: int):
+    def _set_latest_call_code(self, url: str, code: int) -> None:
         if url == BASE_URL:
             self.latest_call_code = code
         else:

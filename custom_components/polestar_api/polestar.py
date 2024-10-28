@@ -122,11 +122,18 @@ class PolestarCar:
 class PolestarCoordinator:
     """Polestar EV integration."""
 
-    def __init__(self, hass: HomeAssistant, username: str, password: str) -> None:
+    def __init__(
+        self, hass: HomeAssistant, username: str, password: str, vin: str | None
+    ) -> None:
         """Initialize the Polestar API."""
-        self.polestar_api = PolestarApi(username, password, get_async_client(hass))
+        self.polestar_api = PolestarApi(
+            username=username,
+            password=password,
+            client_session=get_async_client(hass),
+            vins=[vin] if vin else None,
+        )
 
-    async def async_init(self) -> None:
+    async def async_init(self):
         """Initialize the Polestar API."""
         await self.polestar_api.async_init()
 

@@ -8,7 +8,7 @@ from homeassistant.const import CONF_PASSWORD, CONF_USERNAME, Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import config_validation as cv
 
-from .const import DOMAIN
+from .const import CONF_VIN, DOMAIN
 from .polestar import PolestarCar, PolestarCoordinator
 from .pypolestar.exception import PolestarApiException, PolestarAuthException
 
@@ -30,7 +30,12 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> b
     conf = config_entry.data
 
     _LOGGER.debug("async_setup_entry: %s", config_entry)
-    coordinator = PolestarCoordinator(hass, conf[CONF_USERNAME], conf[CONF_PASSWORD])
+    coordinator = PolestarCoordinator(
+        hass=hass,
+        username=conf[CONF_USERNAME],
+        password=conf[CONF_PASSWORD],
+        vin=conf.get(CONF_VIN),
+    )
 
     hass.data.setdefault(DOMAIN, {})
 

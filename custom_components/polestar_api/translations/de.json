@@ -7,7 +7,8 @@
         "data": {
           "name": "Anzeigename",
           "username": "Benutzername",
-          "password": "Passwort"
+          "password": "Passwort",
+          "vin": "VIN"
         }
       }
     },

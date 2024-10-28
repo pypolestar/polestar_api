@@ -6,7 +6,8 @@
         "description": "Vul authenticatie voor Polestar EV",
         "data": {
           "username": "Gebruikersnaam",
-          "password": "Wachtwoord"
+          "password": "Wachtwoord",
+          "vin": "VIN"
         }
       }
     },

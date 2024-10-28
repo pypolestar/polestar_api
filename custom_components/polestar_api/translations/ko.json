@@ -6,7 +6,8 @@
         "description": "폴스타 API 연동을 위해 필요한 인증 정보를 입력하세요.",
         "data": {
           "username": "Polestar ID",
-          "password": "비밀번호"
+          "password": "비밀번호",
+          "vin": "VIN"
         }
       }
     },

@@ -33,6 +33,7 @@ class PolestarApi:
         username: str,
         password: str,
         client_session: httpx.AsyncClient | None = None,
+        vins: list[str] | None = None,
     ) -> None:
         """Initialize the Polestar API."""
         self.client_session = client_session or httpx.AsyncClient()
@@ -46,8 +47,9 @@ class PolestarApi:
         self.cache_data_by_vin: dict[str, dict] = defaultdict(dict)
         self.cache_ttl = timedelta(seconds=CACHE_TIME)
         self.next_update_delay = timedelta(seconds=5)
+        self.configured_vins = set(vins) if vins else None
 
-    async def async_init(self):
+    async def async_init(self) -> None:
         """Initialize the Polestar API."""
         try:
             await self.auth.init()
@@ -63,6 +65,8 @@ class PolestarApi:
 
             for data in car_data:
                 vin = data["vin"]
+                if self.configured_vins and vin not in self.configured_vins:
+                    continue
                 self.car_data_by_vin[vin] = data
                 self.cache_data_by_vin[vin][CAR_INFO_DATA] = {
                     "data": self.car_data_by_vin[vin],

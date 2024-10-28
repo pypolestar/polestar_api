@@ -6,7 +6,8 @@
         "description": "Entrez les paramètres d'authentification pour Polestar",
         "data": {
           "username": "Nom d'utilisateur",
-          "password": "Mot de passe"
+          "password": "Mot de passe",
+          "vin": "VIN"
         }
       }
     },

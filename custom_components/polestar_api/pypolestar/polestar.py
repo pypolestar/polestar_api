@@ -44,6 +44,8 @@ class PolestarApi:
         self.next_update = None
         self.car_data_by_vin: dict[str, dict] = {}
         self.cache_data_by_vin: dict[str, dict] = defaultdict(dict)
+        self.cache_ttl = timedelta(seconds=CACHE_TIME)
+        self.next_update_delay = timedelta(seconds=5)
 
     async def async_init(self):
         """Initialize the Polestar API."""
@@ -121,7 +123,7 @@ class PolestarApi:
         await call_api(lambda: self._get_battery_data(vin))
 
         self.updating = False
-        self.next_update = datetime.now() + timedelta(seconds=5)
+        self.next_update = datetime.now() + self.next_update_delay
 
     def get_cache_data(
         self, vin: str, query: str, field_name: str, skip_cache: bool = False
@@ -135,8 +137,7 @@ class PolestarApi:
             data = cache_entry["data"]
             if data is not None and (
                 skip_cache is True
-                or cache_entry["timestamp"] + timedelta(seconds=CACHE_TIME)
-                > datetime.now()
+                or cache_entry["timestamp"] + self.cache_ttl > datetime.now()
             ):
                 return self._get_field_name_value(field_name, data)
         return None

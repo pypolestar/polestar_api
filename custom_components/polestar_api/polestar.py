@@ -60,7 +60,7 @@ class PolestarCar:
             return
         except PolestarApiException as e:
             _LOGGER.warning("API Exception on update data %s", str(e))
-            self.a.next_update = datetime.now() + timedelta(seconds=5)
+            self.polestar_api.next_update = datetime.now() + timedelta(seconds=5)
         except PolestarAuthException as e:
             _LOGGER.warning("Auth Exception on update data %s", str(e))
             await self.polestar_api.auth.get_token()

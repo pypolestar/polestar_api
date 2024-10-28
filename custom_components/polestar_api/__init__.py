@@ -35,7 +35,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> b
     hass.data.setdefault(DOMAIN, {})
 
     try:
-        await coordinator.init()
+        await coordinator.async_init()
 
         entities: list[PolestarCar] = []
         for car in coordinator.get_cars():

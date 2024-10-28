@@ -36,7 +36,7 @@ class FlowHandler(config_entries.ConfigFlow):
 
         try:
             device = PolestarCoordinator(self.hass, username, password)
-            await device.init()
+            await device.async_init()
 
             # check if we have a token, otherwise throw exception
             if device.polestar_api.auth.access_token is None:

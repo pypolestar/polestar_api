@@ -45,7 +45,7 @@ class PolestarApi:
         self.car_data_by_vin: dict[str, dict] = {}
         self.cache_data_by_vin: dict[str, dict] = defaultdict(dict)
 
-    async def init(self):
+    async def async_init(self):
         """Initialize the Polestar API."""
         try:
             await self.auth.init()

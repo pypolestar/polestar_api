@@ -7,7 +7,6 @@ import httpx
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.httpx_client import get_async_client
-from urllib3 import disable_warnings
 
 from .const import DOMAIN as POLESTAR_API_DOMAIN
 from .pypolestar.exception import PolestarApiException, PolestarAuthException
@@ -128,11 +127,10 @@ class PolestarCoordinator:
     def __init__(self, hass: HomeAssistant, username: str, password: str) -> None:
         """Initialize the Polestar API."""
         self.polestar_api = PolestarApi(username, password, get_async_client(hass))
-        disable_warnings()
 
-    async def init(self):
+    async def async_init(self):
         """Initialize the Polestar API."""
-        await self.polestar_api.init()
+        await self.polestar_api.async_init()
 
     def get_cars(self) -> list[PolestarCar]:
         return [

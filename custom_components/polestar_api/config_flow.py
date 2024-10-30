@@ -47,23 +47,23 @@ class FlowHandler(config_entries.ConfigFlow):
 
             # check that we found cars
             if not len(device.get_cars()):
-                return self.async_abort(reason="no_cars")
+                return self.async_abort(reason="No cars found")
 
             # check if we have a token, otherwise throw exception
             if device.polestar_api.auth.access_token is None:
                 _LOGGER.exception(
                     "No token, Could be wrong credentials (invalid email or password))"
                 )
-                return self.async_abort(reason="no_token")
+                return self.async_abort(reason="No API token")
 
         except asyncio.TimeoutError:
-            return self.async_abort(reason="api_timeout")
+            return self.async_abort(reason="API timeout")
         except ClientError:
             _LOGGER.exception("ClientError")
-            return self.async_abort(reason="api_failed")
+            return self.async_abort(reason="API client failure")
         except Exception:  # pylint: disable=broad-except
             _LOGGER.exception("Unexpected error creating device")
-            return self.async_abort(reason="api_failed")
+            return self.async_abort(reason="API unexpected failure")
 
         return await self._create_entry(username, password, vin)
 

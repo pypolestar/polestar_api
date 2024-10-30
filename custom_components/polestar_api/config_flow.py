@@ -6,6 +6,7 @@ import logging
 import voluptuous as vol
 from aiohttp import ClientError
 from homeassistant import config_entries
+from homeassistant.config_entries import ConfigFlowResult
 from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
 
 from .const import CONF_VIN, DOMAIN
@@ -21,14 +22,18 @@ class FlowHandler(config_entries.ConfigFlow):
     VERSION = 1
     CONNECTION_CLASS = config_entries.CONN_CLASS_LOCAL_POLL
 
-    async def _create_entry(self, username: str, password: str, vin: str) -> None:
+    async def _create_entry(
+        self, username: str, password: str, vin: str | None
+    ) -> ConfigFlowResult:
         """Register new entry."""
         return self.async_create_entry(
             title="Polestar EV",
             data={CONF_USERNAME: username, CONF_PASSWORD: password, CONF_VIN: vin},
         )
 
-    async def _create_device(self, username: str, password: str, vin: str) -> None:
+    async def _create_device(
+        self, username: str, password: str, vin: str | None
+    ) -> ConfigFlowResult:
         """Create device."""
 
         try:
@@ -42,27 +47,27 @@ class FlowHandler(config_entries.ConfigFlow):
 
             # check that we found cars
             if not len(device.get_cars()):
-                return self.async_abort(reason="no_cars")
+                return self.async_abort(reason="No cars found")
 
             # check if we have a token, otherwise throw exception
             if device.polestar_api.auth.access_token is None:
                 _LOGGER.exception(
                     "No token, Could be wrong credentials (invalid email or password))"
                 )
-                return self.async_abort(reason="no_token")
+                return self.async_abort(reason="No API token")
 
         except asyncio.TimeoutError:
-            return self.async_abort(reason="api_timeout")
+            return self.async_abort(reason="API timeout")
         except ClientError:
             _LOGGER.exception("ClientError")
-            return self.async_abort(reason="api_failed")
+            return self.async_abort(reason="API client failure")
         except Exception:  # pylint: disable=broad-except
             _LOGGER.exception("Unexpected error creating device")
-            return self.async_abort(reason="api_failed")
+            return self.async_abort(reason="API unexpected failure")
 
         return await self._create_entry(username, password, vin)
 
-    async def async_step_user(self, user_input: dict = None) -> None:
+    async def async_step_user(self, user_input: dict | None = None) -> ConfigFlowResult:
         """User initiated config flow."""
         if user_input is None:
             return self.async_show_form(
@@ -78,13 +83,13 @@ class FlowHandler(config_entries.ConfigFlow):
         return await self._create_device(
             username=user_input[CONF_USERNAME],
             password=user_input[CONF_PASSWORD],
-            vin=user_input[CONF_VIN],
+            vin=user_input.get(CONF_VIN),
         )
 
-    async def async_step_import(self, user_input: dict) -> None:
+    async def async_step_import(self, user_input: dict) -> ConfigFlowResult:
         """Import a config entry."""
         return await self._create_device(
             username=user_input[CONF_USERNAME],
             password=user_input[CONF_PASSWORD],
-            vin=user_input.get(CONF_VIN, ""),
+            vin=user_input.get(CONF_VIN),
         )

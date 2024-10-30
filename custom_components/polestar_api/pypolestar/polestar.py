@@ -52,31 +52,27 @@ class PolestarApi:
 
     async def async_init(self) -> None:
         """Initialize the Polestar API."""
-        try:
-            await self.auth.init()
-            await self.auth.get_token()
+        await self.auth.init()
+        await self.auth.get_token()
 
-            if self.auth.access_token is None:
-                _LOGGER.warning("No access token %s", self.username)
-                return
+        if self.auth.access_token is None:
+            _LOGGER.warning("No access token %s", self.username)
+            return
 
-            if not (car_data := await self._get_vehicle_data()):
-                _LOGGER.warning("No cars found for %s", self.username)
-                return
+        if not (car_data := await self._get_vehicle_data()):
+            _LOGGER.warning("No cars found for %s", self.username)
+            return
 
-            for data in car_data:
-                vin = data["vin"]
-                if self.configured_vins and vin not in self.configured_vins:
-                    continue
-                self.car_data_by_vin[vin] = data
-                self.cache_data_by_vin[vin][CAR_INFO_DATA] = {
-                    "data": self.car_data_by_vin[vin],
-                    "timestamp": datetime.now(),
-                }
-                _LOGGER.debug("API setup for VIN %s", vin)
-
-        except PolestarAuthException as e:
-            _LOGGER.exception("Auth Exception: %s", str(e))
+        for data in car_data:
+            vin = data["vin"]
+            if self.configured_vins and vin not in self.configured_vins:
+                continue
+            self.car_data_by_vin[vin] = data
+            self.cache_data_by_vin[vin][CAR_INFO_DATA] = {
+                "data": self.car_data_by_vin[vin],
+                "timestamp": datetime.now(),
+            }
+            _LOGGER.debug("API setup for VIN %s", vin)
 
     @property
     def vins(self) -> list[str]:

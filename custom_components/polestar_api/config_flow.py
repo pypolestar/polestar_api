@@ -6,6 +6,7 @@ import logging
 import voluptuous as vol
 from aiohttp import ClientError
 from homeassistant import config_entries
+from homeassistant.config_entries import ConfigFlowResult
 from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
 
 from .const import CONF_VIN, DOMAIN
@@ -21,14 +22,18 @@ class FlowHandler(config_entries.ConfigFlow):
     VERSION = 1
     CONNECTION_CLASS = config_entries.CONN_CLASS_LOCAL_POLL
 
-    async def _create_entry(self, username: str, password: str, vin: str) -> None:
+    async def _create_entry(
+        self, username: str, password: str, vin: str | None
+    ) -> ConfigFlowResult:
         """Register new entry."""
         return self.async_create_entry(
             title="Polestar EV",
             data={CONF_USERNAME: username, CONF_PASSWORD: password, CONF_VIN: vin},
         )
 
-    async def _create_device(self, username: str, password: str, vin: str) -> None:
+    async def _create_device(
+        self, username: str, password: str, vin: str | None
+    ) -> ConfigFlowResult:
         """Create device."""
 
         try:
@@ -62,7 +67,7 @@ class FlowHandler(config_entries.ConfigFlow):
 
         return await self._create_entry(username, password, vin)
 
-    async def async_step_user(self, user_input: dict = None) -> None:
+    async def async_step_user(self, user_input: dict | None = None) -> ConfigFlowResult:
         """User initiated config flow."""
         if user_input is None:
             return self.async_show_form(
@@ -78,13 +83,13 @@ class FlowHandler(config_entries.ConfigFlow):
         return await self._create_device(
             username=user_input[CONF_USERNAME],
             password=user_input[CONF_PASSWORD],
-            vin=user_input[CONF_VIN],
+            vin=user_input.get(CONF_VIN),
         )
 
-    async def async_step_import(self, user_input: dict) -> None:
+    async def async_step_import(self, user_input: dict) -> ConfigFlowResult:
         """Import a config entry."""
         return await self._create_device(
             username=user_input[CONF_USERNAME],
             password=user_input[CONF_PASSWORD],
-            vin=user_input.get(CONF_VIN, ""),
+            vin=user_input.get(CONF_VIN),
         )

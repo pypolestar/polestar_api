@@ -16,7 +16,7 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from . import DOMAIN as POLESTAR_API_DOMAIN
 from .entity import PolestarEntity
-from .polestar import Polestar
+from .polestar import PolestarCar
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -49,10 +49,8 @@ async def async_setup_entry(
 ) -> None:
     """Set up Polestar image entities based on a config entry."""
 
-    devices: list[Polestar] = hass.data[POLESTAR_API_DOMAIN][entry.entry_id]
+    devices: list[PolestarCar] = hass.data[POLESTAR_API_DOMAIN][entry.entry_id]
     for device in devices:
-        # put data in cache
-        await device.async_update()
         images = [
             PolestarImage(device, description, hass)
             for description in POLESTAR_IMAGE_TYPES
@@ -68,7 +66,7 @@ class PolestarImage(PolestarEntity, ImageEntity):
 
     def __init__(
         self,
-        device: Polestar,
+        device: PolestarCar,
         description: PolestarImageDescription,
         hass: HomeAssistant,
     ) -> None:

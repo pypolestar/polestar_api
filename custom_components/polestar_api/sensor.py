@@ -34,7 +34,7 @@ from homeassistant.util.unit_conversion import (
 
 from . import DOMAIN as POLESTAR_API_DOMAIN
 from .entity import PolestarEntity
-from .polestar import Polestar
+from .polestar import PolestarCar
 
 _LOGGER = logging.getLogger(__name__)
 SCAN_INTERVAL = timedelta(seconds=15)
@@ -491,10 +491,8 @@ async def async_setup_entry(
     hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
 ):
     """Set up using config_entry."""
-    devices: list[Polestar] = hass.data[POLESTAR_API_DOMAIN][entry.entry_id]
+    devices: list[PolestarCar] = hass.data[POLESTAR_API_DOMAIN][entry.entry_id]
     for device in devices:
-        # put data in cache
-        await device.async_update()
         sensors = [
             PolestarSensor(device, description) for description in POLESTAR_SENSOR_TYPES
         ]
@@ -510,7 +508,7 @@ class PolestarSensor(PolestarEntity, SensorEntity):
     _attr_has_entity_name = True
 
     def __init__(
-        self, device: Polestar, description: PolestarSensorDescription
+        self, device: PolestarCar, description: PolestarSensorDescription
     ) -> None:
         """Initialize the sensor."""
         super().__init__(device)
@@ -745,4 +743,6 @@ class PolestarSensor(PolestarEntity, SensorEntity):
 
         except Exception:
             _LOGGER.warning("Failed to update sensor async update")
-            self.device.polestarApi.next_update = datetime.now() + timedelta(seconds=60)
+            self.device.polestar_api.next_update = datetime.now() + timedelta(
+                seconds=60
+            )

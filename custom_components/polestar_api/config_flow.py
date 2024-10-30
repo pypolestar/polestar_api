@@ -11,6 +11,7 @@ from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
 
 from .const import CONF_VIN, DOMAIN
 from .polestar import PolestarCoordinator
+from .pypolestar.exception import PolestarAuthException
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -61,6 +62,8 @@ class FlowHandler(config_entries.ConfigFlow):
         except ClientError:
             _LOGGER.exception("ClientError")
             return self.async_abort(reason="API client failure")
+        except PolestarAuthException:
+            return self.async_abort(reason="Login failed")
         except Exception:  # pylint: disable=broad-except
             _LOGGER.exception("Unexpected error creating device")
             return self.async_abort(reason="API unexpected failure")

@@ -10,5 +10,5 @@
   "documentation": "https://github.com/pypolestar/polestar_api",
   "iot_class": "cloud_polling",
   "issue_tracker": "https://github.com/pypolestar/polestar_api/issues",
-  "version": "1.7.3"
+  "version": "1.8.0b1"
 }

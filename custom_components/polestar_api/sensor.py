@@ -12,7 +12,6 @@ from homeassistant.components.sensor import (
     SensorEntityDescription,
     SensorStateClass,
 )
-from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     PERCENTAGE,
     UnitOfElectricCurrent,
@@ -23,7 +22,6 @@ from homeassistant.const import (
     UnitOfTime,
 )
 from homeassistant.core import HomeAssistant, callback
-from homeassistant.helpers import entity_platform
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import StateType
 from homeassistant.util.unit_conversion import (
@@ -32,7 +30,8 @@ from homeassistant.util.unit_conversion import (
     SpeedConverter,
 )
 
-from . import DOMAIN as POLESTAR_API_DOMAIN
+from .const import DOMAIN as POLESTAR_API_DOMAIN
+from .data import PolestarConfigEntry
 from .entity import PolestarEntity
 from .polestar import PolestarCar
 
@@ -477,28 +476,19 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
 )
 
 
-async def async_setup_platform(
-    hass: HomeAssistant,
-    config: ConfigEntry,
-    async_add_entities: AddEntitiesCallback,
-    discovery_info=None,
-):
-    """Set up the Polestar sensor."""
-    pass
-
-
 async def async_setup_entry(
-    hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddEntitiesCallback
+    hass: HomeAssistant,
+    entry: PolestarConfigEntry,
+    async_add_entities: AddEntitiesCallback,
 ):
     """Set up using config_entry."""
-    devices: list[PolestarCar] = hass.data[POLESTAR_API_DOMAIN][entry.entry_id]
-    for device in devices:
-        sensors = [
-            PolestarSensor(device, description) for description in POLESTAR_SENSOR_TYPES
+    async_add_entities(
+        [
+            PolestarSensor(car, entity_description)
+            for entity_description in POLESTAR_SENSOR_TYPES
+            for car in entry.runtime_data.cars
         ]
-        async_add_entities(sensors)
-
-    entity_platform.current_platform.get()
+    )
 
 
 class PolestarSensor(PolestarEntity, SensorEntity):
@@ -508,35 +498,37 @@ class PolestarSensor(PolestarEntity, SensorEntity):
     _attr_has_entity_name = True
 
     def __init__(
-        self, device: PolestarCar, description: PolestarSensorDescription
+        self, car: PolestarCar, entity_description: PolestarSensorDescription
     ) -> None:
         """Initialize the sensor."""
-        super().__init__(device)
-        unique_id = device.get_unique_id()
-        self.entity_id = (
-            f"{POLESTAR_API_DOMAIN}.'polestar_'.{unique_id}_{description.key}"
-        )
+        super().__init__(car)
+        self.car = car
+        self.entity_description = entity_description
+        self.entity_id = f"{POLESTAR_API_DOMAIN}.'polestar_'.{car.get_short_id()}_{entity_description.key}"
         # self._attr_name = f"{description.name}"
-        self._attr_unique_id = f"polestar_{unique_id}-{description.key}"
-        self.entity_description = description
-        self._attr_translation_key = f"polestar_{description.key}"
-        self._attr_native_unit_of_measurement = description.native_unit_of_measurement
+        self._attr_unique_id = (
+            f"polestar_{car.get_unique_id()}_{entity_description.key}"
+        )
+        self._attr_translation_key = f"polestar_{entity_description.key}"
+        self._attr_native_unit_of_measurement = (
+            entity_description.native_unit_of_measurement
+        )
         self._sensor_data = None
-        self._attr_unit_of_measurement = description.native_unit_of_measurement
-        self._attr_native_value = self.device.get_value(
+        self._attr_unit_of_measurement = entity_description.native_unit_of_measurement
+        self._attr_native_value = self.car.get_value(
             self.entity_description.query,
             self.entity_description.field_name,
             self.get_skip_cache(),
         )
 
-        if description.round_digits is not None:
-            self.attr_suggested_display_precision = description.round_digits
+        if entity_description.round_digits is not None:
+            self.attr_suggested_display_precision = entity_description.round_digits
 
-        if description.state_class is not None:
-            self._attr_state_class = description.state_class
-        if description.device_class is not None:
-            self._attr_device_class = description.device_class
-        if self.device is not None and self.device.get_latest_call_code() == 200:
+        if entity_description.state_class is not None:
+            self._attr_state_class = entity_description.state_class
+        if entity_description.device_class is not None:
+            self._attr_device_class = entity_description.device_class
+        if self.car is not None and self.car.get_latest_call_code() == 200:
             self._async_update_attrs()
 
     def get_skip_cache(self) -> bool:
@@ -550,7 +542,7 @@ class PolestarSensor(PolestarEntity, SensorEntity):
     @callback
     def _async_update_attrs(self) -> None:
         """Update the state and attributes."""
-        self._sensor_data = self.device.get_value(
+        self._sensor_data = self.car.get_value(
             self.entity_description.query,
             self.entity_description.field_name,
             self.get_skip_cache(),
@@ -574,32 +566,32 @@ class PolestarSensor(PolestarEntity, SensorEntity):
         if self.entity_description.dict_data is not None:
             if self.entity_description.key == "api_status_code":
                 return self.entity_description.dict_data.get(
-                    self.device.get_latest_call_code_v1(), "Error"
+                    self.car.get_latest_call_code_v1(), "Error"
                 )
             elif self.entity_description.key == "api_status_code_v2":
                 return self.entity_description.dict_data.get(
-                    self.device.get_latest_call_code_v2(), "Error"
+                    self.car.get_latest_call_code_v2(), "Error"
                 )
             elif self.entity_description.key == "api_status_code_auth":
                 return self.entity_description.dict_data.get(
-                    self.device.get_latest_call_code_auth(), "Error"
+                    self.car.get_latest_call_code_auth(), "Error"
                 )
             self._attr_native_value = self.entity_description.dict_data.get(
                 self._attr_native_value, self._attr_native_value
             )
 
         if self.entity_description.key == "api_token_expires_at":
-            if self.device.get_token_expiry() is None:
+            if self.car.get_token_expiry() is None:
                 return None
-            return self.device.get_token_expiry().strftime("%Y-%m-%d %H:%M:%S")
+            return self.car.get_token_expiry().strftime("%Y-%m-%d %H:%M:%S")
         if self._attr_native_value != 0 and self._attr_native_value in (None, False):
             return None
 
         if self.entity_description.key in ("estimate_full_charge_range"):
-            battery_level = self.device.get_latest_data(
+            battery_level = self.car.get_latest_data(
                 self.entity_description.query, "batteryChargeLevelPercentage"
             )
-            estimate_range = self.device.get_latest_data(
+            estimate_range = self.car.get_latest_data(
                 self.entity_description.query, self.entity_description.field_name
             )
 
@@ -730,8 +722,8 @@ class PolestarSensor(PolestarEntity, SensorEntity):
     async def async_update(self) -> None:
         """Get the latest data and updates the states."""
         try:
-            await self.device.async_update()
-            value = self.device.get_value(
+            await self.car.async_update()
+            value = self.car.get_value(
                 self.entity_description.query,
                 self.entity_description.field_name,
                 self.get_skip_cache(),
@@ -743,6 +735,4 @@ class PolestarSensor(PolestarEntity, SensorEntity):
 
         except Exception:
             _LOGGER.warning("Failed to update sensor async update")
-            self.device.polestar_api.next_update = datetime.now() + timedelta(
-                seconds=60
-            )
+            self.car.polestar_api.next_update = datetime.now() + timedelta(seconds=60)

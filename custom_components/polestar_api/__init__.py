@@ -3,55 +3,48 @@
 import logging
 
 import httpx
-from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_PASSWORD, CONF_USERNAME, Platform
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers import config_validation as cv
+from homeassistant.loader import async_get_loaded_integration
 
-from .const import CONF_VIN, DOMAIN
+from .const import CONF_VIN
+from .data import PolestarConfigEntry, PolestarData
 from .polestar import PolestarCar, PolestarCoordinator
 from .pypolestar.exception import PolestarApiException, PolestarAuthException
 
 PLATFORMS = [Platform.IMAGE, Platform.SENSOR]
 
-CONFIG_SCHEMA = cv.removed(DOMAIN, raise_if_present=False)
-
 _LOGGER = logging.getLogger(__name__)
 
 
-async def async_setup(hass: HomeAssistant, config: dict) -> bool:
-    """Set up the Polestar API component."""
-    hass.data.setdefault(DOMAIN, {})
-    return True
-
-
-async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> bool:
+async def async_setup_entry(hass: HomeAssistant, entry: PolestarConfigEntry) -> bool:
     """Set up Polestar from a config entry."""
-    conf = config_entry.data
 
-    _LOGGER.debug("async_setup_entry: %s", config_entry)
+    _LOGGER.debug("async_setup_entry: %s", entry)
+
     coordinator = PolestarCoordinator(
         hass=hass,
-        username=conf[CONF_USERNAME],
-        password=conf[CONF_PASSWORD],
-        vin=conf.get(CONF_VIN),
+        username=entry.data[CONF_USERNAME],
+        password=entry.data[CONF_PASSWORD],
+        vin=entry.data.get(CONF_VIN),
     )
-
-    hass.data.setdefault(DOMAIN, {})
 
     try:
         await coordinator.async_init()
 
-        entities: list[PolestarCar] = []
+        cars: list[PolestarCar] = []
         for car in coordinator.get_cars():
             await car.async_update()
-            entities.append(car)
-            _LOGGER.debug("Added entity for VIN %s", car.vin)
+            cars.append(car)
+            _LOGGER.debug("Added car with VIN %s", car.vin)
 
-        hass.data[DOMAIN][config_entry.entry_id] = entities
-        await hass.config_entries.async_forward_entry_setups(
-            config_entry, ["sensor", "image"]
+        entry.runtime_data = PolestarData(
+            coordinator=coordinator,
+            cars=cars,
+            integration=async_get_loaded_integration(hass, entry.domain),
         )
+
+        await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
         return True
     except PolestarApiException as e:
         _LOGGER.exception("API Exception on update data %s", str(e))
@@ -69,17 +62,8 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> b
     return False
 
 
-async def async_unload_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> bool:
-    """Unload a config entry."""
-    _LOGGER.debug("async_unload_entry: %s", config_entry)
+async def async_unload_entry(hass: HomeAssistant, entry: PolestarConfigEntry) -> bool:
+    """Handle removal of an entry."""
 
-    unload_ok = await hass.config_entries.async_unload_platforms(
-        config_entry, PLATFORMS
-    )
-
-    hass.data[DOMAIN].pop(config_entry.entry_id)
-
-    if not hass.data[DOMAIN]:
-        hass.data.pop(DOMAIN)
-
-    return unload_ok
+    _LOGGER.debug("async_unload_entry: %s", entry)
+    return await hass.config_entries.async_unload_platforms(entry, PLATFORMS)

@@ -26,13 +26,19 @@ class PolestarCar:
         """Initialize the Polestar Car."""
         self.polestar_api = api
         self.vin = vin
-        self.name = "Polestar " + self.get_unique_id()
-        self.model = (
+        self.name = "Polestar " + self.get_short_id()
+        self.model = str(
             self.get_value("getConsumerCarsV2", "content/model/name") or "Unknown model"
         )
 
     def get_unique_id(self) -> str:
-        """Last 4 character of the VIN"""
+        """Return unique identifier (VIN)"""
+        if self.vin is None:
+            raise UnknownVIN
+        return self.vin.lower()
+
+    def get_short_id(self) -> str:
+        """Last 4 characters of the VIN"""
         if self.vin is None:
             raise UnknownVIN
         return self.vin[-4:]
@@ -40,7 +46,7 @@ class PolestarCar:
     def get_device_info(self) -> DeviceInfo:
         """Return DeviceInfo for current device"""
         return DeviceInfo(
-            identifiers={(POLESTAR_API_DOMAIN, self.vin)},
+            identifiers={(POLESTAR_API_DOMAIN, self.get_unique_id())},
             manufacturer="Polestar",
             model=self.model,
             name=self.name,

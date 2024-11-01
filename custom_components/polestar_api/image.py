@@ -64,6 +64,7 @@ class PolestarImage(PolestarEntity, ImageEntity):
     """Representation of a Polestar image."""
 
     entity_description: PolestarImageDescription
+    _attr_has_entity_name = True
 
     def __init__(
         self,

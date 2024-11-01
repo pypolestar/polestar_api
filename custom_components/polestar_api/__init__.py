@@ -27,6 +27,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: PolestarConfigEntry) -> 
         username=entry.data[CONF_USERNAME],
         password=entry.data[CONF_PASSWORD],
         vin=entry.data.get(CONF_VIN),
+        unique_id=entry.entry_id,
     )
 
     try:
@@ -36,7 +37,11 @@ async def async_setup_entry(hass: HomeAssistant, entry: PolestarConfigEntry) -> 
         for car in coordinator.get_cars():
             await car.async_update()
             cars.append(car)
-            _LOGGER.debug("Added car with VIN %s", car.vin)
+            _LOGGER.debug(
+                "Added car with VIN %s for %s",
+                car.vin,
+                entry.entry_id,
+            )
 
         entry.runtime_data = PolestarData(
             coordinator=coordinator,

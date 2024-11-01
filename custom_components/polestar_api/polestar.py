@@ -15,32 +15,29 @@ from .pypolestar.polestar import PolestarApi
 _LOGGER = logging.getLogger(__name__)
 
 
-class UnknownVIN(ValueError):
-    pass
-
-
 class PolestarCar:
     """Polestar EV integration."""
 
-    def __init__(self, api: PolestarApi, vin: str) -> None:
+    def __init__(
+        self, api: PolestarApi, vin: str, unique_id: str | None = None
+    ) -> None:
         """Initialize the Polestar Car."""
         self.polestar_api = api
         self.vin = vin
+        self.unique_id = (
+            f"{unique_id}_{self.vin.lower()}" if unique_id else self.vin.lower()
+        )
         self.name = "Polestar " + self.get_short_id()
         self.model = str(
             self.get_value("getConsumerCarsV2", "content/model/name") or "Unknown model"
         )
 
     def get_unique_id(self) -> str:
-        """Return unique identifier (VIN)"""
-        if self.vin is None:
-            raise UnknownVIN
-        return self.vin.lower()
+        """Return unique identifier"""
+        return self.unique_id
 
     def get_short_id(self) -> str:
         """Last 4 characters of the VIN"""
-        if self.vin is None:
-            raise UnknownVIN
         return self.vin[-4:]
 
     def get_device_info(self) -> DeviceInfo:
@@ -129,20 +126,25 @@ class PolestarCoordinator:
     """Polestar EV integration."""
 
     def __init__(
-        self, hass: HomeAssistant, username: str, password: str, vin: str | None
+        self,
+        hass: HomeAssistant,
+        username: str,
+        password: str,
+        vin: str | None,
+        unique_id: str | None = None,
     ) -> None:
         """Initialize the Polestar API."""
         if vin:
             _LOGGER.debug("Configure Polestar API client for car with VIN %s", vin)
         else:
             _LOGGER.debug("Configure Polestar API client for all cars")
-
         self.polestar_api = PolestarApi(
             username=username,
             password=password,
             client_session=get_async_client(hass),
             vins=[vin] if vin else None,
         )
+        self.unique_id = unique_id
 
     async def async_init(self):
         """Initialize the Polestar API."""
@@ -150,6 +152,6 @@ class PolestarCoordinator:
 
     def get_cars(self) -> list[PolestarCar]:
         return [
-            PolestarCar(api=self.polestar_api, vin=vin)
+            PolestarCar(api=self.polestar_api, vin=vin, unique_id=self.unique_id)
             for vin in self.polestar_api.vins
         ]

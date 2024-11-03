@@ -138,13 +138,14 @@ class PolestarCoordinator:
             _LOGGER.debug("Configure Polestar API client for car with VIN %s", vin)
         else:
             _LOGGER.debug("Configure Polestar API client for all cars")
+        self.unique_id = unique_id
         self.polestar_api = PolestarApi(
             username=username,
             password=password,
             client_session=get_async_client(hass),
             vins=[vin] if vin else None,
+            unique_id=self.unique_id,
         )
-        self.unique_id = unique_id
 
     async def async_init(self):
         """Initialize the Polestar API."""

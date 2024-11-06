@@ -35,6 +35,7 @@ class PolestarApi:
         password: str,
         client_session: httpx.AsyncClient | None = None,
         vins: list[str] | None = None,
+        unique_id: str | None = None,
     ) -> None:
         """Initialize the Polestar API."""
         self.client_session = client_session or httpx.AsyncClient()
@@ -49,18 +50,19 @@ class PolestarApi:
         self.cache_ttl = timedelta(seconds=CACHE_TIME)
         self.next_update_delay = timedelta(seconds=5)
         self.configured_vins = set(vins) if vins else None
+        self.logger = _LOGGER.getChild(unique_id) if unique_id else _LOGGER
 
     async def async_init(self) -> None:
         """Initialize the Polestar API."""
-        await self.auth.init()
+        await self.auth.async_init()
         await self.auth.get_token()
 
         if self.auth.access_token is None:
-            _LOGGER.warning("No access token %s", self.username)
+            self.logger.warning("No access token %s", self.username)
             return
 
         if not (car_data := await self._get_vehicle_data()):
-            _LOGGER.warning("No cars found for %s", self.username)
+            self.logger.warning("No cars found for %s", self.username)
             return
 
         for data in car_data:
@@ -72,7 +74,7 @@ class PolestarApi:
                 "data": self.car_data_by_vin[vin],
                 "timestamp": datetime.now(),
             }
-            _LOGGER.debug("API setup for VIN %s", vin)
+            self.logger.debug("API setup for VIN %s", vin)
 
     @property
     def vins(self) -> list[str]:
@@ -95,7 +97,7 @@ class PolestarApi:
             return
 
         if self.next_update is not None and self.next_update > datetime.now():
-            _LOGGER.debug("Skipping update, next update at %s", self.next_update)
+            self.logger.debug("Skipping update, next update at %s", self.next_update)
             return
 
         self.updating = True
@@ -107,7 +109,7 @@ class PolestarApi:
                 await self.auth.get_token(refresh=True)
         except PolestarAuthException as e:
             self._set_latest_call_code(BASE_URL, 500)
-            _LOGGER.warning("Auth Exception: %s", str(e))
+            self.logger.warning("Auth Exception: %s", str(e))
             self.updating = False
             return
 
@@ -118,7 +120,7 @@ class PolestarApi:
                 await self.auth.get_token()
             except PolestarApiException as e:
                 self._set_latest_call_code(BASE_URL_V2, 500)
-                _LOGGER.warning("Failed to get %s data %s", func.__name__, str(e))
+                self.logger.warning("Failed to get %s data %s", func.__name__, str(e))
 
         await call_api(lambda: self._get_odometer_data(vin))
         await call_api(lambda: self._get_battery_data(vin))
@@ -132,7 +134,7 @@ class PolestarApi:
         """Get the latest data from the cache."""
         if query is None:
             return None
-        _LOGGER.debug("get_cache_data %s %s", query, field_name)
+        self.logger.debug("get_cache_data %s %s %s", vin, query, field_name)
         if self.cache_data_by_vin and self.cache_data_by_vin[vin].get(query):
             cache_entry = self.cache_data_by_vin[vin][query]
             data = cache_entry["data"]
@@ -210,7 +212,7 @@ class PolestarApi:
                 result["data"][CAR_INFO_DATA] is None
                 or len(result["data"][CAR_INFO_DATA]) == 0
             ):
-                _LOGGER.exception("No cars found in account")
+                self.logger.exception("No cars found in account")
                 # throw new exception
                 raise PolestarNoDataException("No cars found in account")
 
@@ -230,8 +232,8 @@ class PolestarApi:
             "authorization": f"Bearer {self.auth.access_token}",
         }
 
-        _LOGGER.debug("GraphQL URL: %s", url)
-        _LOGGER.debug("GraphQL Query: %s", json.dumps(params))
+        self.logger.debug("GraphQL URL: %s", url)
+        self.logger.debug("GraphQL Query: %s", json.dumps(params))
 
         result = await self.client_session.get(url, params=params, headers=headers)
         self._set_latest_call_code(url, result.status_code)
@@ -248,8 +250,8 @@ class PolestarApi:
             error_message = resultData["errors"][0]["message"]
             if error_message == "User not authenticated":
                 raise PolestarNotAuthorizedException("Unauthorized Exception")
-            _LOGGER.error("Error: %s", resultData.get("errors"))
+            self.logger.error("Error: %s", resultData.get("errors"))
             raise PolestarApiException(error_message)
 
-        _LOGGER.debug("GraphQL Result: %s", json.dumps(resultData))
+        self.logger.debug("GraphQL Result: %s", json.dumps(resultData))
         return resultData

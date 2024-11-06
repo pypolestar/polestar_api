@@ -28,7 +28,7 @@ class FlowHandler(config_entries.ConfigFlow):
     ) -> ConfigFlowResult:
         """Register new entry."""
         return self.async_create_entry(
-            title="Polestar EV",
+            title=f"Polestar EV for {username}",
             data={CONF_USERNAME: username, CONF_PASSWORD: password, CONF_VIN: vin},
         )
 

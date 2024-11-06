@@ -88,6 +88,9 @@
       },
       "polestar_api_token_expires_at": {
         "name": "API Token Expires At"
+      },
+      "polestar_car_image": {
+        "name": "Car Image"
       }
     }
   }

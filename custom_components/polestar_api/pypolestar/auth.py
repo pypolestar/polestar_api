@@ -34,7 +34,7 @@ class PolestarAuth:
         self.latest_call_code = None
         self.oidc_configuration = {}
 
-    async def init(self) -> None:
+    async def async_init(self) -> None:
         await self.update_oidc_configuration()
 
     async def update_oidc_configuration(self) -> None:
@@ -85,7 +85,7 @@ class PolestarAuth:
         if result.status_code != 200 or (
             "errors" in resultData and len(resultData["errors"])
         ):
-            _LOGGER.error("Auth Token Error: %s", result)
+            _LOGGER.error("Auth Token Error: %s", result.text)
             raise PolestarAuthException("Error getting token", result.status_code)
         _LOGGER.debug("Auth Token Result: %s", json.dumps(resultData))
 

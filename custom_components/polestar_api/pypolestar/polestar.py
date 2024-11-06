@@ -42,7 +42,7 @@ class PolestarApi:
         """Initialize the Polestar API."""
         self.client_session = client_session or httpx.AsyncClient()
         self.username = username
-        self.auth = PolestarAuth(username, password, self.client_session)
+        self.auth = PolestarAuth(username, password, self.client_session, unique_id)
         self.updating = threading.Lock()
         self.latest_call_code = None
         self.latest_call_code_2 = None
@@ -148,7 +148,13 @@ class PolestarApi:
         """Get the latest data from the cache."""
         if query is None:
             return None
-        self.logger.debug("get_cache_data %s %s %s", vin, query, field_name)
+        self.logger.debug(
+            "get_cache_data %s %s %s%s",
+            vin,
+            query,
+            field_name,
+            " (skip_cache)" if skip_cache else "",
+        )
         if self.cache_data_by_vin and self.cache_data_by_vin[vin].get(query):
             cache_entry = self.cache_data_by_vin[vin][query]
             data = cache_entry["data"]

@@ -34,7 +34,7 @@ class PolestarAuth:
         self.latest_call_code = None
         self.oidc_configuration = {}
 
-    async def init(self) -> None:
+    async def async_init(self) -> None:
         await self.update_oidc_configuration()
 
     async def update_oidc_configuration(self) -> None:

@@ -54,7 +54,7 @@ class PolestarApi:
 
     async def async_init(self) -> None:
         """Initialize the Polestar API."""
-        await self.auth.init()
+        await self.auth.async_init()
         await self.auth.get_token()
 
         if self.auth.access_token is None:

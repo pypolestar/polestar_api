@@ -10,7 +10,7 @@ HTTPX_TIMEOUT = 30
 
 OIDC_PROVIDER_BASE_URL = "https://polestarid.eu.polestar.com"
 OIDC_REDIRECT_URI = "https://www.polestar.com/sign-in-callback"
-OIDC_CLIENT_ID = "polmystar"
+OIDC_CLIENT_ID = "l3oopkc_10"
 
 API_AUTH_URL = "https://pc-api.polestar.com/eu-north-1/auth/"
 

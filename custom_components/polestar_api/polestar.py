@@ -81,7 +81,6 @@ class PolestarCar:
             _LOGGER.error("Unexpected Error on update data %s", str(e))
             self.polestar_api.next_update = datetime.now() + timedelta(seconds=60)
         self.polestar_api.latest_call_code_v2 = 500
-        self.polestar_api.updating = False
 
     def get_value(self, query: str, field_name: str, skip_cache: bool = False):
         """Get the latest value from the Polestar API."""

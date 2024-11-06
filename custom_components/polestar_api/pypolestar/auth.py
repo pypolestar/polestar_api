@@ -82,12 +82,12 @@ class PolestarAuth:
         )
         self.latest_call_code = result.status_code
         resultData = result.json()
+        _LOGGER.debug("Auth Token Result: %s", json.dumps(resultData))
         if result.status_code != 200 or (
             "errors" in resultData and len(resultData["errors"])
         ):
-            _LOGGER.error("Auth Token Error: %s", result.text)
+            _LOGGER.error("Auth Token Error: %s", result)
             raise PolestarAuthException("Error getting token", result.status_code)
-        _LOGGER.debug("Auth Token Result: %s", json.dumps(resultData))
 
         if resultData["data"]:
             self.access_token = resultData["data"][operationName]["access_token"]
@@ -122,12 +122,27 @@ class PolestarAuth:
             data=data,
         )
         self.latest_call_code = result.status_code
-        if result.status_code != 302:
+        if result.status_code not in [302, 303]:
             raise PolestarAuthException("Error getting code", result.status_code)
 
         # get the realUrl
         url = result.url
         code = result.next_request.url.params.get("code")
+        uid = result.next_request.url.params.get("uid")
+
+        # handle missing code (e.g., accepting terms and conditions)
+        if code is None and uid:
+            _LOGGER.debug("Code missing; submit confirmation for uid=%s and retry", uid)
+            data = {"pf.submit": True, "subject": uid}
+            result = await self.client_session.post(
+                urljoin(
+                    OIDC_PROVIDER_BASE_URL,
+                    f"/as/{resumePath}/resume/as/authorization.ping",
+                ),
+                data=data,
+            )
+            url = result.url
+            code = result.next_request.url.params.get("code")
 
         # sign-in-callback
         result = await self.client_session.get(

@@ -2,6 +2,8 @@
 
 import json
 import logging
+import threading
+import time
 from collections import defaultdict
 from datetime import datetime, timedelta
 
@@ -41,7 +43,7 @@ class PolestarApi:
         self.client_session = client_session or httpx.AsyncClient()
         self.username = username
         self.auth = PolestarAuth(username, password, self.client_session)
-        self.updating = False
+        self.updating = threading.Lock()
         self.latest_call_code = None
         self.latest_call_code_2 = None
         self.next_update = None
@@ -92,15 +94,23 @@ class PolestarApi:
         return None
 
     async def get_ev_data(self, vin: str) -> None:
-        """Get the latest ev data from the Polestar API."""
-        if self.updating:
+        """
+        Get the latest ev data from the Polestar API.
+
+        Currently updates data for all VINs (this might change in the future).
+        """
+
+        if not self.updating.acquire(blocking=False):
+            self.logger.debug("Skipping update, already in progress")
             return
 
         if self.next_update is not None and self.next_update > datetime.now():
             self.logger.debug("Skipping update, next update at %s", self.next_update)
+            self.updating.release()
             return
 
-        self.updating = True
+        self.logger.debug("Starting update for VIN %s", vin)
+        t1 = time.perf_counter()
 
         try:
             if self.auth.token_expiry is None:
@@ -110,7 +120,7 @@ class PolestarApi:
         except PolestarAuthException as e:
             self._set_latest_call_code(BASE_URL, 500)
             self.logger.warning("Auth Exception: %s", str(e))
-            self.updating = False
+            self.updating.release()
             return
 
         async def call_api(func):
@@ -122,11 +132,15 @@ class PolestarApi:
                 self._set_latest_call_code(BASE_URL_V2, 500)
                 self.logger.warning("Failed to get %s data %s", func.__name__, str(e))
 
-        await call_api(lambda: self._get_odometer_data(vin))
-        await call_api(lambda: self._get_battery_data(vin))
+        try:
+            await call_api(lambda: self._get_odometer_data(vin))
+            await call_api(lambda: self._get_battery_data(vin))
+            self.next_update = datetime.now() + self.next_update_delay
+        finally:
+            self.updating.release()
 
-        self.updating = False
-        self.next_update = datetime.now() + self.next_update_delay
+        t2 = time.perf_counter()
+        self.logger.debug("Update took %.2f seconds", t2 - t1)
 
     def get_cache_data(
         self, vin: str, query: str, field_name: str, skip_cache: bool = False

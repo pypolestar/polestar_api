@@ -10,6 +10,6 @@
   "documentation": "https://github.com/pypolestar/polestar_api",
   "iot_class": "cloud_polling",
   "issue_tracker": "https://github.com/pypolestar/polestar_api/issues",
-  "requirements": ["gql[httpx]>=3.5.0"],
+  "requirements": ["gql[httpx]>=3.5.0", "homeassistant>=2024.6.0"],
   "version": "1.8.0"
 }

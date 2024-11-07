@@ -21,7 +21,11 @@ class PolestarAuth:
     """base class for Polestar authentication."""
 
     def __init__(
-        self, username: str, password: str, client_session: httpx.AsyncClient
+        self,
+        username: str,
+        password: str,
+        client_session: httpx.AsyncClient,
+        unique_id: str | None = None,
     ) -> None:
         """Initialize the Polestar authentication."""
         self.username = username
@@ -33,6 +37,7 @@ class PolestarAuth:
         self.token_expiry = None
         self.latest_call_code = None
         self.oidc_configuration = {}
+        self.logger = _LOGGER.getChild(unique_id) if unique_id else _LOGGER
 
     async def async_init(self) -> None:
         await self.update_oidc_configuration()
@@ -82,11 +87,11 @@ class PolestarAuth:
         )
         self.latest_call_code = result.status_code
         resultData = result.json()
-        _LOGGER.debug("Auth Token Result: %s", json.dumps(resultData))
+        self.logger.debug("Auth Token Result: %s", json.dumps(resultData))
         if result.status_code != 200 or (
             "errors" in resultData and len(resultData["errors"])
         ):
-            _LOGGER.error("Auth Token Error: %s", result)
+            self.logger.error("Auth Token Error: %s", result)
             raise PolestarAuthException("Error getting token", result.status_code)
 
         if resultData["data"]:
@@ -132,7 +137,9 @@ class PolestarAuth:
 
         # handle missing code (e.g., accepting terms and conditions)
         if code is None and uid:
-            _LOGGER.debug("Code missing; submit confirmation for uid=%s and retry", uid)
+            self.logger.debug(
+                "Code missing; submit confirmation for uid=%s and retry", uid
+            )
             data = {"pf.submit": True, "subject": uid}
             result = await self.client_session.post(
                 urljoin(
@@ -151,7 +158,7 @@ class PolestarAuth:
         self.latest_call_code = result.status_code
 
         if result.status_code != 200:
-            _LOGGER.error("Auth Code Error: %s", result)
+            self.logger.error("Auth Code Error: %s", result)
             raise PolestarAuthException(
                 "Error getting code callback", result.status_code
             )
@@ -177,5 +184,5 @@ class PolestarAuth:
         if result.status_code in (303, 302):
             return result.next_request.url.params
 
-        _LOGGER.error("Error: %s", result.text)
+        self.logger.error("Error: %s", result.text)
         raise PolestarAuthException("Error getting resume path ", result.status_code)

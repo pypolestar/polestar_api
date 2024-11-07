@@ -1,6 +1,5 @@
 """Asynchronous Python client for the Polestar API.""" ""
 
-import json
 import logging
 import threading
 import time
@@ -9,6 +8,7 @@ from datetime import datetime, timedelta
 
 import httpx
 from gql import gql
+from gql.transport.exceptions import TransportQueryError
 from graphql import DocumentNode
 
 from .auth import PolestarAuth
@@ -417,41 +417,24 @@ class PolestarApi:
                         "headers": {"Authorization": f"Bearer {self.auth.access_token}"}
                     },
                 )
+            except TransportQueryError as exc:
+                self.logger.debug("GraphQL TransportQueryError: %s", str(exc))
+                if (
+                    exc.errors
+                    and len(exc.errors)
+                    and exc.errors[0]["extensions"]["code"] == "UNAUTHENTICATED"
+                ):
+                    self._set_latest_call_code(url, 401)
+                    raise PolestarNotAuthorizedException(
+                        exc.errors[0]["message"]
+                    ) from exc
+                self._set_latest_call_code(url, 500)
+                raise PolestarApiException from exc
             except Exception as exc:
                 self.logger.debug("GraphQL Exception: %s", str(exc))
-                # TODO: Raise correct exception
-                raise PolestarApiException from exc
+                raise exc
 
         self.logger.debug("GraphQL Result: %s", result)
+        self._set_latest_call_code(url, 200)
+
         return result
-
-    async def _get_graph_ql(self, params: dict, url: str = BASE_URL):
-        """Get the latest data from the Polestar API."""
-        headers = {
-            "Content-Type": "application/json",
-            "authorization": f"Bearer {self.auth.access_token}",
-        }
-
-        self.logger.debug("GraphQL URL: %s", url)
-        self.logger.debug("GraphQL Query: %s", json.dumps(params))
-
-        result = await self.client_session.get(url, params=params, headers=headers)
-        self._set_latest_call_code(url, result.status_code)
-
-        if result.status_code == 401:
-            raise PolestarNotAuthorizedException("Unauthorized Exception")
-
-        if result.status_code != 200:
-            raise PolestarApiException(f"Get GraphQL error: {result.text}")
-
-        resultData = result.json()
-        if resultData.get("errors"):
-            self._set_latest_call_code(url, 500)
-            error_message = resultData["errors"][0]["message"]
-            if error_message == "User not authenticated":
-                raise PolestarNotAuthorizedException("Unauthorized Exception")
-            self.logger.error("Error: %s", resultData.get("errors"))
-            raise PolestarApiException(error_message)
-
-        self.logger.debug("GraphQL Result: %s", json.dumps(resultData))
-        return resultData

@@ -7,6 +7,8 @@ import time
 from collections import defaultdict
 from datetime import datetime, timedelta
 
+import gql
+import gql.transport.httpx
 import httpx
 
 from .auth import PolestarAuth
@@ -41,6 +43,8 @@ class PolestarApi:
     ) -> None:
         """Initialize the Polestar API."""
         self.client_session = client_session or httpx.AsyncClient()
+        self.gql_transport_v1 = gql.transport.httpx.HTTPXAsyncTransport(url=BASE_URL)
+        self.gql_transport_v2 = gql.transport.httpx.HTTPXAsyncTransport(url=BASE_URL_V2)
         self.username = username
         self.auth = PolestarAuth(username, password, self.client_session, unique_id)
         self.updating = threading.Lock()

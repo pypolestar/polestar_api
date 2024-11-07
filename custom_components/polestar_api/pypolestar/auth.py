@@ -52,7 +52,6 @@ class PolestarAuth:
 
     async def get_token(self, refresh=False) -> None:
         """Get the token from Polestar."""
-        headers = {}
         # can't use refresh if the token is expired or not set even if refresh is True
         if (
             not refresh
@@ -62,7 +61,8 @@ class PolestarAuth:
             if (code := await self._get_code()) is None:
                 return
 
-            operationName = "getAuthToken"
+            access_token = None
+            operation_name = "getAuthToken"
             query = gql("""
                 query getAuthToken($code: String!) {
                     getAuthToken(code: $code) {
@@ -74,8 +74,8 @@ class PolestarAuth:
         elif self.refresh_token is None:
             return
         else:
-            operationName = "refreshAuthToken"
-            headers["Authorization"] = f"Bearer {self.access_token}"
+            access_token = self.access_token
+            operation_name = "refreshAuthToken"
             query = gql("""
                 query refreshAuthToken($token: String!) {
                     refreshAuthToken(token: $token) {
@@ -86,16 +86,23 @@ class PolestarAuth:
             variable_values = {"token": self.refresh_token}
 
         try:
-            async with get_gql_client(
-                url=API_AUTH_URL, client=self.client_session, headers=headers
+            async with await get_gql_client(
+                url=API_AUTH_URL, client=self.client_session
             ) as client:
                 result = await client.execute(
                     query,
                     variable_values=variable_values,
+                    extra_args={
+                        **(
+                            {"headers": {"Authorization": f"Bearer {access_token}"}}
+                            if access_token
+                            else {}
+                        )
+                    },
                 )
             self.logger.debug("Auth Token Result: %s", result)
 
-            if data := result.get(operationName):
+            if data := result.get(operation_name):
                 self.access_token = data["access_token"]
                 self.id_token = data["id_token"]
                 self.refresh_token = data["refresh_token"]

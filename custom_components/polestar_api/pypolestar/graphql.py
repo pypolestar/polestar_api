@@ -57,6 +57,7 @@ QUERY_GET_CONSUMER_CARS_V2 = gql(
             internalVehicleIdentifier
             registrationNo
             registrationDate
+            factoryCompleteDate
             content {
                 model { name }
                 images {

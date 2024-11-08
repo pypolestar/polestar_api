@@ -3,7 +3,6 @@ from datetime import datetime, timedelta
 from urllib.parse import urljoin
 
 import httpx
-from gql import gql
 
 from .const import (
     API_AUTH_URL,
@@ -13,7 +12,7 @@ from .const import (
     OIDC_REDIRECT_URI,
 )
 from .exception import PolestarAuthException
-from .graphql import get_gql_client
+from .graphql import QUERY_GET_AUTH_TOKEN, QUERY_REFRESH_AUTH_TOKEN, get_gql_client
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -63,26 +62,14 @@ class PolestarAuth:
 
             access_token = None
             operation_name = "getAuthToken"
-            query = gql("""
-                query getAuthToken($code: String!) {
-                    getAuthToken(code: $code) {
-                        id_token access_token refresh_token expires_in
-                    }
-                }
-            """)
+            query = QUERY_GET_AUTH_TOKEN
             variable_values = {"code": code}
         elif self.refresh_token is None:
             return
         else:
             access_token = self.access_token
             operation_name = "refreshAuthToken"
-            query = gql("""
-                query refreshAuthToken($token: String!) {
-                    refreshAuthToken(token: $token) {
-                        id_token access_token refresh_token expires_in
-                    }
-                }
-            """)
+            query = QUERY_REFRESH_AUTH_TOKEN
             variable_values = {"token": self.refresh_token}
 
         try:

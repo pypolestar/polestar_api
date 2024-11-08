@@ -55,6 +55,33 @@ QUERY_GET_CONSUMER_CARS_V2 = gql(
         getConsumerCarsV2 {
             vin
             internalVehicleIdentifier
+            registrationNo
+            registrationDate
+            content {
+                model { name }
+                images {
+                    studio { url }
+                }
+                specification {
+                    battery
+                    torque
+                }
+            }
+            software {
+                version
+                versionTimestamp
+            }
+        }
+    }
+    """
+)
+
+QUERY_GET_CONSUMER_CARS_V2_VERBOSE = gql(
+    """
+    query GetConsumerCarsV2 {
+        getConsumerCarsV2 {
+            vin
+            internalVehicleIdentifier
             salesType
             currentPlannedDeliveryDate
             market

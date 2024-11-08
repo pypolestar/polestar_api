@@ -28,6 +28,7 @@ from .exception import (
 from .graphql import (
     QUERY_GET_BATTERY_DATA,
     QUERY_GET_CONSUMER_CARS_V2,
+    QUERY_GET_CONSUMER_CARS_V2_VERBOSE,
     QUERY_GET_ODOMETER_DATA,
     get_gql_client,
 )
@@ -61,7 +62,7 @@ class PolestarApi:
         self.configured_vins = set(vins) if vins else None
         self.logger = _LOGGER.getChild(unique_id) if unique_id else _LOGGER
 
-    async def async_init(self) -> None:
+    async def async_init(self, verbose: bool = False) -> None:
         """Initialize the Polestar API."""
         await self.auth.async_init()
         await self.auth.get_token()
@@ -70,7 +71,7 @@ class PolestarApi:
             self.logger.warning("No access token %s", self.username)
             return
 
-        if not (car_data := await self._get_vehicle_data()):
+        if not (car_data := await self._get_vehicle_data(verbose=verbose)):
             self.logger.warning("No cars found for %s", self.username)
             return
 
@@ -215,11 +216,13 @@ class PolestarApi:
             "timestamp": datetime.now(),
         }
 
-    async def _get_vehicle_data(self) -> dict | None:
+    async def _get_vehicle_data(self, verbose: bool = False) -> dict | None:
         """Get the latest vehicle data from the Polestar API."""
         result = await self._query_graph_ql(
             url=BASE_URL,
-            query=QUERY_GET_CONSUMER_CARS_V2,
+            query=QUERY_GET_CONSUMER_CARS_V2_VERBOSE
+            if verbose
+            else QUERY_GET_CONSUMER_CARS_V2,
             variable_values={"locale": "en_GB"},
         )
 

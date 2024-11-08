@@ -11,6 +11,7 @@ from .const import (
     OIDC_CLIENT_ID,
     OIDC_PROVIDER_BASE_URL,
     OIDC_REDIRECT_URI,
+    TOKEN_REFRESH_WINDOW_MIN,
 )
 from .exception import PolestarAuthException
 
@@ -34,6 +35,7 @@ class PolestarAuth:
         self.access_token = None
         self.id_token = None
         self.refresh_token = None
+        self.token_lifetime = None
         self.token_expiry = None
         self.latest_call_code = None
         self.oidc_configuration = {}
@@ -48,6 +50,19 @@ class PolestarAuth:
         )
         result.raise_for_status()
         self.oidc_configuration = result.json()
+
+    def need_token_refresh(self) -> bool:
+        """Return True if token needs refresh"""
+        if self.token_expiry is None:
+            raise PolestarAuthException("No token expiry found")
+        refresh_window = min([(self.token_lifetime or 0) / 2, TOKEN_REFRESH_WINDOW_MIN])
+        expires_in = (self.token_expiry - datetime.now()).total_seconds()
+        if expires_in < refresh_window:
+            self.logger.debug(
+                "Token expires in %d seconds, time to refresh", expires_in
+            )
+            return True
+        return False
 
     async def get_token(self, refresh=False) -> None:
         """Get the token from Polestar."""
@@ -98,9 +113,8 @@ class PolestarAuth:
             self.access_token = resultData["data"][operationName]["access_token"]
             self.id_token = resultData["data"][operationName]["id_token"]
             self.refresh_token = resultData["data"][operationName]["refresh_token"]
-            self.token_expiry = datetime.now() + timedelta(
-                seconds=resultData["data"][operationName]["expires_in"]
-            )
+            self.token_lifetime = resultData["data"][operationName]["expires_in"]
+            self.token_expiry = datetime.now() + timedelta(seconds=self.token_lifetime)
 
     async def _get_code(self) -> None:
         query_params = await self._get_resume_path()

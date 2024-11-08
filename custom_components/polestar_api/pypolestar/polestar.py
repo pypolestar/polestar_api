@@ -113,9 +113,7 @@ class PolestarApi:
         t1 = time.perf_counter()
 
         try:
-            if self.auth.token_expiry is None:
-                raise PolestarAuthException("No token expiry found", 500)
-            if (self.auth.token_expiry - datetime.now()).total_seconds() < 300:
+            if self.auth.need_token_refresh():
                 await self.auth.get_token(refresh=True)
         except PolestarAuthException as e:
             self._set_latest_call_code(BASE_URL, 500)

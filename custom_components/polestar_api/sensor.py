@@ -36,7 +36,7 @@ from .entity import PolestarEntity
 from .polestar import PolestarCar
 
 _LOGGER = logging.getLogger(__name__)
-SCAN_INTERVAL = timedelta(seconds=15)
+SCAN_INTERVAL = timedelta(seconds=60)
 
 
 @dataclass

@@ -61,6 +61,10 @@ class PolestarApi:
         self.next_update_delay = timedelta(seconds=5)
         self.configured_vins = set(vins) if vins else None
         self.logger = _LOGGER.getChild(unique_id) if unique_id else _LOGGER
+        self.gql_clients = {
+            BASE_URL: get_gql_client(url=BASE_URL, client=self.client_session),
+            BASE_URL_V2: get_gql_client(url=BASE_URL_V2, client=self.client_session),
+        }
 
     async def async_init(self, verbose: bool = False) -> None:
         """Initialize the Polestar API."""
@@ -247,10 +251,7 @@ class PolestarApi:
     ):
         self.logger.debug("GraphQL URL: %s", url)
 
-        async with await get_gql_client(
-            url=url,
-            client=self.client_session,
-        ) as client:
+        async with self.gql_clients[url] as client:
             try:
                 result = await client.execute(
                     query,

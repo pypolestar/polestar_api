@@ -20,7 +20,7 @@ class _HTTPXAsyncTransport(HTTPXAsyncTransport):
         pass
 
 
-async def get_gql_client(client: httpx.AsyncClient, url: str) -> Client:
+def get_gql_client(client: httpx.AsyncClient, url: str) -> Client:
     transport = _HTTPXAsyncTransport(url=url, client=client)
     return Client(
         transport=transport,

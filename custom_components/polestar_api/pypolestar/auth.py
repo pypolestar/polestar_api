@@ -40,6 +40,7 @@ class PolestarAuth:
         self.oidc_configuration = {}
         self.latest_call_code = None
         self.logger = _LOGGER.getChild(unique_id) if unique_id else _LOGGER
+        self.gql_client = get_gql_client(url=API_AUTH_URL, client=self.client_session)
 
     async def async_init(self) -> None:
         await self.update_oidc_configuration()
@@ -88,9 +89,7 @@ class PolestarAuth:
             variable_values = {"token": self.refresh_token}
 
         try:
-            async with await get_gql_client(
-                url=API_AUTH_URL, client=self.client_session
-            ) as client:
+            async with self.gql_client as client:
                 result = await client.execute(
                     query,
                     variable_values=variable_values,

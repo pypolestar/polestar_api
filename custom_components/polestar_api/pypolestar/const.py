@@ -7,6 +7,7 @@ ODO_METER_DATA = "getOdometerData"
 BATTERY_DATA = "getBatteryData"
 
 HTTPX_TIMEOUT = 30
+TOKEN_REFRESH_WINDOW_MIN = 300
 
 OIDC_PROVIDER_BASE_URL = "https://polestarid.eu.polestar.com"
 OIDC_REDIRECT_URI = "https://www.polestar.com/sign-in-callback"

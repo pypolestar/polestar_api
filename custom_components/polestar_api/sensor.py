@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta
 from typing import Final
 
+import homeassistant.util.dt as dt_util
 from homeassistant.components.sensor import (
     SensorDeviceClass,
     SensorEntity,
@@ -581,9 +582,12 @@ class PolestarSensor(PolestarEntity, SensorEntity):
             )
 
         if self.entity_description.key == "api_token_expires_at":
-            if self.car.get_token_expiry() is None:
-                return None
-            return self.car.get_token_expiry().strftime("%Y-%m-%d %H:%M:%S")
+            expire = self.car.get_token_expiry()
+            return (
+                dt_util.as_local(expire).strftime("%Y-%m-%d %H:%M:%S")
+                if expire
+                else None
+            )
         if self._attr_native_value != 0 and self._attr_native_value in (None, False):
             return None
 

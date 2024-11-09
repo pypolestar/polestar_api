@@ -2,20 +2,26 @@
 
 from __future__ import annotations
 
-import datetime
 import logging
 from dataclasses import dataclass
-from functools import cached_property
 from typing import Final
 
+import homeassistant.util.dt as dt_util
 from homeassistant.components.image import ImageEntity, ImageEntityDescription
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.helpers.typing import UndefinedType
 
 from .const import DOMAIN as POLESTAR_API_DOMAIN
 from .data import PolestarConfigEntry
 from .entity import PolestarEntity
 from .polestar import PolestarCar
+
+try:
+    from propcache import cached_property
+except ImportError:
+    from functools import cached_property
+
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -82,11 +88,19 @@ class PolestarImage(PolestarEntity, ImageEntity):
             f"polestar_{car.get_unique_id()}_{entity_description.key}"
         )
         self._attr_translation_key = f"polestar_{entity_description.key}"
-        self._attr_image_last_updated = datetime.datetime.now()
 
     @cached_property
-    def image_url(self) -> str | None:
+    def image_url(self) -> str | None | UndefinedType:
         """Return the image URL."""
-        return self.car.get_value(
-            self.entity_description.query, self.entity_description.field_name
+        value = self.car.get_value(
+            query=self.entity_description.query,
+            field_name=self.entity_description.field_name,
         )
+        if value is None:
+            _LOGGER.debug("No URL found")
+        elif isinstance(value, str) and value != self._attr_image_url:
+            _LOGGER.debug("Returning URL %s", value)
+            self._attr_image_url = value
+            self._attr_image_last_updated = dt_util.utcnow()
+            return value
+        return self._attr_image_url

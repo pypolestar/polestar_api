@@ -2,6 +2,10 @@
 homeassistant:
   debug: true
 
+recorder:
+
+logbook:
+
 # https://www.home-assistant.io/integrations/logger/
 logger:
   default: info

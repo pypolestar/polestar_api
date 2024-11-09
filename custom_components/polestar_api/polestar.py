@@ -7,8 +7,9 @@ import httpx
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.httpx_client import get_async_client
+from homeassistant.util import Throttle
 
-from .const import DOMAIN as POLESTAR_API_DOMAIN
+from .const import DEFAULT_SCAN_INTERVAL, DOMAIN as POLESTAR_API_DOMAIN
 from .pypolestar.exception import PolestarApiException, PolestarAuthException
 from .pypolestar.polestar import PolestarApi
 
@@ -31,6 +32,8 @@ class PolestarCar:
         self.model = str(
             self.get_value("getConsumerCarsV2", "content/model/name") or "Unknown model"
         )
+        self.scan_interval = DEFAULT_SCAN_INTERVAL
+        self.async_update = Throttle(min_time=self.scan_interval)(self.async_update)
 
     def get_unique_id(self) -> str:
         """Return unique identifier"""

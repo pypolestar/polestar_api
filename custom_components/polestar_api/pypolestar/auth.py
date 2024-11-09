@@ -1,4 +1,3 @@
-import json
 import logging
 from datetime import datetime, timedelta
 from urllib.parse import urljoin
@@ -14,6 +13,7 @@ from .const import (
     TOKEN_REFRESH_WINDOW_MIN,
 )
 from .exception import PolestarAuthException
+from .graphql import QUERY_GET_AUTH_TOKEN, QUERY_REFRESH_AUTH_TOKEN, get_gql_client
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -37,9 +37,10 @@ class PolestarAuth:
         self.refresh_token = None
         self.token_lifetime = None
         self.token_expiry = None
-        self.latest_call_code = None
         self.oidc_configuration = {}
+        self.latest_call_code = None
         self.logger = _LOGGER.getChild(unique_id) if unique_id else _LOGGER
+        self.gql_client = get_gql_client(url=API_AUTH_URL, client=self.client_session)
 
     async def async_init(self) -> None:
         await self.update_oidc_configuration()
@@ -66,55 +67,55 @@ class PolestarAuth:
 
     async def get_token(self, refresh=False) -> None:
         """Get the token from Polestar."""
-        headers = {"Content-Type": "application/json"}
-        operationName = "getAuthToken"
         # can't use refresh if the token is expired or not set even if refresh is True
         if (
             not refresh
             or self.token_expiry is None
             or self.token_expiry < datetime.now()
         ):
-            code = await self._get_code()
-            if code is None:
+            if (code := await self._get_code()) is None:
                 return
-            params = {
-                "query": "query getAuthToken($code: String!) { getAuthToken(code: $code) { id_token access_token refresh_token expires_in }}",
-                "operationName": operationName,
-                "variables": json.dumps({"code": code}),
-            }
+
+            access_token = None
+            operation_name = "getAuthToken"
+            query = QUERY_GET_AUTH_TOKEN
+            variable_values = {"code": code}
+        elif self.refresh_token is None:
+            return
         else:
-            if self.refresh_token is None:
-                return
-            token = self.refresh_token
-            operationName = "refreshAuthToken"
-            headers["Authorization"] = f"Bearer {self.access_token}"
+            access_token = self.access_token
+            operation_name = "refreshAuthToken"
+            query = QUERY_REFRESH_AUTH_TOKEN
+            variable_values = {"token": self.refresh_token}
 
-            params = {
-                "query": "query refreshAuthToken($token: String!) { refreshAuthToken(token: $token) { id_token access_token refresh_token expires_in }}",
-                "operationName": operationName,
-                "variables": json.dumps({"token": token}),
-            }
-        result = await self.client_session.get(
-            API_AUTH_URL,
-            params=params,
-            headers=headers,
-            timeout=HTTPX_TIMEOUT,
-        )
-        self.latest_call_code = result.status_code
-        resultData = result.json()
-        self.logger.debug("Auth Token Result: %s", json.dumps(resultData))
-        if result.status_code != 200 or (
-            "errors" in resultData and len(resultData["errors"])
-        ):
-            self.logger.error("Auth Token Error: %s", result)
-            raise PolestarAuthException("Error getting token", result.status_code)
+        try:
+            async with self.gql_client as client:
+                result = await client.execute(
+                    query,
+                    variable_values=variable_values,
+                    extra_args={
+                        **(
+                            {"headers": {"Authorization": f"Bearer {access_token}"}}
+                            if access_token
+                            else {}
+                        )
+                    },
+                )
+            self.logger.debug("Auth Token Result: %s", result)
 
-        if resultData["data"]:
-            self.access_token = resultData["data"][operationName]["access_token"]
-            self.id_token = resultData["data"][operationName]["id_token"]
-            self.refresh_token = resultData["data"][operationName]["refresh_token"]
-            self.token_lifetime = resultData["data"][operationName]["expires_in"]
-            self.token_expiry = datetime.now() + timedelta(seconds=self.token_lifetime)
+            if data := result.get(operation_name):
+                self.access_token = data["access_token"]
+                self.id_token = data["id_token"]
+                self.refresh_token = data["refresh_token"]
+                self.token_lifetime = data["expires_in"]
+                self.token_expiry = datetime.now() + timedelta(
+                    seconds=self.token_lifetime
+                )
+                self.latest_call_code = 200
+        except Exception as exc:
+            self.latest_call_code = None
+            self.logger.error("Auth Token Error: %s", str(exc))
+            raise PolestarAuthException("Error getting token") from exc
 
     async def _get_code(self) -> None:
         query_params = await self._get_resume_path()
@@ -140,8 +141,8 @@ class PolestarAuth:
             params=params,
             data=data,
         )
-        self.latest_call_code = result.status_code
         if result.status_code not in [302, 303]:
+            self.latest_call_code = result.status_code
             raise PolestarAuthException("Error getting code", result.status_code)
 
         # get the realUrl
@@ -177,9 +178,7 @@ class PolestarAuth:
                 "Error getting code callback", result.status_code
             )
 
-        # url encode the code
         result = await self.client_session.get(url)
-        self.latest_call_code = result.status_code
 
         return code
 
@@ -195,6 +194,8 @@ class PolestarAuth:
             params=params,
             timeout=HTTPX_TIMEOUT,
         )
+        self.latest_call_code = result.status_code
+
         if result.status_code in (303, 302):
             return result.next_request.url.params
 

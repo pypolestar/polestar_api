@@ -519,7 +519,6 @@ class PolestarSensor(PolestarEntity, SensorEntity):
         self._attr_native_value = self.car.get_value(
             self.entity_description.query,
             self.entity_description.field_name,
-            self.get_skip_cache(),
         )
 
         if entity_description.round_digits is not None:
@@ -532,21 +531,12 @@ class PolestarSensor(PolestarEntity, SensorEntity):
         if self.car is not None and self.car.get_latest_call_code() == 200:
             self._async_update_attrs()
 
-    def get_skip_cache(self) -> bool:
-        """Get the skip cache."""
-        return self.entity_description.key in (
-            "vin",
-            "registration_number",
-            "model_name",
-        )
-
     @callback
     def _async_update_attrs(self) -> None:
         """Update the state and attributes."""
         self._sensor_data = self.car.get_value(
             self.entity_description.query,
             self.entity_description.field_name,
-            self.get_skip_cache(),
         )
 
     @property
@@ -592,10 +582,10 @@ class PolestarSensor(PolestarEntity, SensorEntity):
             return None
 
         if self.entity_description.key in ("estimate_full_charge_range"):
-            battery_level = self.car.get_latest_data(
+            battery_level = self.car.get_value(
                 self.entity_description.query, "batteryChargeLevelPercentage"
             )
-            estimate_range = self.car.get_latest_data(
+            estimate_range = self.car.get_value(
                 self.entity_description.query, self.entity_description.field_name
             )
 
@@ -730,7 +720,6 @@ class PolestarSensor(PolestarEntity, SensorEntity):
             value = self.car.get_value(
                 self.entity_description.query,
                 self.entity_description.field_name,
-                self.get_skip_cache(),
             )
 
             if value is not None:

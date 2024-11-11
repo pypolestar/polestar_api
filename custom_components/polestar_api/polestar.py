@@ -53,12 +53,6 @@ class PolestarCar:
             serial_number=self.vin,
         )
 
-    def get_latest_data(self, query: str, field_name: str):
-        """Get the latest data from the Polestar API."""
-        return self.polestar_api.get_latest_data(
-            vin=self.vin, query=query, field_name=field_name
-        )
-
     async def async_update(self) -> None:
         """Update data from Polestar."""
         try:
@@ -85,10 +79,12 @@ class PolestarCar:
             self.polestar_api.next_update = datetime.now() + timedelta(seconds=60)
         self.polestar_api.latest_call_code_v2 = 500
 
-    def get_value(self, query: str, field_name: str, skip_cache: bool = False):
+    def get_value(self, query: str, field_name: str):
         """Get the latest value from the Polestar API."""
-        data = self.polestar_api.get_cache_data(
-            vin=self.vin, query=query, field_name=field_name, skip_cache=skip_cache
+        if query is None or field_name is None:
+            return None
+        data = self.polestar_api.get_latest_data(
+            vin=self.vin, query=query, field_name=field_name
         )
         if data is None:
             # if amp and voltage can be null, so we will return 0

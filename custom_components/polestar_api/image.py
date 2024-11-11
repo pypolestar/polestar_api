@@ -86,7 +86,6 @@ class PolestarImage(PolestarEntity, ImageEntity):
         value = self.car.get_value(
             query=self.entity_description.query,
             field_name=self.entity_description.field_name,
-            skip_cache=True,
         )
         if value is None:
             _LOGGER.debug("No image URL found")

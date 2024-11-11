@@ -11,14 +11,7 @@ from gql.transport.exceptions import TransportQueryError
 from graphql import DocumentNode
 
 from .auth import PolestarAuth
-from .const import (
-    BASE_URL,
-    BASE_URL_V2,
-    BATTERY_DATA,
-    CACHE_TIME,
-    CAR_INFO_DATA,
-    ODO_METER_DATA,
-)
+from .const import BASE_URL, BASE_URL_V2, BATTERY_DATA, CAR_INFO_DATA, ODO_METER_DATA
 from .exception import (
     PolestarApiException,
     PolestarAuthException,
@@ -55,9 +48,7 @@ class PolestarApi:
         self.latest_call_code = None
         self.latest_call_code_2 = None
         self.next_update = None
-        self.car_data_by_vin: dict[str, dict] = {}
-        self.cache_data_by_vin: dict[str, dict] = defaultdict(dict)
-        self.cache_ttl = timedelta(seconds=CACHE_TIME)
+        self.data_by_vin: dict[str, dict] = defaultdict(dict)
         self.next_update_delay = timedelta(seconds=5)
         self.configured_vins = set(vins) if vins else None
         self.logger = _LOGGER.getChild(unique_id) if unique_id else _LOGGER
@@ -83,26 +74,33 @@ class PolestarApi:
             vin = data["vin"]
             if self.configured_vins and vin not in self.configured_vins:
                 continue
-            self.car_data_by_vin[vin] = data
-            self.cache_data_by_vin[vin][CAR_INFO_DATA] = {
-                "data": self.car_data_by_vin[vin],
+            self.data_by_vin[vin][CAR_INFO_DATA] = {
+                "data": data,
                 "timestamp": datetime.now(),
             }
             self.logger.debug("API setup for VIN %s", vin)
 
     @property
     def vins(self) -> list[str]:
-        return list(self.car_data_by_vin.keys())
+        return list(self.data_by_vin.keys())
 
-    def get_latest_data(
-        self, vin: str, query: str, field_name: str
-    ) -> dict or bool or None:
+    def get_latest_data(self, vin: str, query: str, field_name: str) -> dict | None:
         """Get the latest data from the Polestar API."""
-        if self.cache_data_by_vin and self.cache_data_by_vin[vin][query]:
-            data = self.cache_data_by_vin[vin][query]["data"]
-            if data is None:
-                return False
+        self.logger.debug(
+            "get_latest_data %s %s %s",
+            vin,
+            query,
+            field_name,
+        )
+        query_result = self.data_by_vin[vin].get(query)
+        if query_result and (data := query_result.get("data")) is not None:
             return self._get_field_name_value(field_name, data)
+        self.logger.debug(
+            "get_latest_data returning None for %s %s %s",
+            vin,
+            query,
+            field_name,
+        )
         return None
 
     async def get_ev_data(self, vin: str) -> None:
@@ -152,31 +150,8 @@ class PolestarApi:
         t2 = time.perf_counter()
         self.logger.debug("Update took %.2f seconds", t2 - t1)
 
-    def get_cache_data(
-        self, vin: str, query: str, field_name: str, skip_cache: bool = False
-    ) -> dict | None:
-        """Get the latest data from the cache."""
-        if query is None:
-            return None
-        self.logger.debug(
-            "get_cache_data %s %s %s%s",
-            vin,
-            query,
-            field_name,
-            " (skip_cache)" if skip_cache else "",
-        )
-        if self.cache_data_by_vin and self.cache_data_by_vin[vin].get(query):
-            cache_entry = self.cache_data_by_vin[vin][query]
-            data = cache_entry["data"]
-            if data is not None and (
-                skip_cache is True
-                or cache_entry["timestamp"] + self.cache_ttl > datetime.now()
-            ):
-                return self._get_field_name_value(field_name, data)
-        return None
-
     @staticmethod
-    def _get_field_name_value(field_name: str, data: dict) -> str or bool or None:
+    def _get_field_name_value(field_name: str, data: dict) -> str | bool | None:
         if field_name is None or data is None:
             return None
 
@@ -203,7 +178,7 @@ class PolestarApi:
             variable_values={"vin": vin},
         )
 
-        res = self.cache_data_by_vin[vin][ODO_METER_DATA] = {
+        res = self.data_by_vin[vin][ODO_METER_DATA] = {
             "data": result[ODO_METER_DATA],
             "timestamp": datetime.now(),
         }
@@ -217,7 +192,7 @@ class PolestarApi:
             variable_values={"vin": vin},
         )
 
-        res = self.cache_data_by_vin[vin][BATTERY_DATA] = {
+        res = self.data_by_vin[vin][BATTERY_DATA] = {
             "data": result[BATTERY_DATA],
             "timestamp": datetime.now(),
         }

@@ -239,3 +239,19 @@ QUERY_GET_BATTERY_DATA = gql(
     }
     """
 )
+
+QUERY_GET_HEALTH_DATA = gql(
+    """
+    query GetHealthData($vin: String!) {
+        getHealthData(vin: $vin) {
+            brakeFluidLevelWarning
+            daysToService
+            distanceToServiceKm
+            engineCoolantLevelWarning
+            eventUpdatedTimestamp { iso unix }
+            oilLevelWarning
+            serviceWarning
+        }
+    }
+    """
+)

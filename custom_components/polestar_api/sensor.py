@@ -76,6 +76,40 @@ CHARGING_STATUS_DICT = {
     "CHARGING_STATUS_SMART_CHARGING": "Smart Charging",
 }
 
+BRAKE_FLUID_LEVEL_WARNING_DICT = {
+    "BRAKE_FLUID_LEVEL_WARNING_NO_WARNING": "No Warning",
+    "BRAKE_FLUID_LEVEL_WARNING_UNSPECIFIED": "Unspecified",
+    "BRAKE_FLUID_LEVEL_WARNING_TOO_LOW": "Too Low",
+}
+
+ENGINE_COOLANT_LEVEL_WARNING_DICT = {
+    "ENGINE_COOLANT_LEVEL_WARNING_NO_WARNING": "No Warning",
+    "ENGINE_COOLANT_LEVEL_WARNING_UNSPECIFIED": "Unspecified",
+    "ENGINE_COOLANT_LEVEL_WARNING_TOO_LOW": "Too Low",
+}
+
+OIL_LEVEL_WARNING_DICT = {
+    "OIL_LEVEL_WARNING_NO_WARNING": "No Warning",
+    "OIL_LEVEL_WARNING_UNSPECIFIED": "Unspecified",
+    "OIL_LEVEL_WARNING_TOO_LOW": "Too Low",
+    "OIL_LEVEL_WARNING_TOO_HIGH": "Too High",
+    "OIL_LEVEL_WARNING_SERVICE_REQUIRED": "Service Required",
+}
+
+
+SERVICE_WARNING_DICT = {
+    "SERVICE_WARNING_NO_WARNING": "No Warning",
+    "SERVICE_WARNING_UNSPECIFIED": "Unspecified",
+    "SERVICE_WARNING_SERVICE_REQUIRED": "Service Required",
+    "SERVICE_WARNING_REGULAR_MAINTENANCE_ALMOST_TIME_FOR_SERVICE": "Regular Maintenance Almost Time For Service",
+    "SERVICE_WARNING_DISTANCE_DRIVEN_ALMOST_TIME_FOR_SERVICE": "Distance Driven Almost Time For Service",
+    "SERVICE_WARNING_REGULAR_MAINTENANCE_TIME_FOR_SERVICE": "Regular Maintenance Time For Service",
+    "SERVICE_WARNING_DISTANCE_DRIVEN_TIME_FOR_SERVICE": "Distance Driven Time For Service",
+    "SERVICE_WARNING_REGULAR_MAINTENANCE_OVERDUE_FOR_SERVICE": "Regular Maintenance Overdue For Service",
+    "SERVICE_WARNING_DISTANCE_DRIVEN_OVERDUE_FOR_SERVICE": "Distance Driven Overdue For Service",
+}
+
+
 API_STATUS_DICT = {
     200: "OK",
     303: "OK",
@@ -472,6 +506,85 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         dict_data=None,
         state_class=SensorStateClass.TOTAL,
         device_class=SensorDeviceClass.ENERGY,
+    ),
+    PolestarSensorDescription(
+        key="brake_fluid_level_warning",
+        name="Brake Fluid Level Warning",
+        icon="mdi:alert",
+        query="getHealthData",
+        field_name="brakeFluidLevelWarning",
+        native_unit_of_measurement=None,
+        round_digits=None,
+        max_value=None,
+        dict_data=BRAKE_FLUID_LEVEL_WARNING_DICT,
+    ),
+    PolestarSensorDescription(
+        key="engine_coolant_level_warning",
+        name="Engine Coolant Level Warning",
+        icon="mdi:alert",
+        query="getHealthData",
+        field_name="engineCoolantLevelWarning",
+        native_unit_of_measurement=None,
+        round_digits=None,
+        max_value=None,
+        dict_data=ENGINE_COOLANT_LEVEL_WARNING_DICT,
+    ),
+    PolestarSensorDescription(
+        key="oil_level_warning",
+        name="Oil Level Warning",
+        icon="mdi:alert",
+        query="getHealthData",
+        field_name="oilLevelWarning",
+        native_unit_of_measurement=None,
+        round_digits=None,
+        max_value=None,
+        dict_data=OIL_LEVEL_WARNING_DICT,
+    ),
+    PolestarSensorDescription(
+        key="service_warning",
+        name="Service Warning",
+        icon="mdi:alert",
+        query="getHealthData",
+        field_name="serviceWarning",
+        native_unit_of_measurement=None,
+        round_digits=None,
+        max_value=None,
+        dict_data=SERVICE_WARNING_DICT,
+    ),
+    PolestarSensorDescription(
+        key="last_updated_health_data",
+        name="Last Updated Health Data",
+        icon="mdi:clock",
+        query="getHealthData",
+        field_name="eventUpdatedTimestamp/iso",
+        native_unit_of_measurement=None,
+        round_digits=None,
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.TIMESTAMP,
+        max_value=None,
+        dict_data=None,
+    ),
+    PolestarSensorDescription(
+        key="days_to_service",
+        name="Days to Service",
+        icon="mdi:calendar",
+        query="getHealthData",
+        field_name="daysToService",
+        native_unit_of_measurement=UnitOfTime.DAYS,
+        round_digits=None,
+        max_value=None,
+        dict_data=None,
+    ),
+    PolestarSensorDescription(
+        key="distance_to_service",
+        name="Distance to Service",
+        icon="mdi:map-marker-distance",
+        query="getHealthData",
+        field_name="distanceToServiceKm",
+        native_unit_of_measurement=UnitOfLength.KILOMETERS,
+        round_digits=None,
+        max_value=None,
+        dict_data=None,
     ),
 )
 

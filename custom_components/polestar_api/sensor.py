@@ -15,6 +15,7 @@ from homeassistant.components.sensor import (
 )
 from homeassistant.const import (
     PERCENTAGE,
+    EntityCategory,
     UnitOfElectricCurrent,
     UnitOfEnergy,
     UnitOfLength,
@@ -377,6 +378,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         round_digits=None,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.TIMESTAMP,
+        entity_category=EntityCategory.DIAGNOSTIC,
         max_value=None,
         dict_data=None,
     ),
@@ -390,6 +392,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         round_digits=None,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.TIMESTAMP,
+        entity_category=EntityCategory.DIAGNOSTIC,
         max_value=None,
         dict_data=None,
     ),
@@ -407,8 +410,8 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         dict_data=None,
     ),
     PolestarSensorDescription(
-        key="api_status_code",
-        name="API Status Code V1",
+        key="api_status_code_data",
+        name="API Status Code (Data)",
         icon="mdi:heart",
         query=None,
         field_name=None,
@@ -416,21 +419,11 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         round_digits=None,
         max_value=None,
         dict_data=API_STATUS_DICT,
-    ),
-    PolestarSensorDescription(
-        key="api_status_code_v2",
-        name="API Status Code V2",
-        icon="mdi:heart",
-        query=None,
-        field_name=None,
-        native_unit_of_measurement=None,
-        round_digits=None,
-        max_value=None,
-        dict_data=API_STATUS_DICT,
+        entity_category=EntityCategory.DIAGNOSTIC,
     ),
     PolestarSensorDescription(
         key="api_status_code_auth",
-        name="Auth API Status Code",
+        name="API Status Code (Auth)",
         icon="mdi:heart",
         query=None,
         field_name=None,
@@ -438,6 +431,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         round_digits=None,
         max_value=None,
         dict_data=API_STATUS_DICT,
+        entity_category=EntityCategory.DIAGNOSTIC,
     ),
     PolestarSensorDescription(
         key="api_token_expires_at",
@@ -449,6 +443,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         round_digits=None,
         max_value=None,
         dict_data=None,
+        entity_category=EntityCategory.DIAGNOSTIC,
     ),
     PolestarSensorDescription(
         key="torque",
@@ -528,7 +523,7 @@ class PolestarSensor(PolestarEntity, SensorEntity):
             self._attr_state_class = entity_description.state_class
         if entity_description.device_class is not None:
             self._attr_device_class = entity_description.device_class
-        if self.car is not None and self.car.get_latest_call_code() == 200:
+        if self.car is not None and self.car.get_latest_call_code_data() == 200:
             self._async_update_attrs()
 
     @callback
@@ -555,13 +550,9 @@ class PolestarSensor(PolestarEntity, SensorEntity):
             return "Not Supported Yet"
 
         if self.entity_description.dict_data is not None:
-            if self.entity_description.key == "api_status_code":
+            if self.entity_description.key == "api_status_code_data":
                 return self.entity_description.dict_data.get(
-                    self.car.get_latest_call_code_v1(), "Error"
-                )
-            elif self.entity_description.key == "api_status_code_v2":
-                return self.entity_description.dict_data.get(
-                    self.car.get_latest_call_code_v2(), "Error"
+                    self.car.get_latest_call_code_data(), "Error"
                 )
             elif self.entity_description.key == "api_status_code_auth":
                 return self.entity_description.dict_data.get(

@@ -9,3 +9,6 @@ lint:
 reformat:
 	ruff check --select I --fix $(SOURCE)
 	ruff format $(SOURCE)
+
+test:
+	PYTHONPATH=custom_components pytest -vv

@@ -202,7 +202,7 @@ class PolestarApi:
     async def _get_vehicle_data(self, verbose: bool = False) -> dict | None:
         """Get the latest vehicle data from the Polestar API."""
         result = await self._query_graph_ql(
-            url=BASE_URL,
+            url=BASE_URL_V2,
             query=QUERY_GET_CONSUMER_CARS_V2_VERBOSE
             if verbose
             else QUERY_GET_CONSUMER_CARS_V2,

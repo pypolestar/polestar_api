@@ -7,8 +7,9 @@ import httpx
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.httpx_client import get_async_client
+from homeassistant.util import Throttle
 
-from .const import DOMAIN as POLESTAR_API_DOMAIN
+from .const import DEFAULT_SCAN_INTERVAL, DOMAIN as POLESTAR_API_DOMAIN
 from .pypolestar.exception import PolestarApiException, PolestarAuthException
 from .pypolestar.polestar import PolestarApi
 
@@ -31,6 +32,8 @@ class PolestarCar:
         self.model = str(
             self.get_value("getConsumerCarsV2", "content/model/name") or "Unknown model"
         )
+        self.scan_interval = DEFAULT_SCAN_INTERVAL
+        self.async_update = Throttle(min_time=self.scan_interval)(self.async_update)
 
     def get_unique_id(self) -> str:
         """Return unique identifier"""
@@ -48,12 +51,6 @@ class PolestarCar:
             model=self.model,
             name=self.name,
             serial_number=self.vin,
-        )
-
-    def get_latest_data(self, query: str, field_name: str):
-        """Get the latest data from the Polestar API."""
-        return self.polestar_api.get_latest_data(
-            vin=self.vin, query=query, field_name=field_name
         )
 
     async def async_update(self) -> None:
@@ -82,10 +79,12 @@ class PolestarCar:
             self.polestar_api.next_update = datetime.now() + timedelta(seconds=60)
         self.polestar_api.latest_call_code_v2 = 500
 
-    def get_value(self, query: str, field_name: str, skip_cache: bool = False):
+    def get_value(self, query: str, field_name: str):
         """Get the latest value from the Polestar API."""
-        data = self.polestar_api.get_cache_data(
-            vin=self.vin, query=query, field_name=field_name, skip_cache=skip_cache
+        if query is None or field_name is None:
+            return None
+        data = self.polestar_api.get_latest_data(
+            vin=self.vin, query=query, field_name=field_name
         )
         if data is None:
             # if amp and voltage can be null, so we will return 0

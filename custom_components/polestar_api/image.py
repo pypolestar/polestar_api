@@ -2,12 +2,11 @@
 
 from __future__ import annotations
 
-import datetime
 import logging
 from dataclasses import dataclass
-from functools import cached_property
 from typing import Final
 
+import homeassistant.util.dt as dt_util
 from homeassistant.components.image import ImageEntity, ImageEntityDescription
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
@@ -82,11 +81,20 @@ class PolestarImage(PolestarEntity, ImageEntity):
             f"polestar_{car.get_unique_id()}_{entity_description.key}"
         )
         self._attr_translation_key = f"polestar_{entity_description.key}"
-        self._attr_image_last_updated = datetime.datetime.now()
 
-    @cached_property
-    def image_url(self) -> str | None:
-        """Return the image URL."""
-        return self.car.get_value(
-            self.entity_description.query, self.entity_description.field_name
+    async def async_update_image_url(self) -> None:
+        value = self.car.get_value(
+            query=self.entity_description.query,
+            field_name=self.entity_description.field_name,
         )
+        if value is None:
+            _LOGGER.debug("No image URL found")
+        elif isinstance(value, str) and value != self._attr_image_url:
+            _LOGGER.debug("Returning updated image URL %s", value)
+            self._attr_image_url = value
+            self._attr_image_last_updated = dt_util.utcnow()
+
+    async def async_image(self) -> bytes | None:
+        """Return bytes of image."""
+        await self.async_update_image_url()
+        return await ImageEntity.async_image(self)

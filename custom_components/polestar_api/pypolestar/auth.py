@@ -1,5 +1,5 @@
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from urllib.parse import urljoin
 
 import httpx
@@ -57,7 +57,7 @@ class PolestarAuth:
         if self.token_expiry is None:
             raise PolestarAuthException("No token expiry found")
         refresh_window = min([(self.token_lifetime or 0) / 2, TOKEN_REFRESH_WINDOW_MIN])
-        expires_in = (self.token_expiry - datetime.now()).total_seconds()
+        expires_in = (self.token_expiry - datetime.now(tz=timezone.utc)).total_seconds()
         if expires_in < refresh_window:
             self.logger.debug(
                 "Token expires in %d seconds, time to refresh", expires_in
@@ -71,7 +71,7 @@ class PolestarAuth:
         if (
             not refresh
             or self.token_expiry is None
-            or self.token_expiry < datetime.now()
+            or self.token_expiry < datetime.now(tz=timezone.utc)
         ):
             if (code := await self._get_code()) is None:
                 return
@@ -108,7 +108,7 @@ class PolestarAuth:
                 self.id_token = data["id_token"]
                 self.refresh_token = data["refresh_token"]
                 self.token_lifetime = data["expires_in"]
-                self.token_expiry = datetime.now() + timedelta(
+                self.token_expiry = datetime.now(tz=timezone.utc) + timedelta(
                     seconds=self.token_lifetime
                 )
                 self.latest_call_code = 200

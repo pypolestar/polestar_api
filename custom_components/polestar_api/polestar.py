@@ -34,6 +34,7 @@ class PolestarCar:
         )
         self.scan_interval = DEFAULT_SCAN_INTERVAL
         self.async_update = Throttle(min_time=self.scan_interval)(self.async_update)
+        self.data = {}
 
     def get_unique_id(self) -> str:
         """Return unique identifier"""
@@ -57,6 +58,11 @@ class PolestarCar:
         """Update data from Polestar."""
         try:
             await self.polestar_api.get_ev_data(self.vin)
+            self.data["api_connected"] = (
+                self.polestar_api.latest_call_code == 200
+                and self.polestar_api.auth.latest_call_code == 200
+                and self.polestar_api.auth.is_token_valid()
+            )
             return
         except PolestarApiException as e:
             _LOGGER.warning("API Exception on update data %s", str(e))

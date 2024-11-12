@@ -65,6 +65,13 @@ class PolestarAuth:
             return True
         return False
 
+    def is_token_valid(self) -> bool:
+        return (
+            self.access_token is not None
+            and self.token_expiry is not None
+            and self.token_expiry > datetime.now(tz=timezone.utc)
+        )
+
     async def get_token(self, refresh=False) -> None:
         """Get the token from Polestar."""
         # can't use refresh if the token is expired or not set even if refresh is True

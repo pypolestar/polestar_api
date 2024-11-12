@@ -232,7 +232,7 @@ class PolestarApi:
             variable_values={"vin": vin},
         )
 
-        res = self.data_by_vin[vin][BATTERY_DATA] = {
+        res = self.data_by_vin[vin][HEALTH_DATA] = {
             "data": result[HEALTH_DATA],
             "timestamp": datetime.now(),
         }

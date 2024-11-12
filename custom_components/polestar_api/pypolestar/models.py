@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from datetime import date, datetime
+from datetime import date, datetime, timezone
 from enum import StrEnum
 from typing import Self
 
@@ -33,7 +33,12 @@ class ChargingStatus(StrEnum):
 
 
 @dataclass(frozen=True)
-class CarInformation:
+class CarBaseInformation:
+    _received_timestamp: datetime
+
+
+@dataclass(frozen=True)
+class CarInformation(CarBaseInformation):
     vin: str | None
     internal_vehicle_identifier: str | None
     registration_no: str | None
@@ -58,15 +63,16 @@ class CarInformation:
             battery=get_field_name_str("content/specification/battery", data),
             torque=get_field_name_str("content/specification/torque", data),
             software_version=get_field_name_str("software/version", data),
+            _received_timestamp=datetime.now(tz=timezone.utc),
         )
 
 
 @dataclass(frozen=True)
-class CarOdometerData:
+class CarOdometerData(CarBaseInformation):
     average_speed_km_per_hour: float | None
     odometer_meters: int | None
-    trip_meter_automatic_km: int | None
-    trip_meter_manual_km: int | None
+    trip_meter_automatic_km: float | None
+    trip_meter_manual_km: float | None
     event_update_timestamp: datetime | None
 
     @classmethod
@@ -76,16 +82,17 @@ class CarOdometerData:
                 "averageSpeedKmPerHour", data
             ),
             odometer_meters=get_field_name_int("odometerMeters", data),
-            trip_meter_automatic_km=get_field_name_int("tripMeterAutomaticKm", data),
-            trip_meter_manual_km=get_field_name_int("tripMeterManualKm", data),
+            trip_meter_automatic_km=get_field_name_float("tripMeterAutomaticKm", data),
+            trip_meter_manual_km=get_field_name_float("tripMeterManualKm", data),
             event_update_timestamp=get_field_name_datetime(
                 "eventUpdatedTimestamp/iso", data
             ),
+            _received_timestamp=datetime.now(tz=timezone.utc),
         )
 
 
 @dataclass(frozen=True)
-class CarBatteryData:
+class CarBatteryData(CarBaseInformation):
     average_energy_consumption_kwh_per_100km: float | None
     battery_charge_level_percentage: int | None
     charger_connection_status: ChargingConnectionStatus
@@ -126,4 +133,5 @@ class CarBatteryData:
             event_update_timestamp=get_field_name_datetime(
                 "eventUpdatedTimestamp/iso", data
             ),
+            _received_timestamp=datetime.now(tz=timezone.utc),
         )

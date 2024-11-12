@@ -4,6 +4,8 @@ import pytest
 from polestar_api.pypolestar.utils import (
     get_field_name_date,
     get_field_name_datetime,
+    get_field_name_float,
+    get_field_name_int,
     get_field_name_str,
     get_field_name_value,
 )
@@ -25,6 +27,8 @@ TESTDATA = {
         },
         "software": {"version": None, "versionTimestamp": None},
     },
+    "averageEnergyConsumptionKwhPer100Km": 42.01,
+    "batteryChargeLevelPercentage": 100,
 }
 
 
@@ -47,6 +51,16 @@ def test_get_field_name_value():
 
 def test_get_field_name_str():
     assert get_field_name_str("vin", TESTDATA) == "YSMYKEAE7RB000000"
+
+
+def test_get_field_name_float():
+    assert (
+        get_field_name_float("averageEnergyConsumptionKwhPer100Km", TESTDATA) == 42.01
+    )
+
+
+def test_get_field_name_int():
+    assert get_field_name_int("batteryChargeLevelPercentage", TESTDATA) == 100
 
 
 def test_get_field_name_date():

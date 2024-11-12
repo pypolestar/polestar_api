@@ -15,6 +15,7 @@ from homeassistant.components.sensor import (
 )
 from homeassistant.const import (
     PERCENTAGE,
+    EntityCategory,
     UnitOfElectricCurrent,
     UnitOfEnergy,
     UnitOfLength,
@@ -377,6 +378,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         round_digits=None,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.TIMESTAMP,
+        entity_category=EntityCategory.DIAGNOSTIC,
         max_value=None,
         dict_data=None,
     ),
@@ -390,6 +392,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         round_digits=None,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.TIMESTAMP,
+        entity_category=EntityCategory.DIAGNOSTIC,
         max_value=None,
         dict_data=None,
     ),
@@ -416,6 +419,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         round_digits=None,
         max_value=None,
         dict_data=API_STATUS_DICT,
+        entity_category=EntityCategory.DIAGNOSTIC,
     ),
     PolestarSensorDescription(
         key="api_status_code_auth",
@@ -427,6 +431,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         round_digits=None,
         max_value=None,
         dict_data=API_STATUS_DICT,
+        entity_category=EntityCategory.DIAGNOSTIC,
     ),
     PolestarSensorDescription(
         key="api_token_expires_at",
@@ -438,6 +443,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         round_digits=None,
         max_value=None,
         dict_data=None,
+        entity_category=EntityCategory.DIAGNOSTIC,
     ),
     PolestarSensorDescription(
         key="torque",

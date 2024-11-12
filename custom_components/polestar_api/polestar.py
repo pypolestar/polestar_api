@@ -97,27 +97,13 @@ class PolestarCar:
         """Get the token expiry time."""
         return self.polestar_api.auth.token_expiry
 
-    def get_latest_call_code_v1(self) -> int | None:
-        """Get the latest call code mystar API."""
+    def get_latest_call_code_data(self) -> int | None:
+        """Get the latest call code data API."""
         return self.polestar_api.latest_call_code
 
-    def get_latest_call_code_v2(self) -> int | None:
-        """Get the latest call code mystar-v2 API."""
-        return self.polestar_api.latest_call_code_2
-
     def get_latest_call_code_auth(self) -> int | None:
-        """Get the latest call code mystar API."""
+        """Get the latest call code auth API."""
         return self.polestar_api.auth.latest_call_code
-
-    def get_latest_call_code(self) -> int | None:
-        """Get the latest call code."""
-        # if AUTH code last code is not 200 then we return that error code,
-        # otherwise just give the call_code in API from v1 and then v2
-        if self.polestar_api.auth.latest_call_code != 200:
-            return self.polestar_api.auth.latest_call_code
-        if self.polestar_api.latest_call_code != 200:
-            return self.polestar_api.latest_call_code
-        return self.polestar_api.latest_call_code_2
 
 
 class PolestarCoordinator:

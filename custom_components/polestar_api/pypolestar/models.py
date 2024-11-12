@@ -3,7 +3,14 @@ from datetime import date, datetime
 from enum import StrEnum
 from typing import Self
 
-from .utils import get_field_name_date, get_field_name_datetime, get_field_name_str
+from .utils import (
+    GqlDict,
+    get_field_name_date,
+    get_field_name_datetime,
+    get_field_name_float,
+    get_field_name_int,
+    get_field_name_str,
+)
 
 
 class ChargingConnectionStatus(StrEnum):
@@ -27,8 +34,8 @@ class ChargingStatus(StrEnum):
 
 @dataclass(frozen=True)
 class CarInformation:
-    vin: str
-    internal_vehicle_identifier: str
+    vin: str | None
+    internal_vehicle_identifier: str | None
     registration_no: str | None
     registration_date: date | None
     factory_complete_date: date | None
@@ -38,11 +45,13 @@ class CarInformation:
     software_version: str | None
 
     @classmethod
-    def from_dict(cls, data) -> Self:
+    def from_dict(cls, data: GqlDict) -> Self:
         return cls(
-            vin=data["vin"],
-            internal_vehicle_identifier=data["internalVehicleIdentifier"],
-            registration_no=data.get("registrationNo"),
+            vin=get_field_name_str("vin", data),
+            internal_vehicle_identifier=get_field_name_str(
+                "internalVehicleIdentifier", data
+            ),
+            registration_no=get_field_name_str("registrationNo", data),
             registration_date=get_field_name_date("registrationDate", data),
             factory_complete_date=get_field_name_date("factoryCompleteDate", data),
             image_url=get_field_name_str("content/images/studio/url", data),
@@ -61,12 +70,14 @@ class CarOdometerData:
     event_update_timestamp: datetime | None
 
     @classmethod
-    def from_dict(cls, data) -> Self:
+    def from_dict(cls, data: GqlDict) -> Self:
         return cls(
-            average_speed_km_per_hour=int(data["averageSpeedKmPerHour"]),
-            odometer_meters=int(data["odometerMeters"]),
-            trip_meter_automatic_km=int(data["tripMeterAutomaticKm"]),
-            trip_meter_manual_km=int(data["tripMeterManualKm"]),
+            average_speed_km_per_hour=get_field_name_float(
+                "averageSpeedKmPerHour", data
+            ),
+            odometer_meters=get_field_name_int("odometerMeters", data),
+            trip_meter_automatic_km=get_field_name_int("tripMeterAutomaticKm", data),
+            trip_meter_manual_km=get_field_name_int("tripMeterManualKm", data),
             event_update_timestamp=get_field_name_datetime(
                 "eventUpdatedTimestamp/iso", data
             ),
@@ -75,37 +86,43 @@ class CarOdometerData:
 
 @dataclass(frozen=True)
 class CarBatteryData:
-    average_energy_consumption_kwh_per_100km: float
-    battery_charge_level_percentage: int
+    average_energy_consumption_kwh_per_100km: float | None
+    battery_charge_level_percentage: int | None
     charger_connection_status: ChargingConnectionStatus
     charging_current_amps: int | None
     charging_power_watts: int | None
     charging_status: ChargingStatus
-    estimated_charging_time_minutes_to_target_distance: int
-    estimated_charging_time_to_full_minutes: int
-    estimated_distance_to_empty_km: int
+    estimated_charging_time_minutes_to_target_distance: int | None
+    estimated_charging_time_to_full_minutes: int | None
+    estimated_distance_to_empty_km: int | None
     event_update_timestamp: datetime | None
 
     @classmethod
-    def from_dict(cls, data) -> Self:
+    def from_dict(cls, data: GqlDict) -> Self:
         return cls(
-            average_energy_consumption_kwh_per_100km=data[
-                "averageEnergyConsumptionKwhPer100Km"
-            ],
-            battery_charge_level_percentage=data["batteryChargeLevelPercentage"],
+            average_energy_consumption_kwh_per_100km=get_field_name_float(
+                "averageEnergyConsumptionKwhPer100Km", data
+            ),
+            battery_charge_level_percentage=get_field_name_int(
+                "batteryChargeLevelPercentage", data
+            ),
             charger_connection_status=ChargingConnectionStatus[
-                data["chargerConnectionStatus"]
+                str(get_field_name_str("chargerConnectionStatus", data))
             ],
-            charging_current_amps=data.get("chargingCurrentAmps"),
-            charging_power_watts=data.get("chargingPowerWatts"),
-            charging_status=ChargingStatus[data["chargingStatus"]],
-            estimated_charging_time_minutes_to_target_distance=data[
-                "estimatedChargingTimeMinutesToTargetDistance"
+            charging_current_amps=get_field_name_int("chargingCurrentAmps", data),
+            charging_power_watts=get_field_name_int("chargingPowerWatts", data),
+            charging_status=ChargingStatus[
+                str(get_field_name_str("chargingStatus", data))
             ],
-            estimated_charging_time_to_full_minutes=data[
-                "estimatedChargingTimeToFullMinutes"
-            ],
-            estimated_distance_to_empty_km=data["estimatedDistanceToEmptyKm"],
+            estimated_charging_time_minutes_to_target_distance=get_field_name_int(
+                "estimatedChargingTimeMinutesToTargetDistance", data
+            ),
+            estimated_charging_time_to_full_minutes=get_field_name_int(
+                "estimatedChargingTimeToFullMinutes", data
+            ),
+            estimated_distance_to_empty_km=get_field_name_int(
+                "estimatedDistanceToEmptyKm", data
+            ),
             event_update_timestamp=get_field_name_datetime(
                 "eventUpdatedTimestamp/iso", data
             ),

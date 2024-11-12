@@ -32,6 +32,16 @@ def get_field_name_str(field_name: str, data: GqlDict) -> str | None:
         return value
 
 
+def get_field_name_float(field_name: str, data: GqlDict) -> float | None:
+    if (value := get_field_name_value(field_name, data)) and isinstance(value, float):
+        return value
+
+
+def get_field_name_int(field_name: str, data: GqlDict) -> int | None:
+    if (value := get_field_name_value(field_name, data)) and isinstance(value, int):
+        return value
+
+
 def get_field_name_date(field_name: str, data: GqlDict) -> date | None:
     if (value := get_field_name_value(field_name, data)) and isinstance(value, str):
         return date.fromisoformat(value)

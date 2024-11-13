@@ -96,8 +96,8 @@ class CarBatteryData(CarBaseInformation):
     average_energy_consumption_kwh_per_100km: float | None
     battery_charge_level_percentage: int | None
     charger_connection_status: ChargingConnectionStatus
-    charging_current_amps: int | None
-    charging_power_watts: int | None
+    charging_current_amps: int
+    charging_power_watts: int
     charging_status: ChargingStatus
     estimated_charging_time_minutes_to_target_distance: int | None
     estimated_charging_time_to_full_minutes: int | None
@@ -116,8 +116,8 @@ class CarBatteryData(CarBaseInformation):
             charger_connection_status=ChargingConnectionStatus[
                 str(get_field_name_str("chargerConnectionStatus", data))
             ],
-            charging_current_amps=get_field_name_int("chargingCurrentAmps", data),
-            charging_power_watts=get_field_name_int("chargingPowerWatts", data),
+            charging_current_amps=get_field_name_int("chargingCurrentAmps", data) or 0,
+            charging_power_watts=get_field_name_int("chargingPowerWatts", data) or 0,
             charging_status=ChargingStatus[
                 str(get_field_name_str("chargingStatus", data))
             ],

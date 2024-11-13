@@ -332,6 +332,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         round_digits=None,
         max_value=None,
         dict_data=None,
+        entity_registry_enabled_default=False,
     ),
     PolestarSensorDescription(
         key="internal_vehicle_id",
@@ -343,6 +344,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         round_digits=None,
         max_value=None,
         dict_data=None,
+        entity_registry_enabled_default=False,
     ),
     PolestarSensorDescription(
         key="estimated_fully_charged_time",
@@ -420,6 +422,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         max_value=None,
         dict_data=API_STATUS_DICT,
         entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
     ),
     PolestarSensorDescription(
         key="api_status_code_auth",
@@ -432,6 +435,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         max_value=None,
         dict_data=API_STATUS_DICT,
         entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
     ),
     PolestarSensorDescription(
         key="api_token_expires_at",
@@ -444,6 +448,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         max_value=None,
         dict_data=None,
         entity_category=EntityCategory.DIAGNOSTIC,
+        entity_registry_enabled_default=False,
     ),
     PolestarSensorDescription(
         key="torque",

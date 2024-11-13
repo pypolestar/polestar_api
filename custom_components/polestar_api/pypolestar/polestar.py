@@ -25,6 +25,7 @@ from .graphql import (
     QUERY_GET_ODOMETER_DATA,
     get_gql_client,
 )
+from .models import CarBatteryData, CarInformationData, CarOdometerData
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -83,6 +84,18 @@ class PolestarApi:
     @property
     def vins(self) -> list[str]:
         return list(self.data_by_vin.keys())
+
+    def get_car_information(self, vin: str) -> CarInformationData | None:
+        if data := self.data_by_vin[vin].get(CAR_INFO_DATA, {}).get("data"):
+            return CarInformationData.from_dict(data)
+
+    def get_car_battery(self, vin: str) -> CarBatteryData | None:
+        if data := self.data_by_vin[vin].get(BATTERY_DATA, {}).get("data"):
+            return CarBatteryData.from_dict(data)
+
+    def get_car_odometer(self, vin: str) -> CarOdometerData | None:
+        if data := self.data_by_vin[vin].get(ODO_METER_DATA, {}).get("data"):
+            return CarOdometerData.from_dict(data)
 
     def get_latest_data(self, vin: str, query: str, field_name: str) -> dict | None:
         """Get the latest data from the Polestar API."""

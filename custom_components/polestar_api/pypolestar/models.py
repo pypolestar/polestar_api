@@ -38,7 +38,7 @@ class CarBaseInformation:
 
 
 @dataclass(frozen=True)
-class CarInformation(CarBaseInformation):
+class CarInformationData(CarBaseInformation):
     vin: str | None
     internal_vehicle_identifier: str | None
     registration_no: str | None

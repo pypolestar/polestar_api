@@ -310,6 +310,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         round_digits=None,
         max_value=None,
         dict_data=None,
+        entity_registry_enabled_default=False,
     ),
     PolestarSensorDescription(
         key="registration_number",
@@ -332,6 +333,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         round_digits=None,
         max_value=None,
         dict_data=None,
+        entity_registry_enabled_default=False,
     ),
     PolestarSensorDescription(
         key="internal_vehicle_id",
@@ -515,6 +517,7 @@ class PolestarSensor(PolestarEntity, SensorEntity):
             self.entity_description.query,
             self.entity_description.field_name,
         )
+        self._attr_extra_state_attributes = {}
 
         if entity_description.round_digits is not None:
             self.attr_suggested_display_precision = entity_description.round_digits
@@ -561,6 +564,22 @@ class PolestarSensor(PolestarEntity, SensorEntity):
             self._attr_native_value = self.entity_description.dict_data.get(
                 self._attr_native_value, self._attr_native_value
             )
+
+        if self.entity_description.key == "vin":
+            self._attr_extra_state_attributes = {
+                "factory_complete_date": self.car.get_value(
+                    query="getConsumerCarsV2",
+                    field_name="factoryCompleteDate",
+                )
+            }
+
+        if self.entity_description.key == "registration_number":
+            self._attr_extra_state_attributes = {
+                "registration_date": self.car.get_value(
+                    query="getConsumerCarsV2",
+                    field_name="registrationDate",
+                )
+            }
 
         if self.entity_description.key == "api_token_expires_at":
             expire = self.car.get_token_expiry()

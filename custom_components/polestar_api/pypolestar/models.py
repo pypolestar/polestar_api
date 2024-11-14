@@ -73,7 +73,7 @@ class CarOdometerData(CarBaseInformation):
     odometer_meters: int | None
     trip_meter_automatic_km: float | None
     trip_meter_manual_km: float | None
-    event_update_timestamp: datetime | None
+    event_updated_timestamp: datetime | None
 
     @classmethod
     def from_dict(cls, data: GqlDict) -> Self:
@@ -84,7 +84,7 @@ class CarOdometerData(CarBaseInformation):
             odometer_meters=get_field_name_int("odometerMeters", data),
             trip_meter_automatic_km=get_field_name_float("tripMeterAutomaticKm", data),
             trip_meter_manual_km=get_field_name_float("tripMeterManualKm", data),
-            event_update_timestamp=get_field_name_datetime(
+            event_updated_timestamp=get_field_name_datetime(
                 "eventUpdatedTimestamp/iso", data
             ),
             _received_timestamp=datetime.now(tz=timezone.utc),
@@ -102,7 +102,7 @@ class CarBatteryData(CarBaseInformation):
     estimated_charging_time_minutes_to_target_distance: int | None
     estimated_charging_time_to_full_minutes: int | None
     estimated_distance_to_empty_km: int | None
-    event_update_timestamp: datetime | None
+    event_updated_timestamp: datetime | None
 
     @classmethod
     def from_dict(cls, data: GqlDict) -> Self:
@@ -130,7 +130,7 @@ class CarBatteryData(CarBaseInformation):
             estimated_distance_to_empty_km=get_field_name_int(
                 "estimatedDistanceToEmptyKm", data
             ),
-            event_update_timestamp=get_field_name_datetime(
+            event_updated_timestamp=get_field_name_datetime(
                 "eventUpdatedTimestamp/iso", data
             ),
             _received_timestamp=datetime.now(tz=timezone.utc),

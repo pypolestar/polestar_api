@@ -40,6 +40,8 @@ class PolestarAuth:
         self.oidc_configuration = {}
         self.latest_call_code = None
         self.logger = _LOGGER.getChild(unique_id) if unique_id else _LOGGER
+        self.oidc_provider = OIDC_PROVIDER_BASE_URL
+        self.api_url = API_AUTH_URL
         self.gql_client = get_gql_client(url=API_AUTH_URL, client=self.client_session)
 
     async def async_init(self) -> None:

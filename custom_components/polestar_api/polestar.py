@@ -129,6 +129,7 @@ class PolestarCoordinator:
         else:
             _LOGGER.debug("Configure Polestar API client for all cars")
         self.unique_id = unique_id
+        self.username = username
         self.polestar_api = PolestarApi(
             username=username,
             password=password,

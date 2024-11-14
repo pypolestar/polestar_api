@@ -310,6 +310,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         round_digits=None,
         max_value=None,
         dict_data=None,
+        entity_registry_enabled_default=False,
     ),
     PolestarSensorDescription(
         key="registration_number",
@@ -332,6 +333,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         round_digits=None,
         max_value=None,
         dict_data=None,
+        entity_registry_enabled_default=False,
     ),
     PolestarSensorDescription(
         key="internal_vehicle_id",

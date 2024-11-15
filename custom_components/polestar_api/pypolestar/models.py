@@ -44,6 +44,7 @@ class CarInformationData(CarBaseInformation):
     registration_no: str | None
     registration_date: date | None
     factory_complete_date: date | None
+    model_name: str | None
     image_url: str | None
     battery: str | None
     torque: str | None
@@ -62,6 +63,7 @@ class CarInformationData(CarBaseInformation):
             registration_no=get_field_name_str("registrationNo", data),
             registration_date=get_field_name_date("registrationDate", data),
             factory_complete_date=get_field_name_date("factoryCompleteDate", data),
+            model_name=get_field_name_str("content/model/name", data),
             image_url=get_field_name_str("content/images/studio/url", data),
             battery=get_field_name_str("content/specification/battery", data),
             torque=get_field_name_str("content/specification/torque", data),
@@ -116,17 +118,17 @@ class CarBatteryData(CarBaseInformation):
             raise TypeError
 
         try:
-            charger_connection_status = ChargingConnectionStatus(
+            charger_connection_status = ChargingConnectionStatus[
                 get_field_name_str("chargerConnectionStatus", data)
-            )
-        except ValueError:
+            ]
+        except KeyError:
             charger_connection_status = (
                 ChargingConnectionStatus.CHARGER_CONNECTION_STATUS_UNSPECIFIED
             )
 
         try:
-            charging_status = ChargingStatus(get_field_name_str("chargingStatus", data))
-        except ValueError:
+            charging_status = ChargingStatus[get_field_name_str("chargingStatus", data)]
+        except KeyError:
             charging_status = ChargingStatus.CHARGING_STATUS_UNSPECIFIED
 
         return cls(

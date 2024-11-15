@@ -6,26 +6,32 @@ GqlDict = dict[str, type["GqlDict"] | GqlScalar]
 
 
 def get_field_name_value(field_name: str, data: GqlDict) -> GqlScalar | GqlDict:
+    """Extract a value from nested dictionary using path-like notation.
+    
+    Args:
+        field_name: Path to the field using "/" as separator (e.g., "car/status/battery")
+        data: Nested dictionary containing the data
+        
+    Returns:
+        The value at the specified path
+        
+    Raises:
+        KeyError: If the path doesn't exist or is invalid
+    """
     if field_name is None or data is None:
         return None
 
     result: GqlScalar | GqlDict = data
-    valid = False
 
     for key in field_name.split("/"):
         if isinstance(result, dict):
             if key not in result:
-                raise KeyError(field_name)
-            result = result[key]  # type: ignore
-            valid = True
+                raise KeyError(f"Key '{key}' not found in path '{field_name}'")
+            result = result[key]
         else:
-            raise KeyError(field_name)
+            raise KeyError(f"Cannot access key '{key}' in non-dict value at path '{field_name}'")
 
-    if valid:
-        return result
-
-    raise KeyError(field_name)
-
+    return result
 
 def get_field_name_str(field_name: str, data: GqlDict) -> str | None:
     if (value := get_field_name_value(field_name, data)) and isinstance(value, str):

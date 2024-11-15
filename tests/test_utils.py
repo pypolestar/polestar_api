@@ -51,25 +51,34 @@ def test_get_field_name_value():
 
 def test_get_field_name_str():
     assert get_field_name_str("vin", TESTDATA) == "YSMYKEAE7RB000000"
+    assert get_field_name_str("registrationDate", TESTDATA) is None  # None handling
 
 
 def test_get_field_name_float():
     assert (
         get_field_name_float("averageEnergyConsumptionKwhPer100Km", TESTDATA) == 42.01
     )
+    assert get_field_name_float("registrationDate", TESTDATA) is None  # None handling
 
 
 def test_get_field_name_int():
     assert get_field_name_int("batteryChargeLevelPercentage", TESTDATA) == 100
+    assert get_field_name_int("registrationDate", TESTDATA) is None  # None handling
 
 
 def test_get_field_name_date():
-    assert get_field_name_date("factoryCompleteDate", TESTDATA) == date(
-        year=2024, month=4, day=16
-    )
+    assert get_field_name_date("factoryCompleteDate", TESTDATA) == date(2024, 4, 16)
+    assert get_field_name_date("registrationDate", TESTDATA) is None  # None handling
+    with pytest.raises(ValueError):  # Invalid date
+        get_field_name_date("vin", TESTDATA)
 
 
 def test_get_field_name_datetime():
     assert get_field_name_datetime("factoryCompleteDate", TESTDATA) == datetime(
-        year=2024, month=4, day=16
+        2024, 4, 16
     )
+    assert (
+        get_field_name_datetime("registrationDate", TESTDATA) is None
+    )  # None handling
+    with pytest.raises(ValueError):  # Invalid datetime
+        get_field_name_datetime("vin", TESTDATA)

@@ -7,14 +7,14 @@ GqlDict = dict[str, type["GqlDict"] | GqlScalar]
 
 def get_field_name_value(field_name: str, data: GqlDict) -> GqlScalar | GqlDict:
     """Extract a value from nested dictionary using path-like notation.
-    
+
     Args:
         field_name: Path to the field using "/" as separator (e.g., "car/status/battery")
         data: Nested dictionary containing the data
-        
+
     Returns:
         The value at the specified path
-        
+
     Raises:
         KeyError: If the path doesn't exist or is invalid
     """
@@ -29,30 +29,78 @@ def get_field_name_value(field_name: str, data: GqlDict) -> GqlScalar | GqlDict:
                 raise KeyError(f"Key '{key}' not found in path '{field_name}'")
             result = result[key]
         else:
-            raise KeyError(f"Cannot access key '{key}' in non-dict value at path '{field_name}'")
+            raise KeyError(
+                f"Cannot access key '{key}' in non-dict value at path '{field_name}'"
+            )
 
     return result
 
+
 def get_field_name_str(field_name: str, data: GqlDict) -> str | None:
-    if (value := get_field_name_value(field_name, data)) and isinstance(value, str):
+    """Extract a str value from the nested dictionary.
+    Args:
+        field_name: Path to the date field
+        data: Nested dictionary containing the data
+    Returns:
+        str if successful, None otherwise
+    """
+    if (value := get_field_name_value(field_name, data)) and (isinstance(value, str)):
         return value
 
 
 def get_field_name_float(field_name: str, data: GqlDict) -> float | None:
+    """Extract a float value from the nested dictionary.
+    Args:
+        field_name: Path to the date field
+        data: Nested dictionary containing the data
+    Returns:
+        float if successful, None otherwise
+    """
     if (value := get_field_name_value(field_name, data)) and isinstance(value, float):
         return value
 
 
 def get_field_name_int(field_name: str, data: GqlDict) -> int | None:
+    """Extract a int value from the nested dictionary.
+    Args:
+        field_name: Path to the date field
+        data: Nested dictionary containing the data
+    Returns:
+        int if successful, None otherwise
+    """
     if (value := get_field_name_value(field_name, data)) and isinstance(value, int):
         return value
 
 
 def get_field_name_date(field_name: str, data: GqlDict) -> date | None:
+    """Extract and convert a date value from the nested dictionary.
+    Args:
+        field_name: Path to the date field
+        data: Nested dictionary containing the data
+    Returns:
+        date object if conversion successful, None otherwise
+    """
     if (value := get_field_name_value(field_name, data)) and isinstance(value, str):
-        return date.fromisoformat(value)
+        try:
+            return date.fromisoformat(value)
+        except ValueError as exc:
+            raise ValueError(
+                f"Invalid datetime format at '{field_name}': {value}"
+            ) from exc
 
 
 def get_field_name_datetime(field_name: str, data: GqlDict) -> datetime | None:
+    """Extract and convert a datetime value from the nested dictionary.
+    Args:
+        field_name: Path to the datetime field
+        data: Nested dictionary containing the data
+    Returns:
+        datetime object if conversion successful, None otherwise
+    """
     if (value := get_field_name_value(field_name, data)) and isinstance(value, str):
-        return datetime.fromisoformat(value)
+        try:
+            return datetime.fromisoformat(value)
+        except ValueError as exc:
+            raise ValueError(
+                f"Invalid datetime format at '{field_name}': {value}"
+            ) from exc

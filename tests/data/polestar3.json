@@ -1,0 +1,53 @@
+{
+    "getBatteryData": {
+        "averageEnergyConsumptionKwhPer100Km": 22.4,
+        "batteryChargeLevelPercentage": 34,
+        "chargerConnectionStatus": "CHARGER_CONNECTION_STATUS_DISCONNECTED",
+        "chargingCurrentAmps": null,
+        "chargingPowerWatts": null,
+        "chargingStatus": "CHARGING_STATUS_IDLE",
+        "estimatedChargingTimeMinutesToTargetDistance": 0,
+        "estimatedChargingTimeToFullMinutes": 0,
+        "estimatedDistanceToEmptyKm": 150,
+        "estimatedDistanceToEmptyMiles": 90,
+        "eventUpdatedTimestamp": {
+            "iso": "2024-11-11T17:47:13.000Z",
+            "unix": "1731347233"
+        }
+    },
+    "getConsumerCarsV2": {
+        "content": {
+            "images": {
+                "studio": {
+                    "url": "https://cas.polestar.com/image/dynamic/MY24_2207/359/summary-transparent-v2/EA/1/72300/R80000/R102/LR02/EV02/K503/JB07/SW01/_/ET01/default.png?market=se"
+                }
+            },
+            "model": {
+                "name": "Polestar 3"
+            },
+            "specification": {
+                "battery": "400V lithium-ion battery, 111 kWh capacity, 17 modules",
+                "torque": "840 Nm / 620 lbf-ft"
+            }
+        },
+        "factoryCompleteDate": "2024-04-16",
+        "internalVehicleIdentifier": "1aaeb452-700e-46f3-9899-395b6219c8a6",
+        "registrationDate": null,
+        "registrationNo": "MLB007",
+        "software": {
+            "version": null,
+            "versionTimestamp": null
+        },
+        "vin": "YSMYKEAE7RB000000"
+    },
+    "getOdometerData": {
+        "averageSpeedKmPerHour": 42,
+        "eventUpdatedTimestamp": {
+            "iso": "2024-11-11T15:15:16.000Z",
+            "unix": "1731338116"
+        },
+        "odometerMeters": 2001000,
+        "tripMeterAutomaticKm": 4.2,
+        "tripMeterManualKm": 1984.0
+    }
+}

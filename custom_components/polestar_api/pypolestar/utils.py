@@ -79,6 +79,13 @@ def get_field_name_int(field_name: str, data: GqlDict) -> int | None:
     """
     if (value := get_field_name_value(field_name, data)) and isinstance(value, int):
         return value
+    elif value is not None:
+        try:
+            return int(value)
+        except (ValueError, TypeError) as exc:
+            raise ValueError(
+                f"Invalid integer value at '{field_name}': {value}"
+            ) from exc
 
 
 def get_field_name_date(field_name: str, data: GqlDict) -> date | None:

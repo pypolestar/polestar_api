@@ -13,6 +13,7 @@ jobs:
   pytest:
     name: Pytest
     needs: ruff
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python ${{ matrix.python-version }}

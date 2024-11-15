@@ -106,6 +106,20 @@ class CarBatteryData(CarBaseInformation):
 
     @classmethod
     def from_dict(cls, data: GqlDict) -> Self:
+        try:
+            charger_connection_status = ChargingConnectionStatus(
+                get_field_name_str("chargerConnectionStatus", data)
+            )
+        except ValueError:
+            charger_connection_status = (
+                ChargingConnectionStatus.CHARGER_CONNECTION_STATUS_UNSPECIFIED
+            )
+
+        try:
+            charging_status = ChargingStatus(get_field_name_str("chargingStatus", data))
+        except ValueError:
+            charging_status = ChargingStatus.CHARGING_STATUS_UNSPECIFIED
+
         return cls(
             average_energy_consumption_kwh_per_100km=get_field_name_float(
                 "averageEnergyConsumptionKwhPer100Km", data
@@ -113,14 +127,10 @@ class CarBatteryData(CarBaseInformation):
             battery_charge_level_percentage=get_field_name_int(
                 "batteryChargeLevelPercentage", data
             ),
-            charger_connection_status=ChargingConnectionStatus[
-                str(get_field_name_str("chargerConnectionStatus", data))
-            ],
+            charger_connection_status=charger_connection_status,
             charging_current_amps=get_field_name_int("chargingCurrentAmps", data) or 0,
             charging_power_watts=get_field_name_int("chargingPowerWatts", data) or 0,
-            charging_status=ChargingStatus[
-                str(get_field_name_str("chargingStatus", data))
-            ],
+            charging_status=charging_status,
             estimated_charging_time_minutes_to_target_distance=get_field_name_int(
                 "estimatedChargingTimeMinutesToTargetDistance", data
             ),

@@ -25,6 +25,7 @@ from .graphql import (
     QUERY_GET_ODOMETER_DATA,
     get_gql_client,
 )
+from .models import CarBatteryData, CarInformationData, CarOdometerData
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -80,6 +81,66 @@ class PolestarApi:
     @property
     def vins(self) -> list[str]:
         return list(self.data_by_vin.keys())
+
+    def get_car_information(self, vin: str) -> CarInformationData | None:
+        """
+        Get car information for the specified VIN.
+
+        Args:
+            vin: The vehicle identification number
+        Returns:
+            CarInformationData if data exists, None otherwise
+        Raises:
+            KeyError: If the VIN doesn't exist
+            ValueError: If data conversion fails
+        """
+        if vin not in self.data_by_vin:
+            raise KeyError(f"No data found for VIN: {vin}")
+        if data := self.data_by_vin[vin].get(CAR_INFO_DATA, {}).get("data"):
+            try:
+                return CarInformationData.from_dict(data)
+            except Exception as exc:
+                raise ValueError("Failed to convert car information data") from exc
+
+    def get_car_battery(self, vin: str) -> CarBatteryData | None:
+        """
+        Get car battery information for the specified VIN.
+
+        Args:
+            vin: The vehicle identification number
+        Returns:
+            CarInformatiCarBatteryDataonData if data exists, None otherwise
+        Raises:
+            KeyError: If the VIN doesn't exist
+            ValueError: If data conversion fails
+        """
+        if vin not in self.data_by_vin:
+            raise KeyError(f"No data found for VIN: {vin}")
+        if data := self.data_by_vin[vin].get(BATTERY_DATA, {}).get("data"):
+            try:
+                return CarBatteryData.from_dict(data)
+            except Exception as exc:
+                raise ValueError("Failed to convert car battery data") from exc
+
+    def get_car_odometer(self, vin: str) -> CarOdometerData | None:
+        """
+        Get car odomoter information for the specified VIN.
+
+        Args:
+            vin: The vehicle identification number
+        Returns:
+            CarOdometerData if data exists, None otherwise
+        Raises:
+            KeyError: If the VIN doesn't exist
+            ValueError: If data conversion fails
+        """
+        if vin not in self.data_by_vin:
+            raise KeyError(f"No data found for VIN: {vin}")
+        if data := self.data_by_vin[vin].get(ODO_METER_DATA, {}).get("data"):
+            try:
+                return CarOdometerData.from_dict(data)
+            except Exception as exc:
+                raise ValueError("Failed to convert car odometer data") from exc
 
     def get_latest_data(self, vin: str, query: str, field_name: str) -> dict | None:
         """Get the latest data from the Polestar API."""

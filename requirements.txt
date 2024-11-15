@@ -3,3 +3,4 @@ homeassistant==2024.6.0
 pip>=21.3.1
 ruff==0.7.1
 gql[httpx]>=3.5.0
+pytest>=8.3.3

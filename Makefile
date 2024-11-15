@@ -11,4 +11,4 @@ reformat:
 	ruff format $(SOURCE)
 
 test:
-	PYTHONPATH=custom_components $(PYTEST) -vv
+	PYTHONPATH=$(SOURCE) $(PYTEST) -vv tests

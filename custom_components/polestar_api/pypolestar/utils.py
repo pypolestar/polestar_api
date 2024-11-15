@@ -2,7 +2,7 @@ from datetime import date, datetime
 
 GqlScalar = int | float | str | bool | None
 
-GqlDict = dict[str, type["GqlDict"] | GqlScalar]
+GqlDict = dict[str, "GqlDict" | GqlScalar]
 
 
 def get_field_name_value(field_name: str, data: GqlDict) -> GqlScalar | GqlDict:

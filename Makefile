@@ -1,5 +1,5 @@
 SOURCE=		custom_components
-
+PYTEST=		pytest
 
 all:
 
@@ -11,4 +11,4 @@ reformat:
 	ruff format $(SOURCE)
 
 test:
-	PYTHONPATH=custom_components pytest -vv
+	PYTHONPATH=custom_components $(PYTEST) -vv

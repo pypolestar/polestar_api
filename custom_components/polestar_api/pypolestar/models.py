@@ -51,6 +51,9 @@ class CarInformationData(CarBaseInformation):
 
     @classmethod
     def from_dict(cls, data: GqlDict) -> Self:
+        if not isinstance(data, dict):
+            raise TypeError
+
         return cls(
             vin=get_field_name_str("vin", data),
             internal_vehicle_identifier=get_field_name_str(
@@ -77,6 +80,9 @@ class CarOdometerData(CarBaseInformation):
 
     @classmethod
     def from_dict(cls, data: GqlDict) -> Self:
+        if not isinstance(data, dict):
+            raise TypeError
+
         return cls(
             average_speed_km_per_hour=get_field_name_float(
                 "averageSpeedKmPerHour", data
@@ -106,6 +112,9 @@ class CarBatteryData(CarBaseInformation):
 
     @classmethod
     def from_dict(cls, data: GqlDict) -> Self:
+        if not isinstance(data, dict):
+            raise TypeError
+
         try:
             charger_connection_status = ChargingConnectionStatus(
                 get_field_name_str("chargerConnectionStatus", data)

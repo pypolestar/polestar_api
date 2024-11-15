@@ -96,11 +96,16 @@ def get_field_name_date(field_name: str, data: GqlDict) -> date | None:
     Returns:
         date object if conversion successful, None otherwise
     """
-    if (value := get_field_name_value(field_name, data)) and isinstance(value, str):
-        try:
-            return date.fromisoformat(value)
-        except ValueError as exc:
-            raise ValueError(f"Invalid date format at '{field_name}': {value}") from exc
+    if value := get_field_name_value(field_name, data):
+        if isinstance(value, date):
+            return value
+        if isinstance(value, str):
+            try:
+                return date.fromisoformat(value)
+            except ValueError as exc:
+                raise ValueError(
+                    f"Invalid date format at '{field_name}': {value}"
+                ) from exc
 
 
 def get_field_name_datetime(field_name: str, data: GqlDict) -> datetime | None:
@@ -111,10 +116,13 @@ def get_field_name_datetime(field_name: str, data: GqlDict) -> datetime | None:
     Returns:
         datetime object if conversion successful, None otherwise
     """
-    if (value := get_field_name_value(field_name, data)) and isinstance(value, str):
-        try:
-            return datetime.fromisoformat(value)
-        except ValueError as exc:
-            raise ValueError(
-                f"Invalid datetime format at '{field_name}': {value}"
-            ) from exc
+    if value := get_field_name_value(field_name, data):
+        if isinstance(value, datetime):
+            return value
+        if isinstance(value, str):
+            try:
+                return datetime.fromisoformat(value)
+            except ValueError as exc:
+                raise ValueError(
+                    f"Invalid datetime format at '{field_name}': {value}"
+                ) from exc

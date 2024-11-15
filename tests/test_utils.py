@@ -59,6 +59,8 @@ def test_get_field_name_float():
         get_field_name_float("averageEnergyConsumptionKwhPer100Km", TESTDATA) == 42.01
     )
     assert get_field_name_float("registrationDate", TESTDATA) is None  # None handling
+    with pytest.raises(ValueError):  # Invalid date
+        get_field_name_float("vin", TESTDATA)
 
 
 def test_get_field_name_int():

@@ -2,7 +2,7 @@ from datetime import date, datetime
 
 GqlScalar = int | float | str | bool | None
 
-GqlDict = dict[str, "GqlDict" | GqlScalar]
+GqlDict = dict[str, type["GqlDict"] | GqlScalar]
 
 
 def get_field_name_value(field_name: str, data: GqlDict) -> GqlScalar | GqlDict:
@@ -18,7 +18,11 @@ def get_field_name_value(field_name: str, data: GqlDict) -> GqlScalar | GqlDict:
     Raises:
         KeyError: If the path doesn't exist or is invalid
     """
-    if field_name is None or data is None:
+
+    if field_name is None or not field_name.strip():
+        raise ValueError("Field name cannot be empty")
+
+    if data is None:
         return None
 
     result: GqlScalar | GqlDict = data
@@ -58,6 +62,11 @@ def get_field_name_float(field_name: str, data: GqlDict) -> float | None:
     """
     if (value := get_field_name_value(field_name, data)) and isinstance(value, float):
         return value
+    elif value is not None:
+        try:
+            return float(value)
+        except (ValueError, TypeError) as exc:
+            raise ValueError(f"Invalid float value at '{field_name}': {value}") from exc
 
 
 def get_field_name_int(field_name: str, data: GqlDict) -> int | None:
@@ -84,9 +93,7 @@ def get_field_name_date(field_name: str, data: GqlDict) -> date | None:
         try:
             return date.fromisoformat(value)
         except ValueError as exc:
-            raise ValueError(
-                f"Invalid datetime format at '{field_name}': {value}"
-            ) from exc
+            raise ValueError(f"Invalid date format at '{field_name}': {value}") from exc
 
 
 def get_field_name_datetime(field_name: str, data: GqlDict) -> datetime | None:

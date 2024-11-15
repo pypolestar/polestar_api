@@ -39,7 +39,7 @@ def get_field_name_value(field_name: str, data: GqlDict) -> GqlScalar | GqlDict:
 def get_field_name_str(field_name: str, data: GqlDict) -> str | None:
     """Extract a str value from the nested dictionary.
     Args:
-        field_name: Path to the date field
+        field_name: Path to the str field
         data: Nested dictionary containing the data
     Returns:
         str if successful, None otherwise
@@ -51,7 +51,7 @@ def get_field_name_str(field_name: str, data: GqlDict) -> str | None:
 def get_field_name_float(field_name: str, data: GqlDict) -> float | None:
     """Extract a float value from the nested dictionary.
     Args:
-        field_name: Path to the date field
+        field_name: Path to the float field
         data: Nested dictionary containing the data
     Returns:
         float if successful, None otherwise
@@ -63,7 +63,7 @@ def get_field_name_float(field_name: str, data: GqlDict) -> float | None:
 def get_field_name_int(field_name: str, data: GqlDict) -> int | None:
     """Extract a int value from the nested dictionary.
     Args:
-        field_name: Path to the date field
+        field_name: Path to the int field
         data: Nested dictionary containing the data
     Returns:
         int if successful, None otherwise

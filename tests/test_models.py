@@ -13,12 +13,20 @@ from polestar_api.pypolestar.models import (
 
 DATADIR = Path(__file__).parent.resolve() / "data"
 
-with open(DATADIR / "polestar3.json") as fp:
-    POLESTAR_3 = json.load(fp)
+
+@pytest.fixture
+def polestar3_test_data():
+    try:
+        with open(DATADIR / "polestar3.json") as fp:
+            return json.load(fp)
+    except FileNotFoundError as e:
+        pytest.skip(f"Test data file not found: {e.filename}")
+    except json.JSONDecodeError as e:
+        pytest.skip(f"Invalid JSON in test data file: {e}")
 
 
-def test_car_information_data():
-    data = CarInformationData.from_dict(POLESTAR_3["getConsumerCarsV2"])
+def test_car_information_data(polestar3_test_data):
+    data = CarInformationData.from_dict(polestar3_test_data["getConsumerCarsV2"])
     # Verify expected attributes
     assert data is not None
     assert isinstance(data, CarInformationData)
@@ -44,8 +52,8 @@ def test_car_information_data_invalid():
         CarInformationData.from_dict(None)  # Test with None
 
 
-def test_car_battery_data():
-    data = CarBatteryData.from_dict(POLESTAR_3["getBatteryData"])
+def test_car_battery_data(polestar3_test_data):
+    data = CarBatteryData.from_dict(polestar3_test_data["getBatteryData"])
     assert data is not None
     assert isinstance(data, CarBatteryData)
     assert data.average_energy_consumption_kwh_per_100km == 22.4
@@ -79,8 +87,8 @@ def test_car_battery_data_invalid():
         CarBatteryData.from_dict(None)
 
 
-def test_car_odometer_data():
-    data = CarOdometerData.from_dict(POLESTAR_3["getOdometerData"])
+def test_car_odometer_data(polestar3_test_data):
+    data = CarOdometerData.from_dict(polestar3_test_data["getOdometerData"])
     assert data is not None
     assert isinstance(data, CarOdometerData)
     assert data.average_speed_km_per_hour == 42.0

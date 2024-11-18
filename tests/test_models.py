@@ -3,7 +3,8 @@ from datetime import date, datetime, timezone
 from pathlib import Path
 
 import pytest
-from polestar_api.pypolestar.models import (
+
+from custom_components.polestar_api.pypolestar.models import (
     CarBatteryData,
     CarInformationData,
     CarOdometerData,

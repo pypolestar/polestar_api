@@ -292,8 +292,8 @@ class PolestarApi:
                 self.logger.debug("GraphQL TransportQueryError: %s", str(exc))
                 if (
                     exc.errors
-                    and len(exc.errors)
-                    and exc.errors[0]["extensions"]["code"] == "UNAUTHENTICATED"
+                    and exc.errors[0].get("extensions", {}).get("code")
+                    == "UNAUTHENTICATED"
                 ):
                     self.latest_call_code = 401
                     raise PolestarNotAuthorizedException(

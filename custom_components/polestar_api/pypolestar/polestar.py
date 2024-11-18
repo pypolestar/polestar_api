@@ -12,8 +12,7 @@ from graphql import DocumentNode
 
 from .auth import PolestarAuth
 from .const import (
-    BASE_URL,
-    BASE_URL_V2,
+    API_MYSTAR_V2_URL,
     BATTERY_DATA,
     CAR_INFO_DATA,
     HEALTH_DATA,
@@ -33,6 +32,7 @@ from .graphql import (
     QUERY_GET_ODOMETER_DATA,
     get_gql_client,
 )
+from .models import CarBatteryData, CarInformationData, CarOdometerData
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -54,16 +54,13 @@ class PolestarApi:
         self.auth = PolestarAuth(username, password, self.client_session, unique_id)
         self.updating = threading.Lock()
         self.latest_call_code = None
-        self.latest_call_code_2 = None
         self.next_update = None
         self.data_by_vin: dict[str, dict] = defaultdict(dict)
         self.next_update_delay = timedelta(seconds=5)
         self.configured_vins = set(vins) if vins else None
         self.logger = _LOGGER.getChild(unique_id) if unique_id else _LOGGER
-        self.gql_clients = {
-            BASE_URL: get_gql_client(url=BASE_URL, client=self.client_session),
-            BASE_URL_V2: get_gql_client(url=BASE_URL_V2, client=self.client_session),
-        }
+        self.api_url = API_MYSTAR_V2_URL
+        self.gql_client = get_gql_client(url=self.api_url, client=self.client_session)
 
     async def async_init(self, verbose: bool = False) -> None:
         """Initialize the Polestar API."""
@@ -91,6 +88,66 @@ class PolestarApi:
     @property
     def vins(self) -> list[str]:
         return list(self.data_by_vin.keys())
+
+    def get_car_information(self, vin: str) -> CarInformationData | None:
+        """
+        Get car information for the specified VIN.
+
+        Args:
+            vin: The vehicle identification number
+        Returns:
+            CarInformationData if data exists, None otherwise
+        Raises:
+            KeyError: If the VIN doesn't exist
+            ValueError: If data conversion fails
+        """
+        if vin not in self.data_by_vin:
+            raise KeyError(f"No data found for VIN: {vin}")
+        if data := self.data_by_vin[vin].get(CAR_INFO_DATA, {}).get("data"):
+            try:
+                return CarInformationData.from_dict(data)
+            except Exception as exc:
+                raise ValueError("Failed to convert car information data") from exc
+
+    def get_car_battery(self, vin: str) -> CarBatteryData | None:
+        """
+        Get car battery information for the specified VIN.
+
+        Args:
+            vin: The vehicle identification number
+        Returns:
+            CarInformatiCarBatteryDataonData if data exists, None otherwise
+        Raises:
+            KeyError: If the VIN doesn't exist
+            ValueError: If data conversion fails
+        """
+        if vin not in self.data_by_vin:
+            raise KeyError(f"No data found for VIN: {vin}")
+        if data := self.data_by_vin[vin].get(BATTERY_DATA, {}).get("data"):
+            try:
+                return CarBatteryData.from_dict(data)
+            except Exception as exc:
+                raise ValueError("Failed to convert car battery data") from exc
+
+    def get_car_odometer(self, vin: str) -> CarOdometerData | None:
+        """
+        Get car odomoter information for the specified VIN.
+
+        Args:
+            vin: The vehicle identification number
+        Returns:
+            CarOdometerData if data exists, None otherwise
+        Raises:
+            KeyError: If the VIN doesn't exist
+            ValueError: If data conversion fails
+        """
+        if vin not in self.data_by_vin:
+            raise KeyError(f"No data found for VIN: {vin}")
+        if data := self.data_by_vin[vin].get(ODO_METER_DATA, {}).get("data"):
+            try:
+                return CarOdometerData.from_dict(data)
+            except Exception as exc:
+                raise ValueError("Failed to convert car odometer data") from exc
 
     def get_latest_data(self, vin: str, query: str, field_name: str) -> dict | None:
         """Get the latest data from the Polestar API."""
@@ -134,7 +191,7 @@ class PolestarApi:
             if self.auth.need_token_refresh():
                 await self.auth.get_token(refresh=True)
         except PolestarAuthException as e:
-            self._set_latest_call_code(BASE_URL, 500)
+            self.latest_call_code = 500
             self.logger.warning("Auth Exception: %s", str(e))
             self.updating.release()
             return
@@ -145,7 +202,7 @@ class PolestarApi:
             except PolestarNotAuthorizedException:
                 await self.auth.get_token()
             except PolestarApiException as e:
-                self._set_latest_call_code(BASE_URL_V2, 500)
+                self.latest_call_code = 500
                 self.logger.warning("Failed to get %s data %s", func.__name__, str(e))
 
         try:
@@ -182,7 +239,6 @@ class PolestarApi:
         """Get the latest odometer data from the Polestar API."""
 
         result = await self._query_graph_ql(
-            url=BASE_URL_V2,
             query=QUERY_GET_ODOMETER_DATA,
             variable_values={"vin": vin},
         )
@@ -196,7 +252,6 @@ class PolestarApi:
 
     async def _get_battery_data(self, vin: str) -> None:
         result = await self._query_graph_ql(
-            url=BASE_URL_V2,
             query=QUERY_GET_BATTERY_DATA,
             variable_values={"vin": vin},
         )
@@ -211,7 +266,6 @@ class PolestarApi:
     async def _get_vehicle_data(self, verbose: bool = False) -> dict | None:
         """Get the latest vehicle data from the Polestar API."""
         result = await self._query_graph_ql(
-            url=BASE_URL_V2,
             query=QUERY_GET_CONSUMER_CARS_V2_VERBOSE
             if verbose
             else QUERY_GET_CONSUMER_CARS_V2,
@@ -227,7 +281,6 @@ class PolestarApi:
     async def _get_health_data(self, vin: str) -> None:
         """Get the latest health data from the Polestar API."""
         result = await self._query_graph_ql(
-            url=BASE_URL_V2,
             query=QUERY_GET_HEALTH_DATA,
             variable_values={"vin": vin},
         )
@@ -239,22 +292,15 @@ class PolestarApi:
 
         self.logger.debug("Received health data: %s", res)
 
-    def _set_latest_call_code(self, url: str, code: int) -> None:
-        if url == BASE_URL:
-            self.latest_call_code = code
-        else:
-            self.latest_call_code_2 = code
-
     async def _query_graph_ql(
         self,
-        url: str,
         query: DocumentNode,
         operation_name: str | None = None,
         variable_values: dict | None = None,
     ):
-        self.logger.debug("GraphQL URL: %s", url)
+        self.logger.debug("GraphQL URL: %s", self.api_url)
 
-        async with self.gql_clients[url] as client:
+        async with self.gql_client as client:
             try:
                 result = await client.execute(
                     query,
@@ -268,20 +314,20 @@ class PolestarApi:
                 self.logger.debug("GraphQL TransportQueryError: %s", str(exc))
                 if (
                     exc.errors
-                    and len(exc.errors)
-                    and exc.errors[0]["extensions"]["code"] == "UNAUTHENTICATED"
+                    and exc.errors[0].get("extensions", {}).get("code")
+                    == "UNAUTHENTICATED"
                 ):
-                    self._set_latest_call_code(url, 401)
+                    self.latest_call_code = 401
                     raise PolestarNotAuthorizedException(
                         exc.errors[0]["message"]
                     ) from exc
-                self._set_latest_call_code(url, 500)
+                self.latest_call_code = 500
                 raise PolestarApiException from exc
             except Exception as exc:
                 self.logger.debug("GraphQL Exception: %s", str(exc))
                 raise exc
 
         self.logger.debug("GraphQL Result: %s", result)
-        self._set_latest_call_code(url, 200)
+        self.latest_call_code = 200
 
         return result

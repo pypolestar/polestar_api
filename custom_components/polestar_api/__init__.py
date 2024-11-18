@@ -12,7 +12,7 @@ from .data import PolestarConfigEntry, PolestarData
 from .polestar import PolestarCar, PolestarCoordinator
 from .pypolestar.exception import PolestarApiException, PolestarAuthException
 
-PLATFORMS = [Platform.IMAGE, Platform.SENSOR]
+PLATFORMS = [Platform.IMAGE, Platform.SENSOR, Platform.BINARY_SENSOR]
 
 _LOGGER = logging.getLogger(__name__)
 

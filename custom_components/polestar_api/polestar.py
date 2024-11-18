@@ -34,6 +34,7 @@ class PolestarCar:
         )
         self.scan_interval = DEFAULT_SCAN_INTERVAL
         self.async_update = Throttle(min_time=self.scan_interval)(self.async_update)
+        self.data = {}
 
     def get_unique_id(self) -> str:
         """Return unique identifier"""
@@ -57,6 +58,11 @@ class PolestarCar:
         """Update data from Polestar."""
         try:
             await self.polestar_api.get_ev_data(self.vin)
+            self.data["api_connected"] = (
+                self.polestar_api.latest_call_code == 200
+                and self.polestar_api.auth.latest_call_code == 200
+                and self.polestar_api.auth.is_token_valid()
+            )
             return
         except PolestarApiException as e:
             _LOGGER.warning("API Exception on update data %s", str(e))
@@ -77,7 +83,7 @@ class PolestarCar:
         except Exception as e:
             _LOGGER.error("Unexpected Error on update data %s", str(e))
             self.polestar_api.next_update = datetime.now() + timedelta(seconds=60)
-        self.polestar_api.latest_call_code_v2 = 500
+        self.polestar_api.latest_call_code = 500
 
     def get_value(self, query: str, field_name: str):
         """Get the latest value from the Polestar API."""
@@ -97,27 +103,13 @@ class PolestarCar:
         """Get the token expiry time."""
         return self.polestar_api.auth.token_expiry
 
-    def get_latest_call_code_v1(self) -> int | None:
-        """Get the latest call code mystar API."""
+    def get_latest_call_code_data(self) -> int | None:
+        """Get the latest call code data API."""
         return self.polestar_api.latest_call_code
 
-    def get_latest_call_code_v2(self) -> int | None:
-        """Get the latest call code mystar-v2 API."""
-        return self.polestar_api.latest_call_code_2
-
     def get_latest_call_code_auth(self) -> int | None:
-        """Get the latest call code mystar API."""
+        """Get the latest call code auth API."""
         return self.polestar_api.auth.latest_call_code
-
-    def get_latest_call_code(self) -> int | None:
-        """Get the latest call code."""
-        # if AUTH code last code is not 200 then we return that error code,
-        # otherwise just give the call_code in API from v1 and then v2
-        if self.polestar_api.auth.latest_call_code != 200:
-            return self.polestar_api.auth.latest_call_code
-        if self.polestar_api.latest_call_code != 200:
-            return self.polestar_api.latest_call_code
-        return self.polestar_api.latest_call_code_2
 
 
 class PolestarCoordinator:
@@ -137,6 +129,7 @@ class PolestarCoordinator:
         else:
             _LOGGER.debug("Configure Polestar API client for all cars")
         self.unique_id = unique_id
+        self.username = username
         self.polestar_api = PolestarApi(
             username=username,
             password=password,

@@ -1,7 +1,8 @@
 from datetime import date, datetime
 
 import pytest
-from polestar_api.pypolestar.utils import (
+
+from custom_components.polestar_api.pypolestar.utils import (
     get_field_name_date,
     get_field_name_datetime,
     get_field_name_float,

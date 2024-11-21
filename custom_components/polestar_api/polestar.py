@@ -89,8 +89,9 @@ class PolestarCar:
 
         if data := self.polestar_api.get_car_battery(self.vin):
             if (
-                data.battery_charge_level_percentage
-                and data.estimated_distance_to_empty_km
+                data.battery_charge_level_percentage is not None
+                and data.battery_charge_level_percentage != 0
+                and data.estimated_distance_to_empty_km is not None
             ):
                 estimate_full_charge_range = round(
                     data.estimated_distance_to_empty_km

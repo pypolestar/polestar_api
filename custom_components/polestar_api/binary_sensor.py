@@ -1,6 +1,7 @@
 """Support for Polestar binary sensors."""
 
 import logging
+from typing import Final
 
 from homeassistant.components.binary_sensor import (
     BinarySensorDeviceClass,
@@ -19,7 +20,7 @@ from .polestar import PolestarCar
 _LOGGER = logging.getLogger(__name__)
 
 
-ENTITY_DESCRIPTIONS = (
+ENTITY_DESCRIPTIONS: Final[tuple[BinarySensorEntityDescription, ...]] = (
     BinarySensorEntityDescription(
         key="api_connected",
         name="API Connected",

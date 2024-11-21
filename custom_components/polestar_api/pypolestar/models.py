@@ -49,6 +49,7 @@ class CarInformationData(CarBaseInformation):
     battery: str | None
     torque: str | None
     software_version: str | None
+    software_version_timestamp: datetime | None
 
     @classmethod
     def from_dict(cls, data: GqlDict) -> Self:
@@ -68,6 +69,9 @@ class CarInformationData(CarBaseInformation):
             battery=get_field_name_str("content/specification/battery", data),
             torque=get_field_name_str("content/specification/torque", data),
             software_version=get_field_name_str("software/version", data),
+            software_version_timestamp=get_field_name_datetime(
+                "software/versionTimestamp", data
+            ),
             _received_timestamp=datetime.now(tz=timezone.utc),
         )
 

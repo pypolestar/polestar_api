@@ -58,12 +58,12 @@ class PolestarCar:
         """Update data with current car information"""
 
         if data := self.polestar_api.get_car_information(self.vin):
-            if match := re.search(r"(\d+) kWh", data.battery):
+            if data.battery and (match := re.search(r"(\d+) kWh", data.battery)):
                 battery_capacity = match.group(1)
             else:
                 battery_capacity = None
 
-            if match := re.search(r"(\d+) Nm", data.torque):
+            if data.torque and (match := re.search(r"(\d+) Nm", data.torque)):
                 torque = match.group(1)
             else:
                 torque = None

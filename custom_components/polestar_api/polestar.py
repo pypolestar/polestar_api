@@ -101,12 +101,15 @@ class PolestarCar:
             else:
                 estimate_full_charge_range = None
 
-            estimated_fully_charged_time = (
-                datetime.now().replace(second=0, microsecond=0)
-                + timedelta(minutes=round(data.estimated_charging_time_to_full_minutes))
-                if data.estimated_charging_time_to_full_minutes
-                else "Not charging"
-            )
+            if data.estimated_charging_time_to_full_minutes:
+                timestamp = datetime.now().replace(second=0, microsecond=0) + timedelta(
+                    minutes=data.estimated_charging_time_to_full_minutes
+                )
+                estimated_fully_charged_time = dt_util.as_local(timestamp).strftime(
+                    "%Y-%m-%d %H:%M:%S"
+                )
+            else:
+                estimated_fully_charged_time = "Not charging"
 
             self.data.update(
                 {

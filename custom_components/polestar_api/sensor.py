@@ -535,6 +535,8 @@ class PolestarSensor(PolestarEntity, SensorEntity):
                 self._attr_native_value = value
                 self._sensor_data = value
 
-        except Exception:
-            _LOGGER.warning("Failed to update sensor async update")
+        except Exception as exc:
+            _LOGGER.warning(
+                "Failed to update sensor async update: %s", exc, exc_info=exc
+            )
             self.car.polestar_api.next_update = datetime.now() + timedelta(seconds=60)

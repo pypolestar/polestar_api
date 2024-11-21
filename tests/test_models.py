@@ -92,7 +92,7 @@ def test_car_odometer_data(polestar3_test_data):
     data = CarOdometerData.from_dict(polestar3_test_data["getOdometerData"])
     assert data is not None
     assert isinstance(data, CarOdometerData)
-    assert data.average_speed_km_per_hour == 42.0
+    assert data.average_speed_km_per_hour == 42
     assert data.event_updated_timestamp.timestamp() == 1731338116
     assert data.trip_meter_automatic_km == 4.2
     assert data.trip_meter_manual_km == 1984.0

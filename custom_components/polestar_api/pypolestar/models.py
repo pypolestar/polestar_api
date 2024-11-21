@@ -78,7 +78,7 @@ class CarInformationData(CarBaseInformation):
 
 @dataclass(frozen=True)
 class CarOdometerData(CarBaseInformation):
-    average_speed_km_per_hour: float | None
+    average_speed_km_per_hour: int | None
     odometer_meters: int | None
     trip_meter_automatic_km: float | None
     trip_meter_manual_km: float | None
@@ -90,9 +90,7 @@ class CarOdometerData(CarBaseInformation):
             raise TypeError
 
         return cls(
-            average_speed_km_per_hour=get_field_name_float(
-                "averageSpeedKmPerHour", data
-            ),
+            average_speed_km_per_hour=get_field_name_int("averageSpeedKmPerHour", data),
             odometer_meters=get_field_name_int("odometerMeters", data),
             trip_meter_automatic_km=get_field_name_float("tripMeterAutomaticKm", data),
             trip_meter_manual_km=get_field_name_float("tripMeterManualKm", data),

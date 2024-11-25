@@ -1,5 +1,8 @@
+import backoff
 import httpx
-from gql import Client, gql
+from gql import gql
+from gql.client import AsyncClientSession, Client
+from gql.transport.exceptions import TransportQueryError
 from gql.transport.httpx import HTTPXAsyncTransport
 
 from .const import HTTPX_TIMEOUT
@@ -26,6 +29,21 @@ def get_gql_client(client: httpx.AsyncClient, url: str) -> Client:
         transport=transport,
         fetch_schema_from_transport=False,
         execute_timeout=HTTPX_TIMEOUT,
+    )
+
+
+async def get_gql_session(client: Client) -> AsyncClientSession:
+    retry_connect = backoff.on_exception(wait_gen=backoff.expo, exception=Exception)
+    retry_execute = backoff.on_exception(
+        wait_gen=backoff.expo,
+        exception=Exception,
+        max_tries=3,
+        giveup=lambda e: isinstance(e, TransportQueryError),
+    )
+    return await client.connect_async(
+        reconnecting=True,
+        retry_connect=retry_connect,
+        retry_execute=retry_execute,
     )
 
 

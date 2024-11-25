@@ -7,6 +7,7 @@ from collections import defaultdict
 from datetime import datetime, timedelta
 
 import httpx
+from gql.client import AsyncClientSession
 from gql.transport.exceptions import TransportQueryError
 from graphql import DocumentNode
 
@@ -24,6 +25,7 @@ from .graphql import (
     QUERY_GET_CONSUMER_CARS_V2_VERBOSE,
     QUERY_GET_ODOMETER_DATA,
     get_gql_client,
+    get_gql_session,
 )
 from .models import CarBatteryData, CarInformationData, CarOdometerData
 
@@ -54,15 +56,19 @@ class PolestarApi:
         self.logger = _LOGGER.getChild(unique_id) if unique_id else _LOGGER
         self.api_url = API_MYSTAR_V2_URL
         self.gql_client = get_gql_client(url=self.api_url, client=self.client_session)
+        self.gql_session: AsyncClientSession | None = None
 
     async def async_init(self, verbose: bool = False) -> None:
         """Initialize the Polestar API."""
+
         await self.auth.async_init()
         await self.auth.get_token()
 
         if self.auth.access_token is None:
             self.logger.warning("No access token %s", self.username)
             return
+
+        self.gql_session = await get_gql_session(self.gql_client)
 
         if not (car_data := await self._get_vehicle_data(verbose=verbose)):
             self.logger.warning("No cars found for %s", self.username)
@@ -276,34 +282,33 @@ class PolestarApi:
         operation_name: str | None = None,
         variable_values: dict | None = None,
     ):
+        if self.gql_session is None:
+            raise RuntimeError("GraphQL not connected")
+
         self.logger.debug("GraphQL URL: %s", self.api_url)
 
-        async with self.gql_client as client:
-            try:
-                result = await client.execute(
-                    query,
-                    operation_name=operation_name,
-                    variable_values=variable_values,
-                    extra_args={
-                        "headers": {"Authorization": f"Bearer {self.auth.access_token}"}
-                    },
-                )
-            except TransportQueryError as exc:
-                self.logger.debug("GraphQL TransportQueryError: %s", str(exc))
-                if (
-                    exc.errors
-                    and exc.errors[0].get("extensions", {}).get("code")
-                    == "UNAUTHENTICATED"
-                ):
-                    self.latest_call_code = 401
-                    raise PolestarNotAuthorizedException(
-                        exc.errors[0]["message"]
-                    ) from exc
-                self.latest_call_code = 500
-                raise PolestarApiException from exc
-            except Exception as exc:
-                self.logger.debug("GraphQL Exception: %s", str(exc))
-                raise exc
+        try:
+            result = await self.gql_session.execute(
+                query,
+                operation_name=operation_name,
+                variable_values=variable_values,
+                extra_args={
+                    "headers": {"Authorization": f"Bearer {self.auth.access_token}"}
+                },
+            )
+        except TransportQueryError as exc:
+            self.logger.debug("GraphQL TransportQueryError: %s", str(exc))
+            if (
+                exc.errors
+                and exc.errors[0].get("extensions", {}).get("code") == "UNAUTHENTICATED"
+            ):
+                self.latest_call_code = 401
+                raise PolestarNotAuthorizedException(exc.errors[0]["message"]) from exc
+            self.latest_call_code = 500
+            raise PolestarApiException from exc
+        except Exception as exc:
+            self.logger.debug("GraphQL Exception: %s", str(exc))
+            raise exc
 
         self.logger.debug("GraphQL Result: %s", result)
         self.latest_call_code = 200

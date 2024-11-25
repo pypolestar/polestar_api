@@ -33,7 +33,11 @@ def get_gql_client(client: httpx.AsyncClient, url: str) -> Client:
 
 
 async def get_gql_session(client: Client) -> AsyncClientSession:
-    retry_connect = backoff.on_exception(wait_gen=backoff.expo, exception=Exception)
+    retry_connect = backoff.on_exception(
+        wait_gen=backoff.expo,
+        exception=Exception,
+        max_tries=5,
+    )
     retry_execute = backoff.on_exception(
         wait_gen=backoff.expo,
         exception=Exception,

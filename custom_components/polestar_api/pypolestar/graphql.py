@@ -2,7 +2,7 @@ import backoff
 import httpx
 from gql import gql
 from gql.client import AsyncClientSession, Client
-from gql.transport.exceptions import TransportQueryError
+from gql.transport.exceptions import TransportError, TransportQueryError
 from gql.transport.httpx import HTTPXAsyncTransport
 
 from .const import GRAPHQL_CONNECT_RETRIES, GRAPHQL_EXECUTE_RETRIES, HTTPX_TIMEOUT
@@ -37,12 +37,12 @@ async def get_gql_session(client: Client) -> AsyncClientSession:
     """Get GraphQL Session with automatic retries"""
     retry_connect = backoff.on_exception(
         wait_gen=backoff.expo,
-        exception=Exception,
+        exception=(TransportError, httpx.TransportError),
         max_tries=GRAPHQL_CONNECT_RETRIES,
     )
     retry_execute = backoff.on_exception(
         wait_gen=backoff.expo,
-        exception=Exception,
+        exception=(TransportError,),
         max_tries=GRAPHQL_EXECUTE_RETRIES,
         giveup=lambda e: isinstance(e, TransportQueryError),
     )

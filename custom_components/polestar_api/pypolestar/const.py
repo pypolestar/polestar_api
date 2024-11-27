@@ -7,6 +7,9 @@ BATTERY_DATA = "getBatteryData"
 HTTPX_TIMEOUT = 30
 TOKEN_REFRESH_WINDOW_MIN = 300
 
+GRAPHQL_CONNECT_RETRIES = 5
+GRAPHQL_EXECUTE_RETRIES = 3
+
 OIDC_PROVIDER_BASE_URL = "https://polestarid.eu.polestar.com"
 OIDC_REDIRECT_URI = "https://www.polestar.com/sign-in-callback"
 OIDC_CLIENT_ID = "l3oopkc_10"

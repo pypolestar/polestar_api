@@ -235,7 +235,7 @@ QUERY_GET_ODOMETER_DATA = gql(
     query GetOdometerData($vin:String!) {
         getOdometerData(vin:$vin) {
             averageSpeedKmPerHour
-            eventUpdatedTimestamp { iso unix }
+            eventUpdatedTimestamp { iso }
             odometerMeters
             tripMeterAutomaticKm
             tripMeterManualKm
@@ -258,7 +258,23 @@ QUERY_GET_BATTERY_DATA = gql(
             estimatedChargingTimeToFullMinutes
             estimatedDistanceToEmptyKm
             estimatedDistanceToEmptyMiles
-            eventUpdatedTimestamp { iso unix }
+            eventUpdatedTimestamp { iso }
+        }
+    }
+    """
+)
+
+QUERY_GET_HEALTH_DATA = gql(
+    """
+    query GetHealthData($vin: String!) {
+        getHealthData(vin: $vin) {
+            brakeFluidLevelWarning
+            daysToService
+            distanceToServiceKm
+            engineCoolantLevelWarning
+            eventUpdatedTimestamp { iso }
+            oilLevelWarning
+            serviceWarning
         }
     }
     """

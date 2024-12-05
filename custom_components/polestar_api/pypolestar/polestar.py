@@ -12,7 +12,13 @@ from gql.transport.exceptions import TransportQueryError
 from graphql import DocumentNode
 
 from .auth import PolestarAuth
-from .const import API_MYSTAR_V2_URL, BATTERY_DATA, CAR_INFO_DATA, ODO_METER_DATA
+from .const import (
+    API_MYSTAR_V2_URL,
+    BATTERY_DATA,
+    CAR_INFO_DATA,
+    HEALTH_DATA,
+    ODO_METER_DATA,
+)
 from .exception import (
     PolestarApiException,
     PolestarAuthException,
@@ -23,6 +29,7 @@ from .graphql import (
     QUERY_GET_BATTERY_DATA,
     QUERY_GET_CONSUMER_CARS_V2,
     QUERY_GET_CONSUMER_CARS_V2_VERBOSE,
+    QUERY_GET_HEALTH_DATA,
     QUERY_GET_ODOMETER_DATA,
     get_gql_client,
     get_gql_session,
@@ -207,6 +214,7 @@ class PolestarApi:
         try:
             await call_api(lambda: self._get_odometer_data(vin))
             await call_api(lambda: self._get_battery_data(vin))
+            await call_api(lambda: self._get_health_data(vin))
             self.next_update = datetime.now() + self.next_update_delay
         finally:
             self.updating.release()
@@ -275,6 +283,20 @@ class PolestarApi:
             raise PolestarNoDataException("No cars found in account")
 
         return result[CAR_INFO_DATA]
+
+    async def _get_health_data(self, vin: str) -> None:
+        """Get the latest health data from the Polestar API."""
+        result = await self._query_graph_ql(
+            query=QUERY_GET_HEALTH_DATA,
+            variable_values={"vin": vin},
+        )
+
+        res = self.data_by_vin[vin][HEALTH_DATA] = {
+            "data": result[HEALTH_DATA],
+            "timestamp": datetime.now(),
+        }
+
+        self.logger.debug("Received health data: %s", res)
 
     async def _query_graph_ql(
         self,

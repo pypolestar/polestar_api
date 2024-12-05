@@ -3,6 +3,7 @@
 CAR_INFO_DATA = "getConsumerCarsV2"
 ODO_METER_DATA = "getOdometerData"
 BATTERY_DATA = "getBatteryData"
+HEALTH_DATA = "getHealthData"
 
 HTTPX_TIMEOUT = 30
 TOKEN_REFRESH_WINDOW_MIN = 300

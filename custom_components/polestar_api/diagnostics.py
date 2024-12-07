@@ -24,7 +24,7 @@ async def async_get_config_entry_diagnostics(
 
     return {
         "config_entry_data": async_redact_data(dict(entry.data), TO_REDACT),
-        "cars": [{"vin": car.vin, "model": car.model} for car in cars],
+        "cars": [{"vin": car.vin, "name": car.name, "data": car.data} for car in cars],
         "auth_api": {
             "oidc_provider": api.auth.oidc_provider,
             "access_token_valid": api.auth.is_token_valid(),

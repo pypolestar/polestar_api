@@ -49,6 +49,7 @@ class CarInformationData(CarBaseInformation):
     battery: str | None
     torque: str | None
     software_version: str | None
+    software_version_timestamp: datetime | None
 
     @classmethod
     def from_dict(cls, data: GqlDict) -> Self:
@@ -68,13 +69,16 @@ class CarInformationData(CarBaseInformation):
             battery=get_field_name_str("content/specification/battery", data),
             torque=get_field_name_str("content/specification/torque", data),
             software_version=get_field_name_str("software/version", data),
+            software_version_timestamp=get_field_name_datetime(
+                "software/versionTimestamp", data
+            ),
             _received_timestamp=datetime.now(tz=timezone.utc),
         )
 
 
 @dataclass(frozen=True)
 class CarOdometerData(CarBaseInformation):
-    average_speed_km_per_hour: float | None
+    average_speed_km_per_hour: int | None
     odometer_meters: int | None
     trip_meter_automatic_km: float | None
     trip_meter_manual_km: float | None
@@ -86,9 +90,7 @@ class CarOdometerData(CarBaseInformation):
             raise TypeError
 
         return cls(
-            average_speed_km_per_hour=get_field_name_float(
-                "averageSpeedKmPerHour", data
-            ),
+            average_speed_km_per_hour=get_field_name_int("averageSpeedKmPerHour", data),
             odometer_meters=get_field_name_int("odometerMeters", data),
             trip_meter_automatic_km=get_field_name_float("tripMeterAutomaticKm", data),
             trip_meter_manual_km=get_field_name_float("tripMeterManualKm", data),

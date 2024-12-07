@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import logging
-from dataclasses import dataclass
 from typing import Final
 
 import homeassistant.util.dt as dt_util
@@ -19,25 +18,10 @@ from .polestar import PolestarCar
 _LOGGER = logging.getLogger(__name__)
 
 
-@dataclass
-class PolestarImageDescriptionMixin:
-    """A mixin class for image entities."""
-
-    query: str
-    field_name: str
-
-
-@dataclass
-class PolestarImageDescription(ImageEntityDescription, PolestarImageDescriptionMixin):
-    """A class that describes image entities."""
-
-
-POLESTAR_IMAGE_TYPES: Final[tuple[PolestarImageDescription, ...]] = (
-    PolestarImageDescription(
+ENTITY_DESCRIPTIONS: Final[tuple[ImageEntityDescription, ...]] = (
+    ImageEntityDescription(
         key="car_image",
         name="Car Image",
-        query="getConsumerCarsV2",
-        field_name="content/images/studio/url",
         entity_registry_enabled_default=False,
     ),
 )
@@ -53,7 +37,7 @@ async def async_setup_entry(
     async_add_entities(
         [
             PolestarImage(car, entity_description, hass)
-            for entity_description in POLESTAR_IMAGE_TYPES
+            for entity_description in ENTITY_DESCRIPTIONS
             for car in entry.runtime_data.cars
         ]
     )
@@ -62,13 +46,13 @@ async def async_setup_entry(
 class PolestarImage(PolestarEntity, ImageEntity):
     """Representation of a Polestar image."""
 
-    entity_description: PolestarImageDescription
+    entity_description: ImageEntityDescription
     _attr_has_entity_name = True
 
     def __init__(
         self,
         car: PolestarCar,
-        entity_description: PolestarImageDescription,
+        entity_description: ImageEntityDescription,
         hass: HomeAssistant,
     ) -> None:
         """Initialize the Polestar image."""
@@ -83,10 +67,7 @@ class PolestarImage(PolestarEntity, ImageEntity):
         self._attr_translation_key = f"polestar_{entity_description.key}"
 
     async def async_update_image_url(self) -> None:
-        value = self.car.get_value(
-            query=self.entity_description.query,
-            field_name=self.entity_description.field_name,
-        )
+        value = self.car.data.get(self.entity_description.key)
         if value is None:
             _LOGGER.debug("No image URL found")
         elif isinstance(value, str) and value != self._attr_image_url:

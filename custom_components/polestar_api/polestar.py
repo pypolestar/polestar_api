@@ -133,15 +133,10 @@ class PolestarCar:
         """Update data with current car odometer readings"""
 
         if data := self.polestar_api.get_car_odometer(self.vin):
-            average_speed_km_per_hour = (
-                round(data.average_speed_km_per_hour)
-                if data.average_speed_km_per_hour
-                else None
-            )
             self.data.update(
                 {
                     "current_odometer": data.odometer_meters,
-                    "average_speed": average_speed_km_per_hour,
+                    "average_speed": data.average_speed_km_per_hour,
                     "current_trip_meter_automatic": data.trip_meter_automatic_km,
                     "current_trip_meter_manual": data.trip_meter_manual_km,
                     "last_updated_odometer_data": data.event_updated_timestamp,

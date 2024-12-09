@@ -1,21 +1,27 @@
+import base64
+import hashlib
 import logging
+import os
 from datetime import datetime, timedelta, timezone
 from urllib.parse import urljoin
 
 import httpx
 
 from .const import (
-    API_AUTH_URL,
     HTTPX_TIMEOUT,
     OIDC_CLIENT_ID,
     OIDC_PROVIDER_BASE_URL,
     OIDC_REDIRECT_URI,
+    OIDC_SCOPE,
     TOKEN_REFRESH_WINDOW_MIN,
 )
 from .exception import PolestarAuthException
-from .graphql import QUERY_GET_AUTH_TOKEN, QUERY_REFRESH_AUTH_TOKEN, get_gql_client
 
 _LOGGER = logging.getLogger(__name__)
+
+
+def b64urlencode(data: bytes) -> str:
+    return base64.urlsafe_b64encode(data).decode().rstrip("=")
 
 
 class PolestarAuth:
@@ -41,8 +47,8 @@ class PolestarAuth:
         self.latest_call_code = None
         self.logger = _LOGGER.getChild(unique_id) if unique_id else _LOGGER
         self.oidc_provider = OIDC_PROVIDER_BASE_URL
-        self.api_url = API_AUTH_URL
-        self.gql_client = get_gql_client(url=API_AUTH_URL, client=self.client_session)
+        self.code_verifier: str | None = None
+        self.state: str | None = None
 
     async def async_init(self) -> None:
         await self.update_oidc_configuration()
@@ -76,7 +82,7 @@ class PolestarAuth:
 
     async def get_token(self, refresh=False) -> None:
         """Get the token from Polestar."""
-        # can't use refresh if the token is expired or not set even if refresh is True
+
         if (
             not refresh
             or self.token_expiry is None
@@ -85,46 +91,59 @@ class PolestarAuth:
             if (code := await self._get_code()) is None:
                 return
 
-            access_token = None
-            operation_name = "getAuthToken"
-            query = QUERY_GET_AUTH_TOKEN
-            variable_values = {"code": code}
-        elif self.refresh_token is None:
-            return
+            token_request = {
+                "grant_type": "authorization_code",
+                "client_id": OIDC_CLIENT_ID,
+                "code": code,
+                "redirect_uri": OIDC_REDIRECT_URI,
+                **(
+                    {
+                        "code_verifier": self.code_verifier,
+                    }
+                    if self.code_verifier
+                    else {}
+                ),
+            }
+
+        elif self.refresh_token:
+            token_request = {
+                "grant_type": "refresh_token",
+                "client_id": OIDC_CLIENT_ID,
+                "refresh_token": self.refresh_token,
+            }
         else:
-            access_token = self.access_token
-            operation_name = "refreshAuthToken"
-            query = QUERY_REFRESH_AUTH_TOKEN
-            variable_values = {"token": self.refresh_token}
+            return
+
+        self.logger.debug(
+            "Call token endpoint with grant_type=%s", token_request["grant_type"]
+        )
 
         try:
-            async with self.gql_client as client:
-                result = await client.execute(
-                    query,
-                    variable_values=variable_values,
-                    extra_args={
-                        **(
-                            {"headers": {"Authorization": f"Bearer {access_token}"}}
-                            if access_token
-                            else {}
-                        )
-                    },
-                )
-            self.logger.debug("Auth Token Result: %s", result)
-
-            if data := result.get(operation_name):
-                self.access_token = data["access_token"]
-                self.id_token = data["id_token"]
-                self.refresh_token = data["refresh_token"]
-                self.token_lifetime = data["expires_in"]
-                self.token_expiry = datetime.now(tz=timezone.utc) + timedelta(
-                    seconds=self.token_lifetime
-                )
-                self.latest_call_code = 200
+            result = await self.client_session.post(
+                self.oidc_configuration["token_endpoint"],
+                data=token_request,
+                timeout=HTTPX_TIMEOUT,
+            )
         except Exception as exc:
             self.latest_call_code = None
             self.logger.error("Auth Token Error: %s", str(exc))
             raise PolestarAuthException("Error getting token") from exc
+
+        payload = result.json()
+        self.latest_call_code = result.status_code
+
+        try:
+            self.access_token = payload["access_token"]
+            self.refresh_token = payload["refresh_token"]
+            self.token_lifetime = payload["expires_in"]
+            self.token_expiry = datetime.now(tz=timezone.utc) + timedelta(
+                seconds=self.token_lifetime
+            )
+        except KeyError as exc:
+            self.logger.error("Token response missing expected keys: %s", exc)
+            raise PolestarAuthException("Incomplete token response") from exc
+
+        self.logger.debug("Access token updated, valid until %s", self.token_expiry)
 
     async def _get_code(self) -> None:
         query_params = await self._get_resume_path()
@@ -133,11 +152,9 @@ class PolestarAuth:
         if query_params.get("code"):
             return query_params.get("code")
 
-        # get the resumePath
-        if query_params.get("resumePath"):
-            resumePath = query_params.get("resumePath")
-
-        if resumePath is None:
+        # get the resume path
+        if not (resume_path := query_params.get("resumePath")):
+            self.logger.warning("Missing resumePath in authorization response")
             return
 
         params = {"client_id": OIDC_CLIENT_ID}
@@ -145,7 +162,7 @@ class PolestarAuth:
         result = await self.client_session.post(
             urljoin(
                 OIDC_PROVIDER_BASE_URL,
-                f"/as/{resumePath}/resume/as/authorization.ping",
+                f"/as/{resume_path}/resume/as/authorization.ping",
             ),
             params=params,
             data=data,
@@ -164,12 +181,14 @@ class PolestarAuth:
             self.logger.debug(
                 "Code missing; submit confirmation for uid=%s and retry", uid
             )
+            params = {"client_id": OIDC_CLIENT_ID}
             data = {"pf.submit": True, "subject": uid}
             result = await self.client_session.post(
                 urljoin(
                     OIDC_PROVIDER_BASE_URL,
-                    f"/as/{resumePath}/resume/as/authorization.ping",
+                    f"/as/{resume_path}/resume/as/authorization.ping",
                 ),
+                params=params,
                 data=data,
             )
             url = result.url
@@ -193,11 +212,19 @@ class PolestarAuth:
 
     async def _get_resume_path(self):
         """Get Resume Path from Polestar."""
+
+        self.state = self.get_state()
+
         params = {
             "response_type": "code",
             "client_id": OIDC_CLIENT_ID,
             "redirect_uri": OIDC_REDIRECT_URI,
+            "state": self.state,
+            "code_challenge_method": "S256",
+            "code_challenge": self.get_code_challenge(),
+            "scope": OIDC_SCOPE,
         }
+
         result = await self.client_session.get(
             self.oidc_configuration["authorization_endpoint"],
             params=params,
@@ -210,3 +237,17 @@ class PolestarAuth:
 
         self.logger.error("Error: %s", result.text)
         raise PolestarAuthException("Error getting resume path ", result.status_code)
+
+    @staticmethod
+    def get_state() -> str:
+        return b64urlencode(os.urandom(32))
+
+    @staticmethod
+    def get_code_verifier() -> str:
+        return b64urlencode(os.urandom(32))
+
+    def get_code_challenge(self) -> str:
+        self.code_verifier = self.get_code_verifier()
+        m = hashlib.sha256()
+        m.update(self.code_verifier.encode())
+        return b64urlencode(m.digest())

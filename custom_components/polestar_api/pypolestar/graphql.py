@@ -53,26 +53,6 @@ async def get_gql_session(client: Client) -> AsyncClientSession:
     )
 
 
-QUERY_GET_AUTH_TOKEN = gql(
-    """
-    query getAuthToken($code: String!) {
-        getAuthToken(code: $code) {
-            id_token access_token refresh_token expires_in
-        }
-    }
-    """
-)
-
-QUERY_REFRESH_AUTH_TOKEN = gql(
-    """
-    query refreshAuthToken($token: String!) {
-        refreshAuthToken(token: $token) {
-            id_token access_token refresh_token expires_in
-        }
-    }
-    """
-)
-
 QUERY_GET_CONSUMER_CARS_V2 = gql(
     """
     query GetConsumerCarsV2 {

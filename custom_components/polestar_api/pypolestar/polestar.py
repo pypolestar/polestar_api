@@ -65,7 +65,7 @@ class PolestarApi:
         await self.auth.get_token()
 
         if self.auth.access_token is None:
-            self.logger.warning("No access token %s", self.username)
+            self.logger.warning("No access token for %s", self.username)
             return
 
         self.gql_session = await get_gql_session(self.gql_client)

@@ -3,7 +3,7 @@
 from homeassistant.components import system_health
 from homeassistant.core import HomeAssistant, callback
 
-from .pypolestar.const import API_AUTH_URL, API_MYSTAR_V2_URL
+from .pypolestar.const import API_MYSTAR_V2_URL, OIDC_PROVIDER_BASE_URL
 
 
 @callback
@@ -17,6 +17,8 @@ def async_register(
 async def system_health_info(hass):
     """Get info for the info page."""
     return {
-        "Auth API": system_health.async_check_can_reach_url(hass, API_AUTH_URL),
+        "OpenID Connect Provider": system_health.async_check_can_reach_url(
+            hass, OIDC_PROVIDER_BASE_URL
+        ),
         "Data API": system_health.async_check_can_reach_url(hass, API_MYSTAR_V2_URL),
     }

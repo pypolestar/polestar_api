@@ -1,19 +1,26 @@
 """Config flow for the Polestar EV platform."""
 
-import asyncio
 import logging
 
 import voluptuous as vol
-from aiohttp import ClientError
 from homeassistant import config_entries
 from homeassistant.config_entries import ConfigFlowResult
 from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
+from homeassistant.helpers.httpx_client import get_async_client
 
 from .const import CONF_VIN, DOMAIN
-from .polestar import PolestarCoordinator
-from .pypolestar.exception import PolestarAuthException
+from .pypolestar.exception import PolestarApiException, PolestarAuthException
+from .pypolestar.polestar import PolestarApi
 
 _LOGGER = logging.getLogger(__name__)
+
+
+class NoCarsFoundException(Exception):
+    pass
+
+
+class VinNotFoundException(Exception):
+    pass
 
 
 @config_entries.HANDLERS.register(DOMAIN)
@@ -23,76 +30,73 @@ class FlowHandler(config_entries.ConfigFlow):
     VERSION = 1
     CONNECTION_CLASS = config_entries.CONN_CLASS_LOCAL_POLL
 
-    async def _create_entry(
-        self, username: str, password: str, vin: str | None
-    ) -> ConfigFlowResult:
-        """Register new entry."""
-        return self.async_create_entry(
-            title=f"Polestar EV for {username}",
-            data={CONF_USERNAME: username, CONF_PASSWORD: password, CONF_VIN: vin},
-        )
-
-    async def _create_device(
-        self, username: str, password: str, vin: str | None
-    ) -> ConfigFlowResult:
-        """Create device."""
-
-        try:
-            device = PolestarCoordinator(
-                hass=self.hass,
-                username=username,
-                password=password,
-                vin=vin,
-            )
-            await device.async_init()
-
-            # check that we found cars
-            if not len(device.get_cars()):
-                return self.async_abort(reason="No cars found")
-
-            # check if we have a token, otherwise throw exception
-            if device.polestar_api.auth.access_token is None:
-                _LOGGER.exception(
-                    "No token, Could be wrong credentials (invalid email or password))"
-                )
-                return self.async_abort(reason="No API token")
-
-        except asyncio.TimeoutError:
-            return self.async_abort(reason="API timeout")
-        except ClientError:
-            _LOGGER.exception("ClientError")
-            return self.async_abort(reason="API client failure")
-        except PolestarAuthException:
-            return self.async_abort(reason="Login failed")
-        except Exception:  # pylint: disable=broad-except
-            _LOGGER.exception("Unexpected error creating device")
-            return self.async_abort(reason="API unexpected failure")
-
-        return await self._create_entry(username, password, vin)
-
     async def async_step_user(self, user_input: dict | None = None) -> ConfigFlowResult:
         """User initiated config flow."""
-        if user_input is None:
-            return self.async_show_form(
-                step_id="user",
-                data_schema=vol.Schema(
-                    {
-                        vol.Required(CONF_USERNAME): str,
-                        vol.Required(CONF_PASSWORD): str,
-                        vol.Optional(CONF_VIN): str,
-                    }
-                ),
-            )
-        return await self._create_device(
-            username=user_input[CONF_USERNAME],
-            password=user_input[CONF_PASSWORD],
-            vin=user_input.get(CONF_VIN),
+        _errors = {}
+
+        if user_input is not None:
+            username = user_input[CONF_USERNAME]
+            password = user_input[CONF_PASSWORD]
+            vin = user_input.get(CONF_VIN)
+
+            try:
+                await self._test_credentials(username, password, vin)
+            except NoCarsFoundException as exc:
+                _LOGGER.error(exc)
+                _errors["base"] = "no_cars_found"
+            except VinNotFoundException as exc:
+                _LOGGER.error(exc)
+                _errors["base"] = "vin_not_found"
+            except PolestarAuthException as exc:
+                _LOGGER.warning(exc)
+                _errors["base"] = "auth_failed"
+            except PolestarApiException as exc:
+                _LOGGER.error(exc)
+                _errors["base"] = "api"
+            except Exception as exc:
+                _LOGGER.error(exc)
+                _errors["base"] = "unknown"
+            else:
+                return self.async_create_entry(
+                    title=f"Polestar EV for {username}",
+                    data={
+                        CONF_USERNAME: username,
+                        CONF_PASSWORD: password,
+                        CONF_VIN: vin,
+                    },
+                )
+
+        return self.async_show_form(
+            step_id="user",
+            data_schema=vol.Schema(
+                {
+                    vol.Required(CONF_USERNAME): str,
+                    vol.Required(CONF_PASSWORD): str,
+                    vol.Optional(CONF_VIN): str,
+                }
+            ),
+            errors=_errors,
         )
 
-    async def async_step_import(self, user_input: dict) -> ConfigFlowResult:
-        """Import a config entry."""
-        return await self._create_device(
-            username=user_input[CONF_USERNAME],
-            password=user_input[CONF_PASSWORD],
-            vin=user_input.get(CONF_VIN),
+    async def _test_credentials(
+        self, username: str, password: str, vin: str | None
+    ) -> None:
+        """Validate credentials and return VINs of found cars."""
+
+        api_client = PolestarApi(
+            username=username,
+            password=password,
+            client_session=get_async_client(self.hass),
         )
+        await api_client.async_init()
+
+        found_vins = api_client.vins
+        _LOGGER.debug("Found %d cars for %s", len(found_vins), username)
+
+        if not found_vins:
+            _LOGGER.warning("No cars found for %s", username)
+            raise NoCarsFoundException
+
+        if vin and vin not in found_vins:
+            _LOGGER.warning("VIN %s not found for %s", vin, username)
+            raise VinNotFoundException

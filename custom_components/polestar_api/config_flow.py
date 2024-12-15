@@ -53,9 +53,6 @@ class FlowHandler(config_entries.ConfigFlow):
             except PolestarApiException as exc:
                 _LOGGER.error(exc)
                 _errors["base"] = "api"
-            except Exception as exc:
-                _LOGGER.error(exc)
-                _errors["base"] = "unknown"
             else:
                 return self.async_create_entry(
                     title=f"Polestar EV for {username}",

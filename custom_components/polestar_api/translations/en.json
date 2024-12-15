@@ -19,10 +19,9 @@
     },
     "error": {
       "auth_failed": "Invalid username/password.",
-      "no_cars_found": "No cars found for Polestar ID.",
-      "vin_not_found": "Specified VIN not found for Polestar ID.",
-      "api": "Error connecting to Polestar API.",
-      "unknown": "Unknown error occurred."
+      "no_cars_found": "No cars found for your Polestar ID.",
+      "vin_not_found": "Specified VIN not found for your Polestar ID.",
+      "api": "Error connecting to Polestar API."
     }
   },
   "entity": {

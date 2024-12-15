@@ -145,12 +145,12 @@ class PolestarAuth:
 
         self.logger.debug("Access token updated, valid until %s", self.token_expiry)
 
-    async def _get_code(self) -> None:
+    async def _get_code(self) -> str | None:
         query_params = await self._get_resume_path()
 
         # check if code is in query_params
-        if query_params.get("code"):
-            return query_params.get("code")
+        if code := query_params.get("code"):
+            return code
 
         # get the resume path
         if not (resume_path := query_params.get("resumePath")):

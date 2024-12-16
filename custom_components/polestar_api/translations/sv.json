@@ -17,6 +17,12 @@
       "api_failed": "Oväntat fel vid skapande av API.",
       "already_configured": "Polestar API är redan konfigurerat",
       "no_token": "Ingen token hittades i svaret. Vänligen kontrollera dina uppgifter."
+    },
+    "error": {
+      "auth_failed": "Felaktigt användarnamn/lösenord.",
+      "no_cars_found": "Inga fordon hittades för ditt Polestar ID.",
+      "vin_not_found": "Specificerad VIN hittades inte för ditt Polestar ID.",
+      "api": "Fel vid anslutning till Polestar API."
     }
   },
   "entity": {

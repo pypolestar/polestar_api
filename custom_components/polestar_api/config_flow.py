@@ -87,7 +87,7 @@ class FlowHandler(config_entries.ConfigFlow):
         )
         await api_client.async_init()
 
-        if found_vins := api_client.vins:
+        if found_vins := api_client.get_available_vins():
             _LOGGER.debug("Found %d VINs for %s", len(found_vins), username)
         else:
             _LOGGER.warning("No VINs found for %s", username)

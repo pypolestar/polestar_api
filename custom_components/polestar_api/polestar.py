@@ -240,5 +240,5 @@ class PolestarCoordinator:
     def get_cars(self) -> list[PolestarCar]:
         return [
             PolestarCar(api=self.polestar_api, vin=vin, unique_id=self.unique_id)
-            for vin in self.polestar_api.vins
+            for vin in self.polestar_api.get_available_vins()
         ]

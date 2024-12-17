@@ -53,6 +53,7 @@ class PolestarApi:
         self.data_by_vin: dict[str, dict] = defaultdict(dict)
         self.next_update_delay = timedelta(seconds=5)
         self.configured_vins = set(vins) if vins else None
+        self.available_vins: set[str] = set()
         self.logger = _LOGGER.getChild(unique_id) if unique_id else _LOGGER
         self.api_url = API_MYSTAR_V2_URL
         self.gql_client = get_gql_client(url=self.api_url, client=self.client_session)
@@ -81,11 +82,17 @@ class PolestarApi:
                 "data": data,
                 "timestamp": datetime.now(),
             }
+            self.available_vins.add(vin)
             self.logger.debug("API setup for VIN %s", vin)
 
-    @property
-    def vins(self) -> list[str]:
-        return list(self.data_by_vin.keys())
+        if self.configured_vins and (
+            missing_vins := self.configured_vins - self.available_vins
+        ):
+            self.logger.warning("Could not found configured VINs %s", missing_vins)
+
+    def get_available_vins(self) -> list[str]:
+        """Get list of all available VINs"""
+        return list(self.available_vins)
 
     def get_car_information(self, vin: str) -> CarInformationData | None:
         """
@@ -99,8 +106,8 @@ class PolestarApi:
             KeyError: If the VIN doesn't exist
             ValueError: If data conversion fails
         """
-        if vin not in self.data_by_vin:
-            raise KeyError(f"No data found for VIN: {vin}")
+        if vin not in self.available_vins:
+            raise KeyError(vin)
         if data := self.data_by_vin[vin].get(CAR_INFO_DATA, {}).get("data"):
             try:
                 return CarInformationData.from_dict(data)
@@ -119,8 +126,8 @@ class PolestarApi:
             KeyError: If the VIN doesn't exist
             ValueError: If data conversion fails
         """
-        if vin not in self.data_by_vin:
-            raise KeyError(f"No data found for VIN: {vin}")
+        if vin not in self.available_vins:
+            raise KeyError(vin)
         if data := self.data_by_vin[vin].get(BATTERY_DATA, {}).get("data"):
             try:
                 return CarBatteryData.from_dict(data)
@@ -139,8 +146,8 @@ class PolestarApi:
             KeyError: If the VIN doesn't exist
             ValueError: If data conversion fails
         """
-        if vin not in self.data_by_vin:
-            raise KeyError(f"No data found for VIN: {vin}")
+        if vin not in self.available_vins:
+            raise KeyError(vin)
         if data := self.data_by_vin[vin].get(ODO_METER_DATA, {}).get("data"):
             try:
                 return CarOdometerData.from_dict(data)

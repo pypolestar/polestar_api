@@ -8,7 +8,7 @@ import homeassistant.util.dt as dt_util
 import httpx
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import DeviceInfo
-from homeassistant.helpers.httpx_client import get_async_client
+from homeassistant.helpers.httpx_client import create_async_httpx_client
 from homeassistant.util import Throttle
 
 from .const import DEFAULT_SCAN_INTERVAL, DOMAIN as POLESTAR_API_DOMAIN
@@ -228,7 +228,7 @@ class PolestarCoordinator:
         self.polestar_api = PolestarApi(
             username=username,
             password=password,
-            client_session=get_async_client(hass),
+            client_session=create_async_httpx_client(hass),
             vins=[vin] if vin else None,
             unique_id=self.unique_id,
         )

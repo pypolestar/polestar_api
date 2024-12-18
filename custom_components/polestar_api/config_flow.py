@@ -85,14 +85,18 @@ class FlowHandler(config_entries.ConfigFlow):
             password=password,
             client_session=get_async_client(self.hass),
         )
-        await api_client.async_init()
 
-        if found_vins := api_client.get_available_vins():
-            _LOGGER.debug("Found %d VINs for %s", len(found_vins), username)
-        else:
-            _LOGGER.warning("No VINs found for %s", username)
-            raise NoCarsFoundException
+        try:
+            await api_client.async_init()
 
-        if vin and vin not in found_vins:
-            _LOGGER.warning("VIN %s not found for %s", vin, username)
-            raise VinNotFoundException
+            if found_vins := api_client.get_available_vins():
+                _LOGGER.debug("Found %d VINs for %s", len(found_vins), username)
+            else:
+                _LOGGER.warning("No VINs found for %s", username)
+                raise NoCarsFoundException
+
+            if vin and vin not in found_vins:
+                _LOGGER.warning("VIN %s not found for %s", vin, username)
+                raise VinNotFoundException
+        finally:
+            await api_client.async_logout()

@@ -90,6 +90,9 @@ class PolestarApi:
         ):
             self.logger.warning("Could not found configured VINs %s", missing_vins)
 
+    async def async_logout(self) -> None:
+        await self.auth.async_logout()
+
     def get_available_vins(self) -> list[str]:
         """Get list of all available VINs"""
         return list(self.available_vins)

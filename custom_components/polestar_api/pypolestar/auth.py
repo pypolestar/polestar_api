@@ -3,13 +3,14 @@ import hashlib
 import logging
 import os
 from datetime import datetime, timedelta, timezone
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urlparse
 
 import httpx
 
 from .const import (
     HTTPX_TIMEOUT,
     OIDC_CLIENT_ID,
+    OIDC_COOKIES,
     OIDC_PROVIDER_BASE_URL,
     OIDC_REDIRECT_URI,
     OIDC_SCOPE,
@@ -38,20 +39,40 @@ class PolestarAuth:
         self.username = username
         self.password = password
         self.client_session = client_session
+
         self.access_token = None
         self.id_token = None
         self.refresh_token = None
         self.token_lifetime = None
         self.token_expiry = None
+
         self.oidc_configuration = {}
+        self.oidc_provider = OIDC_PROVIDER_BASE_URL
+        self.oidc_code_verifier: str | None = None
+        self.oidc_state: str | None = None
+
         self.latest_call_code = None
         self.logger = _LOGGER.getChild(unique_id) if unique_id else _LOGGER
-        self.oidc_provider = OIDC_PROVIDER_BASE_URL
-        self.code_verifier: str | None = None
-        self.state: str | None = None
 
     async def async_init(self) -> None:
         await self.update_oidc_configuration()
+
+    async def async_logout(self) -> None:
+        self.logger.debug("Logout")
+
+        domain = urlparse(OIDC_PROVIDER_BASE_URL).hostname
+        for name in OIDC_COOKIES:
+            self.logger.debug("Delete cookie %s in domain %s", name, domain)
+            self.client_session.cookies.delete(name=name, domain=domain)
+
+        self.access_token = None
+        self.id_token = None
+        self.refresh_token = None
+        self.token_lifetime = None
+        self.token_expiry = None
+
+        self.oidc_code_verifier = None
+        self.oidc_state = None
 
     async def update_oidc_configuration(self) -> None:
         result = await self.client_session.get(
@@ -98,9 +119,9 @@ class PolestarAuth:
                 "redirect_uri": OIDC_REDIRECT_URI,
                 **(
                     {
-                        "code_verifier": self.code_verifier,
+                        "code_verifier": self.oidc_code_verifier,
                     }
-                    if self.code_verifier
+                    if self.oidc_code_verifier
                     else {}
                 ),
             }
@@ -213,13 +234,13 @@ class PolestarAuth:
     async def _get_resume_path(self):
         """Get Resume Path from Polestar."""
 
-        self.state = self.get_state()
+        self.oidc_state = self.get_state()
 
         params = {
             "response_type": "code",
             "client_id": OIDC_CLIENT_ID,
             "redirect_uri": OIDC_REDIRECT_URI,
-            "state": self.state,
+            "state": self.oidc_state,
             "code_challenge_method": "S256",
             "code_challenge": self.get_code_challenge(),
             "scope": OIDC_SCOPE,
@@ -247,7 +268,7 @@ class PolestarAuth:
         return b64urlencode(os.urandom(32))
 
     def get_code_challenge(self) -> str:
-        self.code_verifier = self.get_code_verifier()
+        self.oidc_code_verifier = self.get_code_verifier()
         m = hashlib.sha256()
-        m.update(self.code_verifier.encode())
+        m.update(self.oidc_code_verifier.encode())
         return b64urlencode(m.digest())

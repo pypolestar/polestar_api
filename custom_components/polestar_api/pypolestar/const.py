@@ -14,5 +14,6 @@ OIDC_PROVIDER_BASE_URL = "https://polestarid.eu.polestar.com"
 OIDC_CLIENT_ID = "l3oopkc_10"
 OIDC_REDIRECT_URI = "https://www.polestar.com/sign-in-callback"
 OIDC_SCOPE = "openid profile email customer:attributes"
+OIDC_COOKIES = ["PF", "PF.PERSISTENT"]
 
 API_MYSTAR_V2_URL = "https://pc-api.polestar.com/eu-north-1/mystar-v2/"

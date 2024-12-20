@@ -168,6 +168,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         name="Software Version",
         icon="mdi:information-outline",
         native_unit_of_measurement=None,
+        entity_registry_enabled_default=False,
     ),
     PolestarSensorDescription(
         key="software_version_release",
@@ -176,6 +177,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.TIMESTAMP,
         native_unit_of_measurement=None,
+        entity_registry_enabled_default=False,
     ),
     PolestarSensorDescription(
         key="registration_number",

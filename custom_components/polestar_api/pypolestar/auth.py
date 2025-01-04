@@ -101,7 +101,7 @@ class PolestarAuth:
             and self.token_expiry > datetime.now(tz=timezone.utc)
         )
 
-    async def get_token(self, refresh: bool = True, force: bool = False) -> None:
+    async def get_token(self, force: bool = False) -> None:
         """Ensure we have a valid access token (still valid, refreshed or initial)."""
 
         if (
@@ -113,7 +113,7 @@ class PolestarAuth:
             self.logger.debug("Token still valid until %s", self.token_expiry)
             return
 
-        if refresh and self.refresh_token:
+        if self.refresh_token:
             try:
                 await self._token_refresh()
                 self.logger.debug("Token refreshed")

@@ -117,14 +117,16 @@ class PolestarAuth:
             try:
                 await self._token_refresh()
                 self.logger.debug("Token refreshed")
-            except PolestarAuthException:
-                self.logger.warning("Unable to refresh token, retry with code")
+            except Exception as exc:
+                self.logger.warning(
+                    "Failed to refresh token, retry with code", exc_info=exc
+                )
 
         try:
             await self._authorization_code()
             self.logger.debug("Initial token acquired")
             return
-        except PolestarAuthException as exc:
+        except Exception as exc:
             raise PolestarAuthException("Unable to acquire initial token") from exc
 
     def _parse_token_response(self, response: httpx.Response) -> None:
@@ -138,12 +140,16 @@ class PolestarAuth:
             self.logger.error("Token error: %s", payload)
             raise PolestarAuthException("Token error", response.status_code)
 
-        self.access_token = payload["access_token"]
-        self.refresh_token = payload["refresh_token"]
-        self.token_lifetime = payload["expires_in"]
-        self.token_expiry = datetime.now(tz=timezone.utc) + timedelta(
-            seconds=self.token_lifetime
-        )
+        try:
+            self.access_token = payload["access_token"]
+            self.refresh_token = payload["refresh_token"]
+            self.token_lifetime = payload["expires_in"]
+            self.token_expiry = datetime.now(tz=timezone.utc) + timedelta(
+                seconds=self.token_lifetime
+            )
+        except KeyError as exc:
+            self.logger.error("Token response missing key: %s", exc)
+            raise PolestarAuthException("Token response missing key") from exc
 
         self.logger.debug("Access token updated, valid until %s", self.token_expiry)
 
@@ -174,7 +180,7 @@ class PolestarAuth:
             data=token_request,
             timeout=HTTPX_TIMEOUT,
         )
-
+        response.raise_for_status()
         self._parse_token_response(response)
 
     async def _token_refresh(self) -> None:
@@ -195,7 +201,7 @@ class PolestarAuth:
             data=token_request,
             timeout=HTTPX_TIMEOUT,
         )
-
+        response.raise_for_status()
         self._parse_token_response(response)
 
     async def _get_code(self) -> str | None:

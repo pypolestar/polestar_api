@@ -115,25 +115,24 @@ class PolestarAuth:
 
         if refresh and self.refresh_token:
             try:
-                response = await self._token_refresh()
-                self._parse_token_response(response)
+                await self._token_refresh()
                 self.logger.debug("Token refreshed")
             except PolestarAuthException:
                 self.logger.warning("Unable to refresh token, retry with code")
 
         try:
-            response = await self._authorization_code()
-            self._parse_token_response(response)
+            await self._authorization_code()
             self.logger.debug("Initial token acquired")
             return
         except PolestarAuthException as exc:
             raise PolestarAuthException("Unable to acquire initial token") from exc
 
     def _parse_token_response(self, response: httpx.Response) -> None:
-        """Parse response from token endpoint."""
+        """Parse response from token endpoint and update token state."""
+
+        self.latest_call_code = response.status_code
 
         payload = response.json()
-        self.latest_call_code = response.status_code
 
         if "error" in payload:
             self.logger.error("Token error: %s", payload)
@@ -148,7 +147,7 @@ class PolestarAuth:
 
         self.logger.debug("Access token updated, valid until %s", self.token_expiry)
 
-    async def _authorization_code(self) -> httpx.Response:
+    async def _authorization_code(self) -> None:
         """Get initial token via authorization code."""
 
         if (code := await self._get_code()) is None:
@@ -170,13 +169,15 @@ class PolestarAuth:
             "Call token endpoint with grant_type=%s", token_request["grant_type"]
         )
 
-        return await self.client_session.post(
+        response = await self.client_session.post(
             self.oidc_configuration["token_endpoint"],
             data=token_request,
             timeout=HTTPX_TIMEOUT,
         )
 
-    async def _token_refresh(self) -> httpx.Response:
+        self._parse_token_response(response)
+
+    async def _token_refresh(self) -> None:
         """Refresh existing token."""
 
         token_request = {
@@ -189,11 +190,13 @@ class PolestarAuth:
             "Call token endpoint with grant_type=%s", token_request["grant_type"]
         )
 
-        return await self.client_session.post(
+        response = await self.client_session.post(
             self.oidc_configuration["token_endpoint"],
             data=token_request,
             timeout=HTTPX_TIMEOUT,
         )
+
+        self._parse_token_response(response)
 
     async def _get_code(self) -> str | None:
         query_params = await self._get_resume_path()

@@ -117,6 +117,7 @@ class PolestarAuth:
             try:
                 await self._token_refresh()
                 self.logger.debug("Token refreshed")
+                return
             except Exception as exc:
                 self.logger.warning(
                     "Failed to refresh token, retry with code", exc_info=exc

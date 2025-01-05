@@ -11,6 +11,9 @@ This is the account that you also use in the polestar APP on your mobile phone t
 
 Add custom repository in HACS: https://github.com/pypolestar/polestar_api
 Search for integration 'polestar_api'
+Download the integration
+Go to integrations in HA
+Add the Polestar API integration
 
 ### Fill the information
 

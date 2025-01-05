@@ -10,9 +10,9 @@ This is the account that you also use in the polestar APP on your mobile phone t
 ## Add in HA Integration
 
 Add custom repository in HACS: https://github.com/pypolestar/polestar_api
-Search for integration 'polestar_api'
-Download the integration
-Go to integrations in HA
+Search for integration 'polestar_api' in HACS
+Download the integration in HACS
+Go to Settings, Integrations in Home Assistant
 Add the Polestar API integration
 
 ### Fill the information

@@ -146,13 +146,18 @@ class PolestarCar:
 
         try:
             await self.polestar_api.update_latest_data(self.vin)
+            self.update_odometer()
+            self.update_battery()
         except Exception as e:
             _LOGGER.error(f"Failed to update data for VIN {self.vin}: {e}")
             self.data["api_connected"] = False
-            return
-
-        self.update_odometer()
-        self.update_battery()
+        else:
+            _LOGGER.debug(f"Updated data for VIN {self.vin}")
+            self.data["api_connected"] = (
+                self.get_latest_call_code_data() == 200
+                and self.get_latest_call_code_auth() == 200
+                and self.polestar_api.auth.is_token_valid()
+            )
 
         if token_expire := self.get_token_expiry():
             self.data["api_token_expires_at"] = dt_util.as_local(token_expire).strftime(
@@ -160,12 +165,6 @@ class PolestarCar:
             )
         else:
             self.data["api_token_expires_at"] = None
-
-        self.data["api_connected"] = (
-            self.get_latest_call_code_data() == 200
-            and self.get_latest_call_code_auth() == 200
-            and self.polestar_api.auth.is_token_valid()
-        )
 
         self.data["api_status_code_data"] = self.get_latest_call_code_data() or "Error"
         self.data["api_status_code_auth"] = self.get_latest_call_code_auth() or "Error"

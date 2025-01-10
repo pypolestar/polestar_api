@@ -6,11 +6,11 @@ import httpx
 from homeassistant.const import CONF_PASSWORD, CONF_USERNAME, Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.loader import async_get_loaded_integration
+from pypolestar.exceptions import PolestarApiException, PolestarAuthException
 
 from .const import CONF_VIN
 from .data import PolestarConfigEntry, PolestarData
 from .polestar import PolestarCar, PolestarCoordinator
-from .pypolestar.exception import PolestarApiException, PolestarAuthException
 
 PLATFORMS = [Platform.IMAGE, Platform.SENSOR, Platform.BINARY_SENSOR]
 

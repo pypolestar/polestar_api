@@ -28,8 +28,10 @@ async def async_get_config_entry_diagnostics(
         "auth_api": {
             "oidc_provider": api.auth.oidc_provider,
             "access_token_valid": api.auth.is_token_valid(),
-            "endpoint": api.auth.api_url,
-            "status": api.auth.latest_call_code,
+            "status": api.auth.get_status_code(),
         },
-        "data_api": {"endpoint": api.api_url, "status": api.latest_call_code},
+        "data_api": {
+            "endpoint": api.api_url,
+            "status": api.get_status_code(),
+        },
     }

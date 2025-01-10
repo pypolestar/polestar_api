@@ -144,7 +144,12 @@ class PolestarCar:
     async def async_update(self) -> None:
         """Update data from Polestar."""
 
-        await self.polestar_api.update_latest_data(self.vin)
+        try:
+            await self.polestar_api.update_latest_data(self.vin)
+        except Exception as e:
+            _LOGGER.error(f"Failed to update data for VIN {self.vin}: {e}")
+            self.data["api_connected"] = False
+            return
 
         self.update_odometer()
         self.update_battery()
@@ -164,8 +169,6 @@ class PolestarCar:
 
         self.data["api_status_code_data"] = self.get_latest_call_code_data() or "Error"
         self.data["api_status_code_auth"] = self.get_latest_call_code_auth() or "Error"
-
-        return
 
     def get_token_expiry(self) -> datetime | None:
         """Get the token expiry time."""

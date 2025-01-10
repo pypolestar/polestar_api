@@ -10,6 +10,7 @@ from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.httpx_client import create_async_httpx_client
 from homeassistant.util import Throttle
 from pypolestar import PolestarApi
+from pypolestar.exceptions import PolestarApiException, PolestarAuthException
 
 from .const import DEFAULT_SCAN_INTERVAL, DOMAIN as POLESTAR_API_DOMAIN
 
@@ -148,8 +149,16 @@ class PolestarCar:
             await self.polestar_api.update_latest_data(self.vin)
             self.update_odometer()
             self.update_battery()
-        except Exception as e:
-            _LOGGER.error(f"Failed to update data for VIN {self.vin}: {e}")
+        except PolestarAuthException as exc:
+            _LOGGER.error("Authentication failed for VIN %s: %s", self.vin, str(exc))
+            self.data["api_connected"] = False
+        except PolestarApiException as exc:
+            _LOGGER.error("API error for VIN %s: %s", self.vin, str(exc))
+            self.data["api_connected"] = False
+        except Exception as exc:
+            _LOGGER.error(
+                "Unexpected error updating data for VIN %s: %s", self.vin, str(exc)
+            )
             self.data["api_connected"] = False
         else:
             _LOGGER.debug(f"Updated data for VIN {self.vin}")

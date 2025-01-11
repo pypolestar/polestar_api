@@ -1,15 +1,16 @@
 {
   "domain": "polestar_api",
   "name": "Polestar API",
-  "codeowners": [
-    "@leeyuentuen",
-    "@jschlyter"
-  ],
+  "codeowners": ["@leeyuentuen", "@jschlyter"],
   "config_flow": true,
   "dependencies": [],
   "documentation": "https://github.com/pypolestar/polestar_api",
   "iot_class": "cloud_polling",
   "issue_tracker": "https://github.com/pypolestar/polestar_api/issues",
-  "requirements": ["gql[httpx]>=3.5.0", "homeassistant>=2024.6.0"],
-  "version": "1.13.1"
+  "requirements": [
+    "pypolestar==1.2.0",
+    "gql[httpx]>=3.5.0",
+    "homeassistant>=2024.6.0"
+  ],
+  "version": "1.14.0"
 }

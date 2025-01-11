@@ -5,15 +5,14 @@ import re
 from datetime import datetime, timedelta
 
 import homeassistant.util.dt as dt_util
-import httpx
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.httpx_client import create_async_httpx_client
 from homeassistant.util import Throttle
+from pypolestar import PolestarApi
+from pypolestar.exceptions import PolestarApiException, PolestarAuthException
 
 from .const import DEFAULT_SCAN_INTERVAL, DOMAIN as POLESTAR_API_DOMAIN
-from .pypolestar.exception import PolestarApiException, PolestarAuthException
-from .pypolestar.polestar import PolestarApi
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -147,52 +146,37 @@ class PolestarCar:
         """Update data from Polestar."""
 
         try:
-            await self.polestar_api.get_ev_data(self.vin)
-
+            await self.polestar_api.update_latest_data(self.vin)
             self.update_odometer()
             self.update_battery()
-
-            if token_expire := self.get_token_expiry():
-                self.data["api_token_expires_at"] = dt_util.as_local(
-                    token_expire
-                ).strftime("%Y-%m-%d %H:%M:%S")
-            else:
-                self.data["api_token_expires_at"] = None
-
+        except PolestarAuthException as exc:
+            _LOGGER.error("Authentication failed for VIN %s: %s", self.vin, str(exc))
+            self.data["api_connected"] = False
+        except PolestarApiException as exc:
+            _LOGGER.error("API error for VIN %s: %s", self.vin, str(exc))
+            self.data["api_connected"] = False
+        except Exception as exc:
+            _LOGGER.error(
+                "Unexpected error updating data for VIN %s: %s", self.vin, str(exc)
+            )
+            self.data["api_connected"] = False
+        else:
+            _LOGGER.debug(f"Updated data for VIN {self.vin}")
             self.data["api_connected"] = (
                 self.get_latest_call_code_data() == 200
                 and self.get_latest_call_code_auth() == 200
                 and self.polestar_api.auth.is_token_valid()
             )
 
-            self.data["api_status_code_data"] = (
-                self.get_latest_call_code_data() or "Error"
+        if token_expire := self.get_token_expiry():
+            self.data["api_token_expires_at"] = dt_util.as_local(token_expire).strftime(
+                "%Y-%m-%d %H:%M:%S"
             )
-            self.data["api_status_code_auth"] = (
-                self.get_latest_call_code_auth() or "Error"
-            )
+        else:
+            self.data["api_token_expires_at"] = None
 
-            return
-        except PolestarApiException as e:
-            _LOGGER.warning("API Exception on update data %s", str(e))
-            self.polestar_api.next_update = datetime.now() + timedelta(seconds=5)
-        except PolestarAuthException as e:
-            _LOGGER.warning("Auth Exception on update data %s", str(e))
-            await self.polestar_api.auth.get_token()
-            self.polestar_api.next_update = datetime.now() + timedelta(seconds=5)
-        except httpx.ConnectTimeout as e:
-            _LOGGER.warning("Connection Timeout on update data %s", str(e))
-            self.polestar_api.next_update = datetime.now() + timedelta(seconds=15)
-        except httpx.ConnectError as e:
-            _LOGGER.warning("Connection Error on update data %s", str(e))
-            self.polestar_api.next_update = datetime.now() + timedelta(seconds=15)
-        except httpx.ReadTimeout as e:
-            _LOGGER.warning("Read Timeout on update data %s", str(e))
-            self.polestar_api.next_update = datetime.now() + timedelta(seconds=15)
-        except Exception as e:
-            _LOGGER.error("Unexpected Error on update data %s", str(e))
-            self.polestar_api.next_update = datetime.now() + timedelta(seconds=60)
-        self.polestar_api.latest_call_code = 500
+        self.data["api_status_code_data"] = self.get_latest_call_code_data() or "Error"
+        self.data["api_status_code_auth"] = self.get_latest_call_code_auth() or "Error"
 
     def get_token_expiry(self) -> datetime | None:
         """Get the token expiry time."""
@@ -200,11 +184,11 @@ class PolestarCar:
 
     def get_latest_call_code_data(self) -> int | None:
         """Get the latest call code data API."""
-        return self.polestar_api.latest_call_code
+        return self.polestar_api.get_status_code()
 
     def get_latest_call_code_auth(self) -> int | None:
         """Get the latest call code auth API."""
-        return self.polestar_api.auth.latest_call_code
+        return self.polestar_api.auth.get_status_code()
 
 
 class PolestarCoordinator:

@@ -7,10 +7,10 @@ from homeassistant import config_entries
 from homeassistant.config_entries import ConfigFlowResult
 from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
 from homeassistant.helpers.httpx_client import get_async_client
+from pypolestar import PolestarApi
+from pypolestar.exceptions import PolestarApiException, PolestarAuthException
 
 from .const import CONF_VIN, DOMAIN
-from .pypolestar.exception import PolestarApiException, PolestarAuthException
-from .pypolestar.polestar import PolestarApi
 
 _LOGGER = logging.getLogger(__name__)
 

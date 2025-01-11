@@ -2,8 +2,7 @@
 
 from homeassistant.components import system_health
 from homeassistant.core import HomeAssistant, callback
-
-from .pypolestar.const import API_MYSTAR_V2_URL, OIDC_PROVIDER_BASE_URL
+from pypolestar.const import API_MYSTAR_V2_URL, OIDC_PROVIDER_BASE_URL
 
 
 @callback

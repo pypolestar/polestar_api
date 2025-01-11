@@ -67,7 +67,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         native_unit_of_measurement=UnitOfLength.METERS,
         suggested_unit_of_measurement=UnitOfLength.KILOMETERS,
         suggested_display_precision=0,
-        state_class=SensorStateClass.MEASUREMENT,
+        state_class=SensorStateClass.TOTAL,
         device_class=SensorDeviceClass.DISTANCE,
     ),
     PolestarSensorDescription(
@@ -84,7 +84,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         icon="mdi:map-marker-distance",
         native_unit_of_measurement=UnitOfLength.KILOMETERS,
         suggested_display_precision=1,
-        state_class=SensorStateClass.MEASUREMENT,
+        state_class=SensorStateClass.TOTAL_INCREASING,
         device_class=SensorDeviceClass.DISTANCE,
     ),
     PolestarSensorDescription(
@@ -93,7 +93,7 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         icon="mdi:map-marker-distance",
         native_unit_of_measurement=UnitOfLength.KILOMETERS,
         suggested_display_precision=1,
-        state_class=SensorStateClass.MEASUREMENT,
+        state_class=SensorStateClass.TOTAL_INCREASING,
         device_class=SensorDeviceClass.DISTANCE,
     ),
     PolestarSensorDescription(

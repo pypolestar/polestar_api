@@ -3,17 +3,19 @@
 from __future__ import annotations
 
 import logging
-from typing import Final
+from typing import TYPE_CHECKING, Final
 
 import homeassistant.util.dt as dt_util
 from homeassistant.components.image import ImageEntity, ImageEntityDescription
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from .const import DOMAIN as POLESTAR_API_DOMAIN
-from .data import PolestarConfigEntry
 from .entity import PolestarEntity
-from .polestar import PolestarCar
+
+if TYPE_CHECKING:
+    from homeassistant.core import HomeAssistant
+    from homeassistant.helpers.entity_platform import AddEntitiesCallback
+
+    from .coordinator import PolestarCoordinator
+    from .data import PolestarConfigEntry
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -36,9 +38,9 @@ async def async_setup_entry(
 
     async_add_entities(
         [
-            PolestarImage(car, entity_description, hass)
+            PolestarImage(coordinator, entity_description, hass)
             for entity_description in ENTITY_DESCRIPTIONS
-            for car in entry.runtime_data.cars
+            for coordinator in entry.runtime_data.coordinators
         ]
     )
 
@@ -51,23 +53,16 @@ class PolestarImage(PolestarEntity, ImageEntity):
 
     def __init__(
         self,
-        car: PolestarCar,
+        coordinator: PolestarCoordinator,
         entity_description: ImageEntityDescription,
         hass: HomeAssistant,
     ) -> None:
         """Initialize the Polestar image."""
-        super().__init__(car)
+        super().__init__(coordinator, entity_description)
         ImageEntity.__init__(self, hass)
-        self.car = car
-        self.entity_description = entity_description
-        self.entity_id = f"{POLESTAR_API_DOMAIN}.'polestar_'.{car.get_short_id()}_{entity_description.key}"
-        self._attr_unique_id = (
-            f"polestar_{car.get_unique_id()}_{entity_description.key}"
-        )
-        self._attr_translation_key = f"polestar_{entity_description.key}"
 
     async def async_update_image_url(self) -> None:
-        value = self.car.data.get(self.entity_description.key)
+        value = self.coordinator.data.get(self.entity_description.key)
         if value is None:
             _LOGGER.debug("No image URL found")
         elif isinstance(value, str) and value != self._attr_image_url:

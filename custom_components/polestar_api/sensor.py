@@ -1,8 +1,9 @@
 """Support for Polestar sensors."""
 
+from __future__ import annotations
+
 import logging
-from datetime import datetime, timedelta
-from typing import Final
+from typing import TYPE_CHECKING, Final
 
 from homeassistant.components.sensor import (
     SensorDeviceClass,
@@ -20,35 +21,21 @@ from homeassistant.const import (
     UnitOfSpeed,
     UnitOfTime,
 )
-from homeassistant.core import HomeAssistant, callback
-from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.helpers.typing import StateType
-from homeassistant.util.unit_conversion import (
-    DistanceConverter,
-    EnergyConverter,
-    SpeedConverter,
-)
 
-from .const import DOMAIN as POLESTAR_API_DOMAIN
-from .data import PolestarConfigEntry
 from .entity import PolestarEntity
-from .polestar import PolestarCar
+
+if TYPE_CHECKING:
+    from homeassistant.core import HomeAssistant
+    from homeassistant.helpers.entity_platform import AddEntitiesCallback
+
+    from .coordinator import PolestarCoordinator
+    from .data import PolestarConfigEntry
 
 _LOGGER = logging.getLogger(__name__)
-SCAN_INTERVAL = timedelta(seconds=60)
 
 
 class PolestarSensorDescription(SensorEntityDescription):
     """Class to describe an Polestar sensor entity."""
-
-
-API_STATUS_DICT = {
-    200: "OK",
-    303: "OK",
-    401: "Unauthorized",
-    404: "API Down",
-    500: "Internal Server Error",
-}
 
 
 POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
@@ -174,8 +161,6 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         key="software_version_release",
         name="Software Released",
         icon="mdi:information-outline",
-        state_class=SensorStateClass.MEASUREMENT,
-        device_class=SensorDeviceClass.TIMESTAMP,
         native_unit_of_measurement=None,
         entity_registry_enabled_default=False,
     ),
@@ -211,7 +196,6 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         name="Last Updated Odometer Data",
         icon="mdi:clock",
         native_unit_of_measurement=None,
-        state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.TIMESTAMP,
         entity_category=EntityCategory.DIAGNOSTIC,
     ),
@@ -220,7 +204,6 @@ POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
         name="Last Updated Battery Data",
         icon="mdi:clock",
         native_unit_of_measurement=None,
-        state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.TIMESTAMP,
         entity_category=EntityCategory.DIAGNOSTIC,
     ),
@@ -283,9 +266,9 @@ async def async_setup_entry(
     """Set up using config_entry."""
     async_add_entities(
         [
-            PolestarSensor(car, entity_description)
+            PolestarSensor(coordinator, entity_description)
             for entity_description in POLESTAR_SENSOR_TYPES
-            for car in entry.runtime_data.cars
+            for coordinator in entry.runtime_data.coordinators
         ]
     )
 
@@ -297,137 +280,26 @@ class PolestarSensor(PolestarEntity, SensorEntity):
     _attr_has_entity_name = True
 
     def __init__(
-        self, car: PolestarCar, entity_description: PolestarSensorDescription
+        self,
+        coordinator: PolestarCoordinator,
+        entity_description: PolestarSensorDescription,
     ) -> None:
         """Initialize the sensor."""
-        super().__init__(car)
-        self.car = car
-        self.entity_description = entity_description
-        self.entity_id = f"{POLESTAR_API_DOMAIN}.'polestar_'.{car.get_short_id()}_{entity_description.key}"
-        # self._attr_name = f"{description.name}"
-        self._attr_unique_id = (
-            f"polestar_{car.get_unique_id()}_{entity_description.key}"
-        )
-        self._attr_translation_key = f"polestar_{entity_description.key}"
-        self._attr_native_unit_of_measurement = (
-            entity_description.native_unit_of_measurement
-        )
-        self._sensor_data = None
-        self._attr_unit_of_measurement = entity_description.native_unit_of_measurement
-        self._attr_native_value = self.car.data.get(self.entity_description.key)
-        self._attr_extra_state_attributes = {}
+        super().__init__(coordinator, entity_description)
 
-        if entity_description.state_class is not None:
-            self._attr_state_class = entity_description.state_class
-        if entity_description.device_class is not None:
-            self._attr_device_class = entity_description.device_class
-        if self.car is not None and self.car.polestar_api.latest_call_code == 200:
-            self._async_update_attrs()
-
-    @callback
-    def _async_update_attrs(self) -> None:
-        """Update the state and attributes."""
-        self._attr_native_value = self._sensor_data = self.car.data.get(
-            self.entity_description.key
-        )
+        match self.entity_description.key:
+            case "vin":
+                self._attr_extra_state_attributes = {
+                    "factory_complete_date": self.coordinator.data.get(
+                        "factory_complete_date"
+                    )
+                }
+            case "registration_number":
+                self._attr_extra_state_attributes = {
+                    "registration_date": self.coordinator.data.get("registration_date")
+                }
 
     @property
-    def icon(self) -> str | None:
-        """Return the icon of the sensor."""
-        return self.entity_description.icon
-
-    @property
-    def state(self) -> StateType:
-        """Return the state of the sensor."""
-        if self._attr_native_value is None and self.entity_description.key in (
-            "estimated_charging_time_minutes_to_target_distance"
-        ):
-            # self.entity_description.native_unit_of_measurement = None
-            self._attr_native_unit_of_measurement = None
-            return "Not Supported Yet"
-
-        if self.entity_description.key == "vin":
-            self._attr_extra_state_attributes = {
-                "factory_complete_date": self.car.data.get("factory_complete_date")
-            }
-
-        if self.entity_description.key == "registration_number":
-            self._attr_extra_state_attributes = {
-                "registration_date": self.car.data.get("registration_date")
-            }
-
-        if self._attr_native_value != 0 and self._attr_native_value in (None, False):
-            return None
-
-        # if GUI changed the unit, we need to convert the value
-        if self._sensor_data:  # noqa
-            if self._sensor_option_unit_of_measurement is not None:
-                if self._sensor_option_unit_of_measurement in (
-                    UnitOfLength.MILES,
-                    UnitOfLength.KILOMETERS,
-                    UnitOfLength.METERS,
-                    UnitOfLength.CENTIMETERS,
-                    UnitOfLength.MILLIMETERS,
-                    UnitOfLength.INCHES,
-                    UnitOfLength.FEET,
-                    UnitOfLength.YARDS,
-                ):
-                    self._attr_native_value = DistanceConverter.convert(
-                        self._sensor_data,
-                        self.entity_description.native_unit_of_measurement,
-                        self._sensor_option_unit_of_measurement,
-                    )
-                    self._attr_native_unit_of_measurement = (
-                        self._sensor_option_unit_of_measurement
-                    )
-                elif self._sensor_option_unit_of_measurement in (
-                    UnitOfSpeed.MILES_PER_HOUR,
-                    UnitOfSpeed.KILOMETERS_PER_HOUR,
-                    UnitOfSpeed.METERS_PER_SECOND,
-                    UnitOfSpeed.KNOTS,
-                ):
-                    self._attr_native_value = SpeedConverter.convert(
-                        self._sensor_data,
-                        self.entity_description.native_unit_of_measurement,
-                        self._sensor_option_unit_of_measurement,
-                    )
-                    self._attr_native_unit_of_measurement = (
-                        self._sensor_option_unit_of_measurement
-                    )
-                elif self._sensor_option_unit_of_measurement in (
-                    UnitOfEnergy.WATT_HOUR,
-                    UnitOfEnergy.KILO_WATT_HOUR,
-                    UnitOfEnergy.MEGA_WATT_HOUR,
-                    UnitOfEnergy.GIGA_JOULE,
-                    UnitOfEnergy.MEGA_JOULE,
-                ):
-                    self._attr_native_value = EnergyConverter.convert(
-                        float(self._sensor_data),
-                        self.entity_description.native_unit_of_measurement,
-                        self._sensor_option_unit_of_measurement,
-                    )
-                    self._attr_native_unit_of_measurement = (
-                        self._sensor_option_unit_of_measurement
-                    )
-
-        return self._attr_native_value
-
-    @property
-    def unit_of_measurement(self) -> str:
-        """Return the unit of measurement."""
-        return self.native_unit_of_measurement
-
-    async def async_update(self) -> None:
-        """Get the latest data and updates the states."""
-        try:
-            await self.car.async_update()
-            value = self.car.data.get(self.entity_description.key)
-            if value is not None:
-                self._attr_native_value = value
-                self._sensor_data = value
-
-        except Exception as exc:
-            _LOGGER.warning(
-                "Failed to update sensor async update: %s", exc, exc_info=exc
-            )
-            self.car.polestar_api.next_update = datetime.now() + timedelta(seconds=60)
+    def native_value(self) -> str | None:
+        """Return the native value of the sensor."""
+        return self.coordinator.data.get(self.entity_description.key)

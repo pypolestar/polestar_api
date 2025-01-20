@@ -2,13 +2,16 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from homeassistant.components.diagnostics import async_redact_data
 from homeassistant.const import CONF_PASSWORD
-from homeassistant.core import HomeAssistant
 
-from .data import PolestarConfigEntry
+if TYPE_CHECKING:
+    from homeassistant.core import HomeAssistant
+
+    from .data import PolestarConfigEntry
+
 
 TO_REDACT = {CONF_PASSWORD}
 
@@ -18,9 +21,8 @@ async def async_get_config_entry_diagnostics(
 ) -> dict[str, Any]:
     """Return diagnostics for a config entry."""
 
-    coordinator = entry.runtime_data.coordinator
-    cars = entry.runtime_data.cars
-    api = coordinator.polestar_api
+    cars = entry.runtime_data.coordinators
+    api = entry.runtime_data.api_client
 
     return {
         "config_entry_data": async_redact_data(dict(entry.data), TO_REDACT),

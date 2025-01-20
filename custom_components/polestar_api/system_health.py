@@ -1,8 +1,15 @@
 """Provide info to system health."""
 
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from homeassistant.components import system_health
-from homeassistant.core import HomeAssistant, callback
+from homeassistant.core import callback
 from pypolestar.const import API_MYSTAR_V2_URL, OIDC_PROVIDER_BASE_URL
+
+if TYPE_CHECKING:
+    from homeassistant.core import HomeAssistant
 
 
 @callback

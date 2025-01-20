@@ -1,33 +1,70 @@
 {
   "config": {
+    "abort": {
+      "already_configured": "Polestar API is already configured",
+      "api_failed": "Unexpected error creating api.",
+      "api_timeout": "Timeout connecting to the api.",
+      "no_token": "No token found in response. Please check your credentials."
+    },
     "step": {
       "user": {
-        "title": "Configureer Polestar API",
-        "description": "Vul authenticatie voor Polestar EV",
         "data": {
-          "username": "Gebruikersnaam",
           "password": "Wachtwoord",
+          "username": "Gebruikersnaam",
           "vin": "VIN"
-        }
+        },
+        "description": "Vul authenticatie voor Polestar EV",
+        "title": "Configureer Polestar API"
       }
-    },
-    "abort": {
-      "api_timeout": "Timeout connecting to the api.",
-      "api_failed": "Unexpected error creating api.",
-      "already_configured": "Polestar API is already configured",
-      "no_token": "No token found in response. Please check your credentials."
     }
   },
   "entity": {
+    "binary_sensor": {
+      "polestar_api_connected": {
+        "name": "API verbonden"
+      }
+    },
+    "image": {
+      "polestar_car_image": {
+        "name": "Afbeelding van auto"
+      }
+    },
     "sensor": {
-      "polestar_estimate_range": {
-        "name": "Resterende afstand"
+      "polestar_api_status_code_auth": {
+        "name": "API Status Code (Auth)"
       },
-      "polestar_current_odometer": {
-        "name": "Huidige kilometerstand"
+      "polestar_api_status_code_data": {
+        "name": "API Status Code (Data)"
+      },
+      "polestar_api_token_expires_at": {
+        "name": "API Token vervalt op"
+      },
+      "polestar_average_energy_consumption": {
+        "name": "Gemiddeld verbruik (kWh/100km)"
       },
       "polestar_average_speed": {
         "name": "Gemiddelde snelheid"
+      },
+      "polestar_battery_capacity": {
+        "name": "Batterij capaciteit"
+      },
+      "polestar_battery_charge_level": {
+        "name": "Batterij niveau"
+      },
+      "polestar_charger_connection_status": {
+        "name": "Laadkabel status"
+      },
+      "polestar_charging_current": {
+        "name": "Laadstroom"
+      },
+      "polestar_charging_power": {
+        "name": "Laadvermogen"
+      },
+      "polestar_charging_status": {
+        "name": "Laadstatus"
+      },
+      "polestar_current_odometer": {
+        "name": "Huidige kilometerstand"
       },
       "polestar_current_trip_meter_automatic": {
         "name": "Huidige trip meter (automatisch)"
@@ -35,32 +72,29 @@
       "polestar_current_trip_meter_manual": {
         "name": "Huidige trip meter (manueel)"
       },
-      "polestar_battery_charge_level": {
-        "name": "Batterij niveau"
-      },
       "polestar_estimated_charging_time_to_full": {
-        "name": "Geschatte laadtijd tot vol (min)"
+        "name": "Geschatte laadtijd tot vol"
       },
-      "polestar_charging_status": {
-        "name": "Laadstatus"
+      "polestar_estimated_charging_time_to_target_distance": {
+        "name": "Geschatte laadtijd tot doelafstand"
       },
-      "polestar_charging_power": {
-        "name": "Laadvermogen"
+      "polestar_estimated_full_charge_range": {
+        "name": "Geschatte volledige laadafstand"
       },
-      "polestar_charging_current": {
-        "name": "Laadstroom"
+      "polestar_estimated_fully_charged_time": {
+        "name": "Geschatte volledig opgeladen tijd"
       },
-      "polestar_charger_connection_status": {
-        "name": "Laadkabel status"
+      "polestar_estimated_range": {
+        "name": "Resterende afstand"
       },
-      "polestar_average_energy_consumption_kwh_per_100": {
-        "name": "Gemiddeld verbruik (kWh/100km)"
+      "polestar_last_updated_battery_data": {
+        "name": "Laatst geüpdatete batterijgegevens"
       },
-      "polestar_estimated_charging_time_minutes_to_target_distance": {
-        "name": "Geschatte laadtijd tot doelafstand (min)"
+      "polestar_last_updated_odometer_data": {
+        "name": "Laatst geüpdatete kilometerstand"
       },
-      "polestar_vin": {
-        "name": "VIN"
+      "polestar_model_name": {
+        "name": "Model"
       },
       "polestar_registration_number": {
         "name": "Registratienummer"
@@ -68,26 +102,11 @@
       "polestar_software_version": {
         "name": "Software Versie"
       },
-      "polestar_estimated_fully_charged_time": {
-        "name": "Geschatte volledig opgeladen tijd"
+      "polestar_torque": {
+        "name": "Koppel"
       },
-      "polestar_model_name": {
-        "name": "Model"
-      },
-      "polestar_last_updated_odometer_data": {
-        "name": "Laatst geüpdatete kilometerstand"
-      },
-      "polestar_last_updated_battery_data": {
-        "name": "Laatst geüpdatete batterijgegevens"
-      },
-      "polestar_estimate_full_charge_range": {
-        "name": "Geschatte volledige laadafstand"
-      },
-      "polestar_api_status_code": {
-        "name": "API Status Code"
-      },
-      "polestar_api_token_expires_at": {
-        "name": "API Token vervalt op"
+      "polestar_vin": {
+        "name": "VIN"
       }
     }
   }

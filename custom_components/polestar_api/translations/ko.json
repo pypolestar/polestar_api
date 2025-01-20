@@ -1,33 +1,70 @@
 {
   "config": {
+    "abort": {
+      "already_configured": "Polestar API가 이미 설정되어 있습니다.",
+      "api_failed": "API를 생성하는 중 알 수 없는 에러가 발생했습니다.",
+      "api_timeout": "API 연결 시간이 초과되었습니다.",
+      "no_token": "응답에서 token을 찾을 수 없습니다. Credential을 확인해주세요."
+    },
     "step": {
       "user": {
-        "title": "폴스타 API 설정",
-        "description": "폴스타 API 연동을 위해 필요한 인증 정보를 입력하세요.",
         "data": {
-          "username": "Polestar ID",
           "password": "비밀번호",
+          "username": "Polestar ID",
           "vin": "VIN"
-        }
+        },
+        "description": "폴스타 API 연동을 위해 필요한 인증 정보를 입력하세요.",
+        "title": "폴스타 API 설정"
       }
-    },
-    "abort": {
-      "api_timeout": "API 연결 시간이 초과되었습니다.",
-      "api_failed": "API를 생성하는 중 알 수 없는 에러가 발생했습니다.",
-      "already_configured": "Polestar API가 이미 설정되어 있습니다.",
-      "no_token": "응답에서 token을 찾을 수 없습니다. Credential을 확인해주세요."
     }
   },
   "entity": {
+    "binary_sensor": {
+      "polestar_api_connected": {
+        "name": "API 연결됨"
+      }
+    },
+    "image": {
+      "polestar_car_image": {
+        "name": "차량 이미지"
+      }
+    },
     "sensor": {
-      "polestar_estimate_range": {
-        "name": "주행 가능 거리"
+      "polestar_api_status_code_auth": {
+        "name": "API 상태 (Auth)"
       },
-      "polestar_current_odometer": {
-        "name": "총 주행 거리"
+      "polestar_api_status_code_data": {
+        "name": "API 상태 (Data)"
+      },
+      "polestar_api_token_expires_at": {
+        "name": "API 토큰 만료"
+      },
+      "polestar_average_energy_consumption": {
+        "name": "평균 에너지 소비량"
       },
       "polestar_average_speed": {
         "name": "평균 속도"
+      },
+      "polestar_battery_capacity": {
+        "name": "배터리 용량"
+      },
+      "polestar_battery_charge_level": {
+        "name": "베터리 레벨"
+      },
+      "polestar_charger_connection_status": {
+        "name": "충전기 연결 상태"
+      },
+      "polestar_charging_current": {
+        "name": "충전 전류"
+      },
+      "polestar_charging_power": {
+        "name": "충전 전력"
+      },
+      "polestar_charging_status": {
+        "name": "충전 상태"
+      },
+      "polestar_current_odometer": {
+        "name": "총 주행 거리"
       },
       "polestar_current_trip_meter_automatic": {
         "name": "자동 트립 미터"
@@ -35,32 +72,29 @@
       "polestar_current_trip_meter_manual": {
         "name": "수동 트립 미터"
       },
-      "polestar_battery_charge_level": {
-        "name": "베터리 레벨"
-      },
       "polestar_estimated_charging_time_to_full": {
         "name": "충전 시간"
       },
-      "polestar_charging_status": {
-        "name": "충전 상태"
-      },
-      "polestar_charging_power": {
-        "name": "충전 전력"
-      },
-      "polestar_charging_current": {
-        "name": "충전 전류"
-      },
-      "polestar_charger_connection_status": {
-        "name": "충전기 연결 상태"
-      },
-      "polestar_average_energy_consumption_kwh_per_100": {
-        "name": "평균 에너지 소비량"
-      },
-      "polestar_estimated_charging_time_minutes_to_target_distance": {
+      "polestar_estimated_charging_time_to_target_distance": {
         "name": "목표 주행 거리에 필요한 예상 충전 시간"
       },
-      "polestar_vin": {
-        "name": "VIN"
+      "polestar_estimated_full_charge_range": {
+        "name": "충전 완료 시 예상 주행 거리"
+      },
+      "polestar_estimated_fully_charged_time": {
+        "name": "예상 충전 완료 시간"
+      },
+      "polestar_estimated_range": {
+        "name": "주행 가능 거리"
+      },
+      "polestar_last_updated_battery_data": {
+        "name": "최근 배터리 정보"
+      },
+      "polestar_last_updated_odometer_data": {
+        "name": "최근 주행거리계 정보"
+      },
+      "polestar_model_name": {
+        "name": "모델명"
       },
       "polestar_registration_number": {
         "name": "차량 번호"
@@ -68,26 +102,11 @@
       "polestar_software_version": {
         "name": "소프트웨어 버전"
       },
-      "polestar_estimated_fully_charged_time": {
-        "name": "예상 충전 완료 시간"
+      "polestar_torque": {
+        "name": "토크"
       },
-      "polestar_model_name": {
-        "name": "모델명"
-      },
-      "polestar_last_updated_odometer_data": {
-        "name": "최근 주행거리계 정보"
-      },
-      "polestar_last_updated_battery_data": {
-        "name": "최근 배터리 정보"
-      },
-      "polestar_estimate_full_charge_range": {
-        "name": "충전 완료 시 예상 주행 거리"
-      },
-      "polestar_api_status_code": {
-        "name": "API 상태"
-      },
-      "polestar_api_token_expires_at": {
-        "name": "API 토큰 만료"
+      "polestar_vin": {
+        "name": "VIN"
       }
     }
   }

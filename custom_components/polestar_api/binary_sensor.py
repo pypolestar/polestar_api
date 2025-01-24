@@ -45,8 +45,8 @@ async def async_setup_entry(
             coordinator=coordinator,
             entity_description=entity_description,
         )
-        for entity_description in ENTITY_DESCRIPTIONS
         for coordinator in entry.runtime_data.coordinators
+        for entity_description in ENTITY_DESCRIPTIONS
     )
 
 

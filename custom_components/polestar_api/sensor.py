@@ -38,7 +38,7 @@ class PolestarSensorDescription(SensorEntityDescription):
     """Class to describe an Polestar sensor entity."""
 
 
-POLESTAR_SENSOR_TYPES: Final[tuple[PolestarSensorDescription, ...]] = (
+ENTITY_DESCRIPTIONS: Final[tuple[PolestarSensorDescription, ...]] = (
     PolestarSensorDescription(
         key="estimate_range",
         name="Range",
@@ -267,8 +267,8 @@ async def async_setup_entry(
     async_add_entities(
         [
             PolestarSensor(coordinator, entity_description)
-            for entity_description in POLESTAR_SENSOR_TYPES
             for coordinator in entry.runtime_data.coordinators
+            for entity_description in ENTITY_DESCRIPTIONS
         ]
     )
 

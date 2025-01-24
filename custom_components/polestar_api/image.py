@@ -39,8 +39,8 @@ async def async_setup_entry(
     async_add_entities(
         [
             PolestarImage(coordinator, entity_description, hass)
-            for entity_description in ENTITY_DESCRIPTIONS
             for coordinator in entry.runtime_data.coordinators
+            for entity_description in ENTITY_DESCRIPTIONS
         ]
     )
 

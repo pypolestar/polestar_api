@@ -81,10 +81,10 @@
       "polestar_last_updated_battery_data": {
         "name": "Sist oppdatert batterinivå"
       },
-      "polestar_estimate_full_charge_range_miles": {
+      "polestar_estimated_full_charge_range_miles": {
         "name": "Estimert rekkevidde ved fullt batteri (miles)"
       },
-      "polestar_estimate_full_charge_range": {
+      "polestar_estimated_full_charge_range": {
         "name": "Estimert rekkevidde ved fullt batteri"
       },
       "polestar_api_status_code": {

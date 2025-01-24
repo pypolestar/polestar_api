@@ -20,7 +20,7 @@
   },
   "entity": {
     "sensor": {
-      "polestar_estimate_range": {
+      "polestar_estimated_range": {
         "name": "주행 가능 거리"
       },
       "polestar_current_odometer": {
@@ -80,7 +80,7 @@
       "polestar_last_updated_battery_data": {
         "name": "최근 배터리 정보"
       },
-      "polestar_estimate_full_charge_range": {
+      "polestar_estimated_full_charge_range": {
         "name": "충전 완료 시 예상 주행 거리"
       },
       "polestar_api_status_code": {

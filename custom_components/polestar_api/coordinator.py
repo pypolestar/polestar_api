@@ -96,14 +96,14 @@ class PolestarCoordinator(DataUpdateCoordinator):
                 and data.estimated_distance_to_empty_km is not None
                 and data.battery_charge_level_percentage > 0
             ):
-                estimate_full_charge_range = round(
+                estimated_full_charge_range = round(
                     data.estimated_distance_to_empty_km
                     / data.battery_charge_level_percentage
                     * 100,
                     2,
                 )
             else:
-                estimate_full_charge_range = None
+                estimated_full_charge_range = None
 
             if data.estimated_charging_time_to_full_minutes:
                 timestamp = datetime.now().replace(second=0, microsecond=0) + timedelta(
@@ -122,8 +122,8 @@ class PolestarCoordinator(DataUpdateCoordinator):
                 "charging_power": data.charging_power_watts,
                 "charging_current": data.charging_current_amps,
                 "average_energy_consumption_kwh_per_100": data.average_energy_consumption_kwh_per_100km,
-                "estimate_range": data.estimated_distance_to_empty_km,
-                "estimate_full_charge_range": estimate_full_charge_range,
+                "estimated_range": data.estimated_distance_to_empty_km,
+                "estimated_full_charge_range": estimated_full_charge_range,
                 "estimated_charging_time_minutes_to_target_distance": data.estimated_charging_time_minutes_to_target_distance,
                 "estimated_charging_time_to_full": data.estimated_charging_time_to_full_minutes,
                 "estimated_fully_charged_time": estimated_fully_charged_time,

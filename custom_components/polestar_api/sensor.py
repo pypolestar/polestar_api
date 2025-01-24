@@ -40,7 +40,7 @@ class PolestarSensorDescription(SensorEntityDescription):
 
 ENTITY_DESCRIPTIONS: Final[tuple[PolestarSensorDescription, ...]] = (
     PolestarSensorDescription(
-        key="estimate_range",
+        key="estimated_range",
         name="Range",
         icon="mdi:map-marker-distance",
         native_unit_of_measurement=UnitOfLength.KILOMETERS,
@@ -92,7 +92,7 @@ ENTITY_DESCRIPTIONS: Final[tuple[PolestarSensorDescription, ...]] = (
     ),
     PolestarSensorDescription(
         key="estimated_charging_time_to_full",
-        name="Charging Time",
+        name="Estimated Charging Time To Full",
         icon="mdi:battery-clock",
         native_unit_of_measurement=UnitOfTime.MINUTES,
     ),
@@ -129,7 +129,7 @@ ENTITY_DESCRIPTIONS: Final[tuple[PolestarSensorDescription, ...]] = (
     ),
     PolestarSensorDescription(
         key="average_energy_consumption_kwh_per_100",
-        name="Avg. Energy Consumption",
+        name="Average Energy Consumption",
         icon="mdi:battery-clock",
         native_unit_of_measurement="kWh/100km",
         suggested_display_precision=1,
@@ -138,7 +138,7 @@ ENTITY_DESCRIPTIONS: Final[tuple[PolestarSensorDescription, ...]] = (
     ),
     PolestarSensorDescription(
         key="estimated_charging_time_minutes_to_target_distance",
-        name="Estimated Charging Time To Target Distance",
+        name="Estimated Charging Time Minutes To Target Distance",
         icon="mdi:battery-clock",
         native_unit_of_measurement=UnitOfTime.MINUTES,
         state_class=SensorStateClass.MEASUREMENT,
@@ -208,8 +208,8 @@ ENTITY_DESCRIPTIONS: Final[tuple[PolestarSensorDescription, ...]] = (
         entity_category=EntityCategory.DIAGNOSTIC,
     ),
     PolestarSensorDescription(
-        key="estimate_full_charge_range",
-        name="Calc. Full Charge Range",
+        key="estimated_full_charge_range",
+        name="Estimate Full Charge Range",
         icon="mdi:map-marker-distance",
         native_unit_of_measurement=UnitOfLength.KILOMETERS,
         suggested_display_precision=0,

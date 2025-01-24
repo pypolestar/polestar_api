@@ -81,10 +81,10 @@
       "polestar_last_updated_battery_data": {
         "name": "Останні дані батареї"
       },
-      "polestar_estimate_full_charge_range_miles": {
+      "polestar_estimated_full_charge_range_miles": {
         "name": "Запас відстані при повному заряді, миль"
       },
-      "polestar_estimate_full_charge_range": {
+      "polestar_estimated_full_charge_range": {
         "name": "Запас відстані при повному заряді"
       },
       "polestar_api_status_code": {

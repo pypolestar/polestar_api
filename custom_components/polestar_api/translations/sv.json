@@ -87,10 +87,10 @@
       "polestar_last_updated_battery_data": {
         "name": "Senast uppdaterad batteridata"
       },
-      "polestar_estimate_full_charge_range_miles": {
+      "polestar_estimated_full_charge_range_miles": {
         "name": "Estimerad räckvidd vid full laddning miles"
       },
-      "polestar_estimate_full_charge_range": {
+      "polestar_estimated_full_charge_range": {
         "name": "Estimerad räckvidd vid full laddning"
       },
       "polestar_api_status_code": {

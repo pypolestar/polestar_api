@@ -60,10 +60,10 @@
       "polestar_current_trip_meter_manual": {
         "name": "Triptæller (manuel)"
       },
-      "polestar_estimate_full_charge_range": {
+      "polestar_estimated_full_charge_range": {
         "name": "Estimeret rækkevidde ved fuldt batteri"
       },
-      "polestar_estimate_range": {
+      "polestar_estimated_range": {
         "name": "Estimeret rækkevidde"
       },
       "polestar_estimated_charging_time_minutes_to_target_distance": {

@@ -20,7 +20,7 @@
   },
   "entity": {
     "sensor": {
-      "polestar_estimate_range": {
+      "polestar_estimated_range": {
         "name": "Resterende afstand"
       },
       "polestar_current_odometer": {
@@ -80,7 +80,7 @@
       "polestar_last_updated_battery_data": {
         "name": "Laatst geüpdatete batterijgegevens"
       },
-      "polestar_estimate_full_charge_range": {
+      "polestar_estimated_full_charge_range": {
         "name": "Geschatte volledige laadafstand"
       },
       "polestar_api_status_code": {

@@ -60,10 +60,10 @@
       "polestar_estimated_charging_time_to_full_minutes": {
         "name": "Geschätzte Ladezeit bis zur vollen Batterie"
       },
-      "polestar_estimate_full_charge_range": {
+      "polestar_estimated_full_charge_range": {
         "name": "Geschätzte Reichweite bei voller Ladung"
       },
-      "polestar_estimate_range": {
+      "polestar_estimated_range": {
         "name": "Geschätzte Reichweite"
       },
       "polestar_estimated_charging_time_minutes_to_target_distance": {

@@ -27,6 +27,11 @@ for filename in Path(TRANSLATED_STRINGS_DIR).glob("*.json"):
     }
 
     for entity_type in all_entity_strings:
+        if entity_type not in entity_strings:
+            print(f"Missing entity type {entity_type} in {language_tag}")
+            print("")
+            continue
+
         missing_strings = all_entity_strings[entity_type] - entity_strings[entity_type]
         superflous_strings = (
             entity_strings[entity_type] - all_entity_strings[entity_type]

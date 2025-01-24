@@ -169,7 +169,7 @@ class PolestarCoordinator(DataUpdateCoordinator):
                 "Unexpected error updating data for VIN %s: %s", self.vin, str(exc)
             )
             res["api_connected"] = False
-            raise UpdateFailed(exc) from exc
+            raise exc
         else:
             res["api_connected"] = (
                 self.get_latest_call_code_data() == 200

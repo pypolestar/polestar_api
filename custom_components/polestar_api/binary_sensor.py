@@ -53,6 +53,9 @@ async def async_setup_entry(
 class PolestarBinarySensor(PolestarEntity, BinarySensorEntity):
     """integration_blueprint binary_sensor class."""
 
+    entity_description: BinarySensorEntityDescription
+    _attr_has_entity_name = True
+
     def __init__(
         self,
         coordinator: PolestarCoordinator,

@@ -23,7 +23,6 @@ _LOGGER = logging.getLogger(__name__)
 ENTITY_DESCRIPTIONS: Final[tuple[ImageEntityDescription, ...]] = (
     ImageEntityDescription(
         key="car_image",
-        name="Car Image",
         entity_registry_enabled_default=False,
     ),
 )

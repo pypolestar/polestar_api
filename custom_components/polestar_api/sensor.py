@@ -41,7 +41,6 @@ class PolestarSensorDescription(SensorEntityDescription):
 ENTITY_DESCRIPTIONS: Final[tuple[PolestarSensorDescription, ...]] = (
     PolestarSensorDescription(
         key="estimated_range",
-        name="Range",
         icon="mdi:map-marker-distance",
         native_unit_of_measurement=UnitOfLength.KILOMETERS,
         state_class=SensorStateClass.MEASUREMENT,
@@ -49,7 +48,6 @@ ENTITY_DESCRIPTIONS: Final[tuple[PolestarSensorDescription, ...]] = (
     ),
     PolestarSensorDescription(
         key="current_odometer",
-        name="Odometer",
         icon="mdi:map-marker-distance",
         native_unit_of_measurement=UnitOfLength.METERS,
         suggested_unit_of_measurement=UnitOfLength.KILOMETERS,
@@ -59,7 +57,6 @@ ENTITY_DESCRIPTIONS: Final[tuple[PolestarSensorDescription, ...]] = (
     ),
     PolestarSensorDescription(
         key="average_speed",
-        name="Average Speed",
         icon="mdi:speedometer",
         native_unit_of_measurement=UnitOfSpeed.KILOMETERS_PER_HOUR,
         state_class=SensorStateClass.MEASUREMENT,
@@ -67,7 +64,6 @@ ENTITY_DESCRIPTIONS: Final[tuple[PolestarSensorDescription, ...]] = (
     ),
     PolestarSensorDescription(
         key="current_trip_meter_automatic",
-        name="Trip Meter Automatic",
         icon="mdi:map-marker-distance",
         native_unit_of_measurement=UnitOfLength.KILOMETERS,
         suggested_display_precision=1,
@@ -76,7 +72,6 @@ ENTITY_DESCRIPTIONS: Final[tuple[PolestarSensorDescription, ...]] = (
     ),
     PolestarSensorDescription(
         key="current_trip_meter_manual",
-        name="Trip Meter Manual",
         icon="mdi:map-marker-distance",
         native_unit_of_measurement=UnitOfLength.KILOMETERS,
         suggested_display_precision=1,
@@ -85,26 +80,22 @@ ENTITY_DESCRIPTIONS: Final[tuple[PolestarSensorDescription, ...]] = (
     ),
     PolestarSensorDescription(
         key="battery_charge_level",
-        name="Battery Level",
         native_unit_of_measurement=PERCENTAGE,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.BATTERY,
     ),
     PolestarSensorDescription(
         key="estimated_charging_time_to_full",
-        name="Estimated Charging Time To Full",
         icon="mdi:battery-clock",
         native_unit_of_measurement=UnitOfTime.MINUTES,
     ),
     PolestarSensorDescription(
         key="charging_status",
-        name="Charging Status",
         icon="mdi:ev-station",
         native_unit_of_measurement=None,
     ),
     PolestarSensorDescription(
         key="charging_power",
-        name="Charging Power",
         icon="mdi:lightning-bolt",
         native_unit_of_measurement=UnitOfPower.WATT,
         suggested_display_precision=0,
@@ -113,7 +104,6 @@ ENTITY_DESCRIPTIONS: Final[tuple[PolestarSensorDescription, ...]] = (
     ),
     PolestarSensorDescription(
         key="charging_current",
-        name="Charging Current",
         icon="mdi:current-ac",
         native_unit_of_measurement=UnitOfElectricCurrent.AMPERE,
         suggested_display_precision=0,
@@ -122,14 +112,12 @@ ENTITY_DESCRIPTIONS: Final[tuple[PolestarSensorDescription, ...]] = (
     ),
     PolestarSensorDescription(
         key="charger_connection_status",
-        name="Charging Connection Status",
         icon="mdi:connection",
         native_unit_of_measurement=None,
         device_class=None,
     ),
     PolestarSensorDescription(
         key="average_energy_consumption",
-        name="Average Energy Consumption",
         icon="mdi:battery-clock",
         native_unit_of_measurement="kWh/100km",
         suggested_display_precision=1,
@@ -138,7 +126,6 @@ ENTITY_DESCRIPTIONS: Final[tuple[PolestarSensorDescription, ...]] = (
     ),
     PolestarSensorDescription(
         key="estimated_charging_time_to_target_distance",
-        name="Estimated Charging Time Minutes To Target Distance",
         icon="mdi:battery-clock",
         native_unit_of_measurement=UnitOfTime.MINUTES,
         state_class=SensorStateClass.MEASUREMENT,
@@ -146,40 +133,34 @@ ENTITY_DESCRIPTIONS: Final[tuple[PolestarSensorDescription, ...]] = (
     ),
     PolestarSensorDescription(
         key="vin",
-        name="VIN",
         icon="mdi:card-account-details",
         native_unit_of_measurement=None,
     ),
     PolestarSensorDescription(
         key="software_version",
-        name="Software Version",
         icon="mdi:information-outline",
         native_unit_of_measurement=None,
         entity_registry_enabled_default=False,
     ),
     PolestarSensorDescription(
         key="software_version_release",
-        name="Software Released",
         icon="mdi:information-outline",
         native_unit_of_measurement=None,
         entity_registry_enabled_default=False,
     ),
     PolestarSensorDescription(
         key="registration_number",
-        name="Registration Number",
         icon="mdi:numeric-1-box",
         native_unit_of_measurement=None,
     ),
     PolestarSensorDescription(
         key="internal_vehicle_id",
-        name="Internal Vehicle ID",
         icon="mdi:numeric-1-box",
         native_unit_of_measurement=None,
         entity_registry_enabled_default=False,
     ),
     PolestarSensorDescription(
         key="estimated_fully_charged_time",
-        name="Time Full Charged",
         icon="mdi:battery-clock",
         native_unit_of_measurement=None,
         state_class=SensorStateClass.MEASUREMENT,
@@ -187,13 +168,11 @@ ENTITY_DESCRIPTIONS: Final[tuple[PolestarSensorDescription, ...]] = (
     ),
     PolestarSensorDescription(
         key="model_name",
-        name="Model Name",
         icon="mdi:car-electric",
         native_unit_of_measurement=None,
     ),
     PolestarSensorDescription(
         key="last_updated_odometer_data",
-        name="Last Updated Odometer Data",
         icon="mdi:clock",
         native_unit_of_measurement=None,
         device_class=SensorDeviceClass.TIMESTAMP,
@@ -201,7 +180,6 @@ ENTITY_DESCRIPTIONS: Final[tuple[PolestarSensorDescription, ...]] = (
     ),
     PolestarSensorDescription(
         key="last_updated_battery_data",
-        name="Last Updated Battery Data",
         icon="mdi:clock",
         native_unit_of_measurement=None,
         device_class=SensorDeviceClass.TIMESTAMP,
@@ -209,7 +187,6 @@ ENTITY_DESCRIPTIONS: Final[tuple[PolestarSensorDescription, ...]] = (
     ),
     PolestarSensorDescription(
         key="estimated_full_charge_range",
-        name="Estimate Full Charge Range",
         icon="mdi:map-marker-distance",
         native_unit_of_measurement=UnitOfLength.KILOMETERS,
         suggested_display_precision=0,
@@ -218,7 +195,6 @@ ENTITY_DESCRIPTIONS: Final[tuple[PolestarSensorDescription, ...]] = (
     ),
     PolestarSensorDescription(
         key="api_status_code_data",
-        name="API Status Code (Data)",
         icon="mdi:heart",
         native_unit_of_measurement=None,
         entity_category=EntityCategory.DIAGNOSTIC,
@@ -226,7 +202,6 @@ ENTITY_DESCRIPTIONS: Final[tuple[PolestarSensorDescription, ...]] = (
     ),
     PolestarSensorDescription(
         key="api_status_code_auth",
-        name="API Status Code (Auth)",
         icon="mdi:heart",
         native_unit_of_measurement=None,
         entity_category=EntityCategory.DIAGNOSTIC,
@@ -234,7 +209,6 @@ ENTITY_DESCRIPTIONS: Final[tuple[PolestarSensorDescription, ...]] = (
     ),
     PolestarSensorDescription(
         key="api_token_expires_at",
-        name="Auth Token Expired At",
         icon="mdi:clock-time-eight",
         native_unit_of_measurement=None,
         entity_category=EntityCategory.DIAGNOSTIC,
@@ -242,13 +216,11 @@ ENTITY_DESCRIPTIONS: Final[tuple[PolestarSensorDescription, ...]] = (
     ),
     PolestarSensorDescription(
         key="torque",
-        name="Torque",
         icon="mdi:card-account-details",
         native_unit_of_measurement="Nm",
     ),
     PolestarSensorDescription(
         key="battery_capacity",
-        name="Battery Capacity",
         icon="mdi:battery-check",
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
         suggested_display_precision=0,

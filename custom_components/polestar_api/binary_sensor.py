@@ -27,7 +27,6 @@ _LOGGER = logging.getLogger(__name__)
 ENTITY_DESCRIPTIONS: Final[tuple[BinarySensorEntityDescription, ...]] = (
     BinarySensorEntityDescription(
         key="api_connected",
-        name="API Connected",
         device_class=BinarySensorDeviceClass.CONNECTIVITY,
         entity_category=EntityCategory.DIAGNOSTIC,
     ),

@@ -1,10 +1,10 @@
 {
   "config": {
-    "abort": {
-      "already_configured": "Polestar API is already configured",
-      "api_failed": "Unexpected error creating api.",
-      "api_timeout": "Timeout connecting to the api.",
-      "no_token": "No token found in response. Please check your credentials."
+    "error": {
+      "api": "Error connecting to Polestar API.",
+      "auth_failed": "Invalid username/password.",
+      "no_cars_found": "No cars found for your Polestar ID.",
+      "vin_not_found": "Specified VIN not found for your Polestar ID."
     },
     "step": {
       "user": {
@@ -19,6 +19,16 @@
     }
   },
   "entity": {
+    "binary_sensor": {
+      "polestar_api_connected": {
+        "name": "API Connected"
+      }
+    },
+    "image": {
+      "polestar_car_image": {
+        "name": "Car Image"
+      }
+    },
     "sensor": {
       "polestar_api_status_code_auth": {
         "name": "API Status Code (Auth)"

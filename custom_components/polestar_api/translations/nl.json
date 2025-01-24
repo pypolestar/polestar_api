@@ -19,6 +19,16 @@
     }
   },
   "entity": {
+    "binary_sensor": {
+      "polestar_api_connected": {
+        "name": "API verbonden"
+      }
+    },
+    "image": {
+      "polestar_car_image": {
+        "name": "Afbeelding van auto"
+      }
+    },
     "sensor": {
       "polestar_api_status_code_auth": {
         "name": "API Status Code (Auth)"

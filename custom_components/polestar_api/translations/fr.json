@@ -1,33 +1,60 @@
 {
   "config": {
+    "abort": {
+      "already_configured": "L'API Polestar est déjà configurée.",
+      "api_failed": "Erreur inattendue lors de la création de l'API.",
+      "api_timeout": "Délai d'attente expiré lors de la connexion à l'API.",
+      "no_token": "Jeton non trouvé dans la réponse. Veuillez vérifier vos identifiants de connexion."
+    },
     "step": {
       "user": {
-        "title": "Configuration Polestar VE",
-        "description": "Entrez les paramètres d'authentification pour Polestar",
         "data": {
-          "username": "Nom d'utilisateur",
           "password": "Mot de passe",
+          "username": "Nom d'utilisateur",
           "vin": "VIN"
-        }
+        },
+        "description": "Entrez les paramètres d'authentification pour Polestar",
+        "title": "Configuration Polestar VE"
       }
-    },
-    "abort": {
-      "api_timeout": "Délai d'attente expiré lors de la connexion à l'API.",
-      "api_failed": "Erreur inattendue lors de la création de l'API.",
-      "already_configured": "L'API Polestar est déjà configurée.",
-      "no_token": "Jeton non trouvé dans la réponse. Veuillez vérifier vos identifiants de connexion."
     }
   },
   "entity": {
     "sensor": {
-      "polestar_estimated_range": {
-        "name": "Estimé de l'autonomie"
+      "polestar_api_status_code_auth": {
+        "name": "Code d'état de l'API (Auth)"
       },
-      "polestar_current_odometer": {
-        "name": "Odomètre"
+      "polestar_api_status_code_data": {
+        "name": "Code d'état de l'API (Data)"
+      },
+      "polestar_api_token_expires_at": {
+        "name": "Expiration du jeton d'API"
+      },
+      "polestar_average_energy_consumption": {
+        "name": "Consommation d'énergie moyenne"
       },
       "polestar_average_speed": {
         "name": "Vitesse moyenne"
+      },
+      "polestar_battery_capacity": {
+        "name": "Capacité de la batterie"
+      },
+      "polestar_battery_charge_level": {
+        "name": "Niveau de charge de la betterie"
+      },
+      "polestar_charger_connection_status": {
+        "name": "État de connexion du chargeur"
+      },
+      "polestar_charging_current": {
+        "name": "Courant de recharge"
+      },
+      "polestar_charging_power": {
+        "name": "Puissance de recharge"
+      },
+      "polestar_charging_status": {
+        "name": "État de la recharge"
+      },
+      "polestar_current_odometer": {
+        "name": "Odomètre"
       },
       "polestar_current_trip_meter_automatic": {
         "name": "Compteur kilométrique automatique"
@@ -35,32 +62,29 @@
       "polestar_current_trip_meter_manual": {
         "name": "Compteur kilométrique manuel"
       },
-      "polestar_battery_charge_level": {
-        "name": "Niveau de charge de la betterie"
-      },
       "polestar_estimated_charging_time_to_full": {
         "name": "Temps de recharge jusqu'à recharge complète"
       },
-      "polestar_charging_status": {
-        "name": "État de la recharge"
-      },
-      "polestar_charging_power": {
-        "name": "Puissance de recharge"
-      },
-      "polestar_charging_current": {
-        "name": "Courant de recharge"
-      },
-      "polestar_charger_connection_status": {
-        "name": "État de connexion du chargeur"
-      },
-      "polestar_average_energy_consumption_kwh_per_100": {
-        "name": "Consommation d'énergie moyenne"
-      },
-      "polestar_estimated_charging_time_minutes_to_target_distance": {
+      "polestar_estimated_charging_time_to_target_distance": {
         "name": "Temps de recharge restant pour la distance jusqu'à destination"
       },
-      "polestar_vin": {
-        "name": "NIV"
+      "polestar_estimated_full_charge_range": {
+        "name": "Estimé de l'autonomie complète"
+      },
+      "polestar_estimated_fully_charged_time": {
+        "name": "Temps de recharge restant"
+      },
+      "polestar_estimated_range": {
+        "name": "Estimé de l'autonomie"
+      },
+      "polestar_last_updated_battery_data": {
+        "name": "Dernière mise à jour des données de batterie"
+      },
+      "polestar_last_updated_odometer_data": {
+        "name": "Dernière mise à jour des données d'odomètre"
+      },
+      "polestar_model_name": {
+        "name": "Nom du modèle"
       },
       "polestar_registration_number": {
         "name": "Numéro d'enregistrement"
@@ -68,26 +92,11 @@
       "polestar_software_version": {
         "name": "Version du logiciel"
       },
-      "polestar_estimated_fully_charged_time": {
-        "name": "Temps de recharge restant"
+      "polestar_torque": {
+        "name": "Couple"
       },
-      "polestar_model_name": {
-        "name": "Nom du modèle"
-      },
-      "polestar_last_updated_odometer_data": {
-        "name": "Dernière mise à jour des données d'odomètre"
-      },
-      "polestar_last_updated_battery_data": {
-        "name": "Dernière mise à jour des données de batterie"
-      },
-      "polestar_estimated_full_charge_range": {
-        "name": "Estimé de l'autonomie complète"
-      },
-      "polestar_api_status_code": {
-        "name": "Code d'état de l'API"
-      },
-      "polestar_api_token_expires_at": {
-        "name": "Expiration du jeton d'API: "
+      "polestar_vin": {
+        "name": "NIV"
       }
     }
   }

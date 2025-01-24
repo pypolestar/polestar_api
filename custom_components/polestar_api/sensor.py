@@ -128,7 +128,7 @@ ENTITY_DESCRIPTIONS: Final[tuple[PolestarSensorDescription, ...]] = (
         device_class=None,
     ),
     PolestarSensorDescription(
-        key="average_energy_consumption_kwh_per_100",
+        key="average_energy_consumption",
         name="Average Energy Consumption",
         icon="mdi:battery-clock",
         native_unit_of_measurement="kWh/100km",
@@ -137,7 +137,7 @@ ENTITY_DESCRIPTIONS: Final[tuple[PolestarSensorDescription, ...]] = (
         device_class=None,
     ),
     PolestarSensorDescription(
-        key="estimated_charging_time_minutes_to_target_distance",
+        key="estimated_charging_time_to_target_distance",
         name="Estimated Charging Time Minutes To Target Distance",
         icon="mdi:battery-clock",
         native_unit_of_measurement=UnitOfTime.MINUTES,

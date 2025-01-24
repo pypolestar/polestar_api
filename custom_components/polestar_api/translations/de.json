@@ -1,37 +1,43 @@
 {
   "config": {
+    "abort": {
+      "already_configured": "Die Polestar API ist bereits konfiguriert",
+      "api_failed": "Unerwarteter Fehler beim Erstellen der API.",
+      "api_timeout": "Zeitüberschreitung bei der Verbindung mit der API.",
+      "no_token": "Kein Token in der Antwort gefunden. Bitte überprüfe Deine Anmeldeinformationen."
+    },
     "step": {
       "user": {
-        "title": "Konfiguriere Deinen Polestar",
-        "description": "Eingabe der Zugangsdaten Deines Polestar",
         "data": {
           "name": "Anzeigename",
-          "username": "Benutzername",
           "password": "Passwort",
+          "username": "Benutzername",
           "vin": "VIN"
-        }
+        },
+        "description": "Eingabe der Zugangsdaten Deines Polestar",
+        "title": "Konfiguriere Deinen Polestar"
       }
-    },
-    "abort": {
-      "api_timeout": "Zeitüberschreitung bei der Verbindung mit der API.",
-      "api_failed": "Unerwarteter Fehler beim Erstellen der API.",
-      "already_configured": "Die Polestar API ist bereits konfiguriert",
-      "no_token": "Kein Token in der Antwort gefunden. Bitte überprüfe Deine Anmeldeinformationen."
     }
   },
   "entity": {
     "sensor": {
-      "polestar_api_status_code": {
-        "name": "API Status Code"
+      "polestar_api_status_code_auth": {
+        "name": "API Status Code (Auth)"
+      },
+      "polestar_api_status_code_data": {
+        "name": "API Status Code (Daten)"
       },
       "polestar_api_token_expires_at": {
         "name": "API Token gültig bis"
       },
-      "polestar_average_energy_consumption_kwh_per_100": {
+      "polestar_average_energy_consumption": {
         "name": "Durchschnittlicher Energieverbrauch"
       },
-      "polestar_average_speed_per_hour": {
+      "polestar_average_speed": {
         "name": "Durchschnittsgeschwindigkeit"
+      },
+      "polestar_battery_capacity": {
+        "name": "Batteriekapazität"
       },
       "polestar_battery_charge_level": {
         "name": "Batterieladestand"
@@ -39,16 +45,16 @@
       "polestar_charger_connection_status": {
         "name": "Verbindungsstatus Ladepunkt"
       },
-      "polestar_charging_current_amps": {
+      "polestar_charging_current": {
         "name": "Ladestrom"
       },
-      "polestar_charging_power_watts": {
+      "polestar_charging_power": {
         "name": "Ladeleistung"
       },
       "polestar_charging_status": {
         "name": "Ladestatus"
       },
-      "polestar_current_odometer_meters": {
+      "polestar_current_odometer": {
         "name": "Kilometerstand"
       },
       "polestar_current_trip_meter_automatic": {
@@ -57,20 +63,20 @@
       "polestar_current_trip_meter_manual": {
         "name": "Kilometerzähler (manuell)"
       },
-      "polestar_estimated_charging_time_to_full_minutes": {
+      "polestar_estimated_charging_time_to_full": {
         "name": "Geschätzte Ladezeit bis zur vollen Batterie"
+      },
+      "polestar_estimated_charging_time_to_target_distance": {
+        "name": "Geschätzte Ladezeit bis zur Zielreichweite"
       },
       "polestar_estimated_full_charge_range": {
         "name": "Geschätzte Reichweite bei voller Ladung"
       },
-      "polestar_estimated_range": {
-        "name": "Geschätzte Reichweite"
-      },
-      "polestar_estimated_charging_time_minutes_to_target_distance": {
-        "name": "Geschätzte Ladezeit bis zur Zielreichweite"
-      },
       "polestar_estimated_fully_charged_time": {
         "name": "Geschätzte Zeit zur vollen Ladung"
+      },
+      "polestar_estimated_range": {
+        "name": "Geschätzte Reichweite"
       },
       "polestar_last_updated_battery_data": {
         "name": "Letzte Aktualisierung der Batteriedaten"
@@ -83,6 +89,12 @@
       },
       "polestar_registration_number": {
         "name": "Kennzeichen"
+      },
+      "polestar_software_version": {
+        "name": "Softwareversion"
+      },
+      "polestar_torque": {
+        "name": "Drehmoment"
       },
       "polestar_vin": {
         "name": "Fahrgestellnummer"

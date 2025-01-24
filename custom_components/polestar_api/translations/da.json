@@ -1,37 +1,40 @@
 {
   "config": {
+    "abort": {
+      "already_configured": "Polestar API er allerede konfigureret",
+      "api_failed": "Uventet fejl under oprettelse af API.",
+      "api_timeout": "Timeout under forbindelse med API.",
+      "no_token": "Ingen token modtaget fra serveren. Kontroller venligst de indtastede oplysninger."
+    },
     "step": {
       "user": {
-        "title": "Konfigurer din Polestar",
-        "description": "Angiv dit Polestar ID og adgangskode",
         "data": {
           "name": "Visningsnavn",
-          "username": "Polestar ID",
           "password": "Adgangskode",
+          "username": "Polestar ID",
           "vin": "VIN"
-        }
+        },
+        "description": "Angiv dit Polestar ID og adgangskode",
+        "title": "Konfigurer din Polestar"
       }
-    },
-    "abort": {
-      "api_timeout": "Timeout under forbindelse med API.",
-      "api_failed": "Uventet fejl under oprettelse af API.",
-      "already_configured": "Polestar API er allerede konfigureret",
-      "no_token": "Ingen token modtaget fra serveren. Kontroller venligst de indtastede oplysninger."
     }
   },
   "entity": {
     "sensor": {
-      "polestar_api_status_code": {
-        "name": "API statuskode"
+      "polestar_api_status_code_auth": {
+        "name": "API statuskode (Auth)"
+      },
+      "polestar_api_status_code_data": {
+        "name": "API statuskode (Data)"
       },
       "polestar_api_token_expires_at": {
         "name": "API token udløber"
       },
+      "polestar_average_energy_consumption": {
+        "name": "Gennemsnitligt energiforbrug"
+      },
       "polestar_average_speed": {
         "name": "Gennemsnitsfart"
-      },
-      "polestar_average_energy_consumption_kwh_per_100": {
-        "name": "Gennemsnitligt energiforbrug"
       },
       "polestar_battery_capacity": {
         "name": "Batterikapacitet"
@@ -60,23 +63,20 @@
       "polestar_current_trip_meter_manual": {
         "name": "Triptæller (manuel)"
       },
-      "polestar_estimated_full_charge_range": {
-        "name": "Estimeret rækkevidde ved fuldt batteri"
-      },
-      "polestar_estimated_range": {
-        "name": "Estimeret rækkevidde"
-      },
-      "polestar_estimated_charging_time_minutes_to_target_distance": {
-        "name": "Estimeret ladetid til ønsket afstand"
-      },
       "polestar_estimated_charging_time_to_full": {
         "name": "Estimeret tid til fuld opladet"
+      },
+      "polestar_estimated_charging_time_to_target_distance": {
+        "name": "Estimeret ladetid til ønsket afstand"
+      },
+      "polestar_estimated_full_charge_range": {
+        "name": "Estimeret rækkevidde ved fuldt batteri"
       },
       "polestar_estimated_fully_charged_time": {
         "name": "Estimeret total ladetid"
       },
-      "polestar_factory_complete": {
-        "name": "Færdigsamlet dato"
+      "polestar_estimated_range": {
+        "name": "Estimeret rækkevidde"
       },
       "polestar_internal_vehicle_id": {
         "name": "Internt køretøjs ID"
@@ -89,9 +89,6 @@
       },
       "polestar_model_name": {
         "name": "Modelnavn"
-      },
-      "polestar_registration_date": {
-        "name": "Registreringsdato"
       },
       "polestar_registration_number": {
         "name": "Registreringsnummer"

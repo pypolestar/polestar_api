@@ -82,7 +82,7 @@
         "name": "Charging Time"
       },
       "polestar_estimated_charging_time_to_target_distance": {
-        "name": "Estimated Charging Time Minutes to Target Distance"
+        "name": "Estimated Charging Time to Target Distance"
       },
       "polestar_estimated_full_charge_range": {
         "name": "Estimate Full Charge Range"

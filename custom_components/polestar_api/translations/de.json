@@ -68,10 +68,10 @@
         "name": "Kilometerstand"
       },
       "polestar_current_trip_meter_automatic": {
-        "name": "Kilometerzähler (automatisch)"
+        "name": "Tageskilometerzähler (automatisch)"
       },
       "polestar_current_trip_meter_manual": {
-        "name": "Kilometerzähler (manuell)"
+        "name": "Tageskilometerzähler (manuell)"
       },
       "polestar_estimated_charging_time_to_full": {
         "name": "Geschätzte Ladezeit bis zur vollen Batterie"
@@ -107,7 +107,7 @@
         "name": "Drehmoment"
       },
       "polestar_vin": {
-        "name": "Fahrgestellnummer"
+        "name": "VIN"
       }
     }
   }

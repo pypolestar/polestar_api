@@ -40,7 +40,7 @@
         "name": "API Token vervalt op"
       },
       "polestar_average_energy_consumption": {
-        "name": "Gemiddeld verbruik (kWh/100km)"
+        "name": "Gemiddeld verbruik"
       },
       "polestar_average_speed": {
         "name": "Gemiddelde snelheid"

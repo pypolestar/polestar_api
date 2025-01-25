@@ -77,13 +77,13 @@
         "name": "Час до повного заряду"
       },
       "polestar_estimated_charging_time_to_target_distance": {
-        "name": "Час до повного заряду"
+        "name": "Час зарядки до цільової відстані"
       },
       "polestar_estimated_full_charge_range": {
         "name": "Запас відстані при повному заряді"
       },
       "polestar_estimated_fully_charged_time": {
-        "name": "Час до повного заряду"
+        "name": "Очікуваний час повної зарядки"
       },
       "polestar_estimated_range": {
         "name": "Запас відстані"

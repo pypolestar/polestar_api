@@ -9,12 +9,11 @@
     "step": {
       "user": {
         "data": {
-          "name": "Visningsnavn",
           "password": "Passord",
           "username": "Brukernavn",
           "vin": "VIN"
         },
-        "description": "Autentiseringsdetaljer",
+        "description": "Skriv inn påloggingsinformasjon for din Polestar",
         "title": "Konfigurer din Polestar"
       }
     }

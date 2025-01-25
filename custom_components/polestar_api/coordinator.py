@@ -3,8 +3,7 @@
 from __future__ import annotations
 
 import logging
-import re
-from datetime import datetime, timedelta
+from datetime import datetime
 from typing import TYPE_CHECKING, Any
 
 import homeassistant.util.dt as dt_util
@@ -60,16 +59,6 @@ class PolestarCoordinator(DataUpdateCoordinator):
         """Get current car information"""
 
         if data := self.polestar_api.get_car_information(self.vin):
-            if data.battery and (match := re.search(r"(\d+) kWh", data.battery)):
-                battery_capacity = match.group(1)
-            else:
-                battery_capacity = None
-
-            if data.torque and (match := re.search(r"(\d+) Nm", data.torque)):
-                torque = match.group(1)
-            else:
-                torque = None
-
             return {
                 "vin": self.vin,
                 "internal_vehicle_id": data.internal_vehicle_identifier,
@@ -80,8 +69,10 @@ class PolestarCoordinator(DataUpdateCoordinator):
                 "model_name": data.model_name,
                 "software_version": data.software_version,
                 "software_version_release": data.software_version_timestamp,
-                "battery_capacity": battery_capacity,
-                "torque": torque,
+                "battery_capacity": data.battery_information.capacity
+                if data.battery_information
+                else None,
+                "torque": data.torque_nm,
             }
         else:
             _LOGGER.warning("No car information for VIN %s", self.vin)
@@ -91,29 +82,13 @@ class PolestarCoordinator(DataUpdateCoordinator):
         """Get current car battery readings"""
 
         if data := self.polestar_api.get_car_battery(self.vin):
-            if (
-                data.battery_charge_level_percentage is not None
-                and data.estimated_distance_to_empty_km is not None
-                and data.battery_charge_level_percentage > 0
-            ):
-                estimated_full_charge_range = round(
-                    data.estimated_distance_to_empty_km
-                    / data.battery_charge_level_percentage
-                    * 100,
-                    2,
-                )
-            else:
-                estimated_full_charge_range = None
-
-            if data.estimated_charging_time_to_full_minutes:
-                timestamp = datetime.now().replace(second=0, microsecond=0) + timedelta(
-                    minutes=data.estimated_charging_time_to_full_minutes
-                )
-                estimated_fully_charged_time = dt_util.as_local(timestamp).strftime(
+            estimated_fully_charged_time = (
+                dt_util.as_local(data.estimated_fully_charged).strftime(
                     "%Y-%m-%d %H:%M:%S"
                 )
-            else:
-                estimated_fully_charged_time = None
+                if data.estimated_fully_charged
+                else None
+            )
 
             return {
                 "battery_charge_level": data.battery_charge_level_percentage,
@@ -123,7 +98,7 @@ class PolestarCoordinator(DataUpdateCoordinator):
                 "charging_current": data.charging_current_amps,
                 "average_energy_consumption": data.average_energy_consumption_kwh_per_100km,
                 "estimated_range": data.estimated_distance_to_empty_km,
-                "estimated_full_charge_range": estimated_full_charge_range,
+                "estimated_full_charge_range": data.estimated_full_charge_range_km,
                 "estimated_charging_time_to_target_distance": data.estimated_charging_time_minutes_to_target_distance,
                 "estimated_charging_time_to_full": data.estimated_charging_time_to_full_minutes,
                 "estimated_fully_charged_time": estimated_fully_charged_time,

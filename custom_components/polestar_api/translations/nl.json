@@ -1,10 +1,10 @@
 {
   "config": {
     "abort": {
-      "already_configured": "Polestar API is already configured",
-      "api_failed": "Unexpected error creating api.",
-      "api_timeout": "Timeout connecting to the api.",
-      "no_token": "No token found in response. Please check your credentials."
+      "already_configured": "Polestar API is al geconfigureerd",
+      "api_failed": "Onverwachte fout bij het maken van API.",
+      "api_timeout": "Time-out bij verbinden met de API.",
+      "no_token": "Geen token gevonden in antwoord. Controleer uw inloggegevens."
     },
     "step": {
       "user": {

@@ -3,8 +3,9 @@
 import json
 from pathlib import Path
 
-ALL_STRINGS = "custom_components/polestar_api/strings.json"
-TRANSLATED_STRINGS_DIR = "custom_components/polestar_api/translations"
+ALL_STRINGS = Path("custom_components/polestar_api/strings.json")
+TRANSLATED_STRINGS_DIR = Path("custom_components/polestar_api/translations")
+
 
 with open(ALL_STRINGS) as fp:
     all_strings = json.load(fp)

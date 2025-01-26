@@ -44,7 +44,6 @@ class PolestarCoordinator(DataUpdateCoordinator):
             name=f"Polestar {self.get_short_id()}",
             update_interval=DEFAULT_SCAN_INTERVAL,
         )
-        self.unique_id = self.vin
         self.polestar_api = api
         self.car_information = self.get_car_information()
         self.model = (

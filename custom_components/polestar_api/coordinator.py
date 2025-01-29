@@ -126,6 +126,25 @@ class PolestarCoordinator(DataUpdateCoordinator):
             _LOGGER.warning("No odometer information for VIN %s", self.vin)
             return {}
 
+    def get_car_health(self) -> dict[str, Any]:
+        """Get current car health readings"""
+
+        if (telematics := self.polestar_api.get_car_telematics(self.vin)) and (
+            data := telematics.health
+        ):
+            return {
+                "days_to_service": data.days_to_service,
+                "distance_to_service_km": data.distance_to_service_km,
+                "brake_fluid_level_warning": data.brake_fluid_level_warning,
+                "engine_coolant_level_warning": data.engine_coolant_level_warning,
+                "oil_level_warning": data.oil_level_warning,
+                "service_warning": data.service_warning,
+            }
+        else:
+            # log as debug for now as data is missing for some models
+            _LOGGER.debug("No health information for VIN %s", self.vin)
+            return {}
+
     async def _async_update_data(self) -> Any:
         """Update data via library."""
 
@@ -139,6 +158,7 @@ class PolestarCoordinator(DataUpdateCoordinator):
             )
             res.update(self.get_car_odometer())
             res.update(self.get_car_battery())
+            res.update(self.get_car_health())
         except PolestarAuthException as exc:
             _LOGGER.error("Authentication failed for VIN %s: %s", self.vin, str(exc))
             res["api_connected"] = False

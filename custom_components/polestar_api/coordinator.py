@@ -139,6 +139,7 @@ class PolestarCoordinator(DataUpdateCoordinator):
                 "engine_coolant_level_warning": data.engine_coolant_level_warning,
                 "oil_level_warning": data.oil_level_warning,
                 "service_warning": data.service_warning,
+                "last_updated_health_data": data.event_updated_timestamp,
             }
         else:
             # log as debug for now as data is missing for some models

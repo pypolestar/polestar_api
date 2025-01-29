@@ -105,6 +105,9 @@
       "polestar_last_updated_battery_data": {
         "name": "Last Updated Battery Data"
       },
+      "polestar_last_updated_health_data": {
+        "name": "Last updated health data"
+      },
       "polestar_last_updated_odometer_data": {
         "name": "Last Updated Odometer Data"
       },

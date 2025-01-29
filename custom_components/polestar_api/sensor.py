@@ -186,6 +186,13 @@ ENTITY_DESCRIPTIONS: Final[tuple[PolestarSensorDescription, ...]] = (
         entity_category=EntityCategory.DIAGNOSTIC,
     ),
     PolestarSensorDescription(
+        key="last_updated_health_data",
+        icon="mdi:clock",
+        native_unit_of_measurement=None,
+        device_class=SensorDeviceClass.TIMESTAMP,
+        entity_category=EntityCategory.DIAGNOSTIC,
+    ),
+    PolestarSensorDescription(
         key="estimated_full_charge_range",
         icon="mdi:map-marker-distance",
         native_unit_of_measurement=UnitOfLength.KILOMETERS,

@@ -80,7 +80,9 @@ class PolestarCoordinator(DataUpdateCoordinator):
     def get_car_battery(self) -> dict[str, Any]:
         """Get current car battery readings"""
 
-        if data := self.polestar_api.get_car_battery(self.vin):
+        if (telematics := self.polestar_api.get_car_telematics(self.vin)) and (
+            data := telematics.battery
+        ):
             estimated_fully_charged_time = (
                 dt_util.as_local(data.estimated_fully_charged).strftime(
                     "%Y-%m-%d %H:%M:%S"
@@ -110,7 +112,9 @@ class PolestarCoordinator(DataUpdateCoordinator):
     def get_car_odometer(self) -> dict[str, Any]:
         """Get current car odometer readings"""
 
-        if data := self.polestar_api.get_car_odometer(self.vin):
+        if (telematics := self.polestar_api.get_car_telematics(self.vin)) and (
+            data := telematics.odometer
+        ):
             return {
                 "current_odometer": data.odometer_meters,
                 "average_speed": data.average_speed_km_per_hour,
@@ -127,7 +131,12 @@ class PolestarCoordinator(DataUpdateCoordinator):
 
         res = self.car_information.copy()
         try:
-            await self.polestar_api.update_latest_data(self.vin)
+            await self.polestar_api.update_latest_data(
+                vin=self.vin,
+                update_telematics=True,
+                update_battery=True,
+                update_odometer=True,
+            )
             res.update(self.get_car_odometer())
             res.update(self.get_car_battery())
         except PolestarAuthException as exc:

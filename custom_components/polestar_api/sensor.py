@@ -236,7 +236,7 @@ ENTITY_DESCRIPTIONS: Final[tuple[PolestarSensorDescription, ...]] = (
     ),
     PolestarSensorDescription(
         key="days_to_service",
-        icon="mdi:timer-outline",
+        icon="mdi:calendar",
         native_unit_of_measurement=UnitOfTime.DAYS,
         suggested_display_precision=0,
     ),

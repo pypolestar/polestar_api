@@ -154,8 +154,8 @@ class PolestarCoordinator(DataUpdateCoordinator):
             await self.polestar_api.update_latest_data(
                 vin=self.vin,
                 update_telematics=True,
-                update_battery=True,
-                update_odometer=True,
+                update_battery=False,
+                update_odometer=False,
             )
             res.update(self.get_car_odometer())
             res.update(self.get_car_battery())

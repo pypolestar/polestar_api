@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+from dataclasses import dataclass
 from typing import TYPE_CHECKING, Final
 
 from homeassistant.components.binary_sensor import (
@@ -12,7 +13,7 @@ from homeassistant.components.binary_sensor import (
 )
 from homeassistant.const import EntityCategory
 
-from .entity import PolestarEntity
+from .entity import PolestarEntity, PolestarEntityDescription
 
 if TYPE_CHECKING:
     from homeassistant.core import HomeAssistant
@@ -24,8 +25,15 @@ if TYPE_CHECKING:
 _LOGGER = logging.getLogger(__name__)
 
 
+@dataclass(frozen=True)
+class PolestarBinarySensorEntityDescription(
+    BinarySensorEntityDescription, PolestarEntityDescription
+):
+    """Class to describe an Polestar binary_sensor entity."""
+
+
 ENTITY_DESCRIPTIONS: Final[tuple[BinarySensorEntityDescription, ...]] = (
-    BinarySensorEntityDescription(
+    PolestarBinarySensorEntityDescription(
         key="api_connected",
         device_class=BinarySensorDeviceClass.CONNECTIVITY,
         entity_category=EntityCategory.DIAGNOSTIC,
@@ -52,13 +60,13 @@ async def async_setup_entry(
 class PolestarBinarySensor(PolestarEntity, BinarySensorEntity):
     """integration_blueprint binary_sensor class."""
 
-    entity_description: BinarySensorEntityDescription
+    entity_description: PolestarBinarySensorEntityDescription
     _attr_has_entity_name = True
 
     def __init__(
         self,
         coordinator: PolestarCoordinator,
-        entity_description: BinarySensorEntityDescription,
+        entity_description: PolestarBinarySensorEntityDescription,
     ) -> None:
         """Initialize the binary_sensor class."""
         super().__init__(coordinator, entity_description)

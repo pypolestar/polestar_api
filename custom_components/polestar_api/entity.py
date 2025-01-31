@@ -2,9 +2,13 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+import logging
+from dataclasses import dataclass
+from enum import StrEnum
+from typing import TYPE_CHECKING, Any
 
 from homeassistant.helpers.device_registry import DeviceInfo
+from homeassistant.helpers.entity import EntityDescription
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .const import ATTRIBUTION, DOMAIN
@@ -13,14 +17,35 @@ from .coordinator import PolestarCoordinator
 if TYPE_CHECKING:
     from homeassistant.helpers.entity import EntityDescription
 
+_LOGGER = logging.getLogger(__name__)
+
+
+class PolestarEntityDataSource(StrEnum):
+    INFORMATION = "car_information_data"
+    ODOMETER = "car_odometer_data"
+    BATTERY = "car_battery_data"
+    HEALTH = "car_health_data"
+
+
+@dataclass(frozen=True)
+class PolestarEntityDescription(EntityDescription):
+    """Describes a Polestar entity."""
+
+    data_source: PolestarEntityDataSource | None = None
+    data_attribute: str | None = None
+    data_fn: Any | None = None
+
 
 class PolestarEntity(CoordinatorEntity[PolestarCoordinator]):
     """Base class for Polestar entities."""
 
     _attr_attribution = ATTRIBUTION
+    entity_description: PolestarEntityDescription
 
     def __init__(
-        self, coordinator: PolestarCoordinator, entity_description: EntityDescription
+        self,
+        coordinator: PolestarCoordinator,
+        entity_description: PolestarEntityDescription,
     ) -> None:
         """Initialize the Polestar entity."""
         super().__init__(coordinator)
@@ -37,3 +62,35 @@ class PolestarEntity(CoordinatorEntity[PolestarCoordinator]):
             name=self.coordinator.name,
             serial_number=self.coordinator.vin,
         )
+
+    def get_native_value(self) -> str | None:
+        if (
+            self.entity_description.data_source
+            and self.entity_description.data_attribute
+        ):
+            if data := getattr(self.coordinator, self.entity_description.data_source):
+                if not hasattr(data, self.entity_description.data_attribute):
+                    _LOGGER.error(
+                        "Invalid attribute %s.%s",
+                        self.entity_description.data_source,
+                        self.entity_description.data_attribute,
+                    )
+                    return None
+
+                if value := getattr(data, self.entity_description.data_attribute, None):
+                    return (
+                        self.entity_description.data_fn(value)
+                        if self.entity_description.data_fn
+                        else value
+                    )
+                else:
+                    _LOGGER.debug(
+                        "%s.%s not available",
+                        self.entity_description.data_source,
+                        self.entity_description.data_attribute,
+                    )
+            else:
+                _LOGGER.debug("%s not available", self.entity_description.data_source)
+
+            return None
+        raise AttributeError

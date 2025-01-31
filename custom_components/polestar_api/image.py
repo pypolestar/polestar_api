@@ -3,12 +3,13 @@
 from __future__ import annotations
 
 import logging
+from dataclasses import dataclass
 from typing import TYPE_CHECKING, Final
 
 import homeassistant.util.dt as dt_util
 from homeassistant.components.image import ImageEntity, ImageEntityDescription
 
-from .entity import PolestarEntity
+from .entity import PolestarEntity, PolestarEntityDataSource, PolestarEntityDescription
 
 if TYPE_CHECKING:
     from homeassistant.core import HomeAssistant
@@ -20,10 +21,17 @@ if TYPE_CHECKING:
 _LOGGER = logging.getLogger(__name__)
 
 
-ENTITY_DESCRIPTIONS: Final[tuple[ImageEntityDescription, ...]] = (
-    ImageEntityDescription(
+@dataclass(frozen=True)
+class PolestarImageDescription(ImageEntityDescription, PolestarEntityDescription):
+    """Class to describe an Polestar image entity."""
+
+
+ENTITY_DESCRIPTIONS: Final[tuple[PolestarImageDescription, ...]] = (
+    PolestarImageDescription(
         key="car_image",
         entity_registry_enabled_default=False,
+        data_source=PolestarEntityDataSource.INFORMATION,
+        data_attribute="image_url",
     ),
 )
 
@@ -47,13 +55,13 @@ async def async_setup_entry(
 class PolestarImage(PolestarEntity, ImageEntity):
     """Representation of a Polestar image."""
 
-    entity_description: ImageEntityDescription
+    entity_description: PolestarImageDescription
     _attr_has_entity_name = True
 
     def __init__(
         self,
         coordinator: PolestarCoordinator,
-        entity_description: ImageEntityDescription,
+        entity_description: PolestarImageDescription,
         hass: HomeAssistant,
     ) -> None:
         """Initialize the Polestar image."""
@@ -61,7 +69,7 @@ class PolestarImage(PolestarEntity, ImageEntity):
         ImageEntity.__init__(self, hass)
 
     async def async_update_image_url(self) -> None:
-        value = self.coordinator.data.get(self.entity_description.key)
+        value = self.get_native_value()
         if value is None:
             _LOGGER.debug("No image URL found")
         elif isinstance(value, str) and value != self._attr_image_url:

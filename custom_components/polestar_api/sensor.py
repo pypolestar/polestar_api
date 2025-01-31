@@ -3,8 +3,10 @@
 from __future__ import annotations
 
 import logging
+from dataclasses import dataclass
 from typing import TYPE_CHECKING, Final
 
+import homeassistant.util.dt as dt_util
 from homeassistant.components.sensor import (
     SensorDeviceClass,
     SensorEntity,
@@ -22,7 +24,7 @@ from homeassistant.const import (
     UnitOfTime,
 )
 
-from .entity import PolestarEntity
+from .entity import PolestarEntity, PolestarEntityDataSource, PolestarEntityDescription
 
 if TYPE_CHECKING:
     from homeassistant.core import HomeAssistant
@@ -34,7 +36,8 @@ if TYPE_CHECKING:
 _LOGGER = logging.getLogger(__name__)
 
 
-class PolestarSensorDescription(SensorEntityDescription):
+@dataclass(frozen=True)
+class PolestarSensorDescription(SensorEntityDescription, PolestarEntityDescription):
     """Class to describe an Polestar sensor entity."""
 
 
@@ -45,6 +48,8 @@ ENTITY_DESCRIPTIONS: Final[tuple[PolestarSensorDescription, ...]] = (
         native_unit_of_measurement=UnitOfLength.KILOMETERS,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.DISTANCE,
+        data_source=PolestarEntityDataSource.BATTERY,
+        data_attribute="estimated_distance_to_empty_km",
     ),
     PolestarSensorDescription(
         key="current_odometer",
@@ -54,6 +59,8 @@ ENTITY_DESCRIPTIONS: Final[tuple[PolestarSensorDescription, ...]] = (
         suggested_display_precision=0,
         state_class=SensorStateClass.TOTAL,
         device_class=SensorDeviceClass.DISTANCE,
+        data_source=PolestarEntityDataSource.ODOMETER,
+        data_attribute="odometer_meters",
     ),
     PolestarSensorDescription(
         key="average_speed",
@@ -61,6 +68,8 @@ ENTITY_DESCRIPTIONS: Final[tuple[PolestarSensorDescription, ...]] = (
         native_unit_of_measurement=UnitOfSpeed.KILOMETERS_PER_HOUR,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.SPEED,
+        data_source=PolestarEntityDataSource.ODOMETER,
+        data_attribute="average_speed_km_per_hour",
     ),
     PolestarSensorDescription(
         key="current_trip_meter_automatic",
@@ -69,6 +78,8 @@ ENTITY_DESCRIPTIONS: Final[tuple[PolestarSensorDescription, ...]] = (
         suggested_display_precision=1,
         state_class=SensorStateClass.TOTAL_INCREASING,
         device_class=SensorDeviceClass.DISTANCE,
+        data_source=PolestarEntityDataSource.ODOMETER,
+        data_attribute="trip_meter_automatic_km",
     ),
     PolestarSensorDescription(
         key="current_trip_meter_manual",
@@ -77,22 +88,30 @@ ENTITY_DESCRIPTIONS: Final[tuple[PolestarSensorDescription, ...]] = (
         suggested_display_precision=1,
         state_class=SensorStateClass.TOTAL_INCREASING,
         device_class=SensorDeviceClass.DISTANCE,
+        data_source=PolestarEntityDataSource.ODOMETER,
+        data_attribute="trip_meter_manual_km",
     ),
     PolestarSensorDescription(
         key="battery_charge_level",
         native_unit_of_measurement=PERCENTAGE,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.BATTERY,
+        data_source=PolestarEntityDataSource.BATTERY,
+        data_attribute="battery_charge_level_percentage",
     ),
     PolestarSensorDescription(
         key="estimated_charging_time_to_full",
         icon="mdi:battery-clock",
         native_unit_of_measurement=UnitOfTime.MINUTES,
+        data_source=PolestarEntityDataSource.BATTERY,
+        data_attribute="estimated_charging_time_to_full_minutes",
     ),
     PolestarSensorDescription(
         key="charging_status",
         icon="mdi:ev-station",
         native_unit_of_measurement=None,
+        data_source=PolestarEntityDataSource.BATTERY,
+        data_attribute="charging_status",
     ),
     PolestarSensorDescription(
         key="charging_power",
@@ -101,6 +120,8 @@ ENTITY_DESCRIPTIONS: Final[tuple[PolestarSensorDescription, ...]] = (
         suggested_display_precision=0,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.POWER,
+        data_source=PolestarEntityDataSource.BATTERY,
+        data_attribute="charging_power_watts",
     ),
     PolestarSensorDescription(
         key="charging_current",
@@ -109,12 +130,16 @@ ENTITY_DESCRIPTIONS: Final[tuple[PolestarSensorDescription, ...]] = (
         suggested_display_precision=0,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.CURRENT,
+        data_source=PolestarEntityDataSource.BATTERY,
+        data_attribute="charging_current_amps",
     ),
     PolestarSensorDescription(
         key="charger_connection_status",
         icon="mdi:connection",
         native_unit_of_measurement=None,
         device_class=None,
+        data_source=PolestarEntityDataSource.BATTERY,
+        data_attribute="charger_connection_status",
     ),
     PolestarSensorDescription(
         key="average_energy_consumption",
@@ -123,6 +148,8 @@ ENTITY_DESCRIPTIONS: Final[tuple[PolestarSensorDescription, ...]] = (
         suggested_display_precision=1,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=None,
+        data_source=PolestarEntityDataSource.BATTERY,
+        data_attribute="average_energy_consumption_kwh_per_100km",
     ),
     PolestarSensorDescription(
         key="estimated_charging_time_to_target_distance",
@@ -130,34 +157,46 @@ ENTITY_DESCRIPTIONS: Final[tuple[PolestarSensorDescription, ...]] = (
         native_unit_of_measurement=UnitOfTime.MINUTES,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=None,
+        data_source=PolestarEntityDataSource.BATTERY,
+        data_attribute="estimated_charging_time_minutes_to_target_distance",
     ),
     PolestarSensorDescription(
         key="vin",
         icon="mdi:card-account-details",
         native_unit_of_measurement=None,
+        data_source=PolestarEntityDataSource.INFORMATION,
+        data_attribute="vin",
     ),
     PolestarSensorDescription(
         key="software_version",
         icon="mdi:information-outline",
         native_unit_of_measurement=None,
         entity_registry_enabled_default=False,
+        data_source=PolestarEntityDataSource.INFORMATION,
+        data_attribute="software_version",
     ),
     PolestarSensorDescription(
         key="software_version_release",
         icon="mdi:information-outline",
         native_unit_of_measurement=None,
         entity_registry_enabled_default=False,
+        data_source=PolestarEntityDataSource.INFORMATION,
+        data_attribute="software_version_timestamp",
     ),
     PolestarSensorDescription(
         key="registration_number",
         icon="mdi:numeric-1-box",
         native_unit_of_measurement=None,
+        data_source=PolestarEntityDataSource.INFORMATION,
+        data_attribute="registration_no",
     ),
     PolestarSensorDescription(
         key="internal_vehicle_id",
         icon="mdi:numeric-1-box",
         native_unit_of_measurement=None,
         entity_registry_enabled_default=False,
+        data_source=PolestarEntityDataSource.INFORMATION,
+        data_attribute="internal_vehicle_identifier",
     ),
     PolestarSensorDescription(
         key="estimated_fully_charged_time",
@@ -165,11 +204,16 @@ ENTITY_DESCRIPTIONS: Final[tuple[PolestarSensorDescription, ...]] = (
         native_unit_of_measurement=None,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.DURATION,
+        data_source=PolestarEntityDataSource.BATTERY,
+        data_attribute="estimated_fully_charged",
+        data_fn=lambda value: dt_util.as_local(value).strftime("%Y-%m-%d %H:%M:%S"),
     ),
     PolestarSensorDescription(
         key="model_name",
         icon="mdi:car-electric",
         native_unit_of_measurement=None,
+        data_source=PolestarEntityDataSource.INFORMATION,
+        data_attribute="model_name",
     ),
     PolestarSensorDescription(
         key="last_updated_odometer_data",
@@ -177,6 +221,8 @@ ENTITY_DESCRIPTIONS: Final[tuple[PolestarSensorDescription, ...]] = (
         native_unit_of_measurement=None,
         device_class=SensorDeviceClass.TIMESTAMP,
         entity_category=EntityCategory.DIAGNOSTIC,
+        data_source=PolestarEntityDataSource.ODOMETER,
+        data_attribute="event_updated_timestamp",
     ),
     PolestarSensorDescription(
         key="last_updated_battery_data",
@@ -184,6 +230,8 @@ ENTITY_DESCRIPTIONS: Final[tuple[PolestarSensorDescription, ...]] = (
         native_unit_of_measurement=None,
         device_class=SensorDeviceClass.TIMESTAMP,
         entity_category=EntityCategory.DIAGNOSTIC,
+        data_source=PolestarEntityDataSource.BATTERY,
+        data_attribute="event_updated_timestamp",
     ),
     PolestarSensorDescription(
         key="last_updated_health_data",
@@ -191,6 +239,8 @@ ENTITY_DESCRIPTIONS: Final[tuple[PolestarSensorDescription, ...]] = (
         native_unit_of_measurement=None,
         device_class=SensorDeviceClass.TIMESTAMP,
         entity_category=EntityCategory.DIAGNOSTIC,
+        data_source=PolestarEntityDataSource.HEALTH,
+        data_attribute="event_updated_timestamp",
     ),
     PolestarSensorDescription(
         key="estimated_full_charge_range",
@@ -199,6 +249,8 @@ ENTITY_DESCRIPTIONS: Final[tuple[PolestarSensorDescription, ...]] = (
         suggested_display_precision=0,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.DISTANCE,
+        data_source=PolestarEntityDataSource.BATTERY,
+        data_attribute="estimated_full_charge_range_km",
     ),
     PolestarSensorDescription(
         key="api_status_code_data",
@@ -225,6 +277,8 @@ ENTITY_DESCRIPTIONS: Final[tuple[PolestarSensorDescription, ...]] = (
         key="torque",
         icon="mdi:card-account-details",
         native_unit_of_measurement="Nm",
+        data_source=PolestarEntityDataSource.INFORMATION,
+        data_attribute="torque_nm",
     ),
     PolestarSensorDescription(
         key="battery_capacity",
@@ -233,12 +287,17 @@ ENTITY_DESCRIPTIONS: Final[tuple[PolestarSensorDescription, ...]] = (
         suggested_display_precision=0,
         state_class=SensorStateClass.TOTAL,
         device_class=SensorDeviceClass.ENERGY,
+        data_source=PolestarEntityDataSource.INFORMATION,
+        data_attribute="battery_information",
+        data_fn=lambda value: value.capacity if value else None,
     ),
     PolestarSensorDescription(
         key="days_to_service",
         icon="mdi:calendar",
         native_unit_of_measurement=UnitOfTime.DAYS,
         suggested_display_precision=0,
+        data_source=PolestarEntityDataSource.HEALTH,
+        data_attribute="days_to_service",
     ),
     PolestarSensorDescription(
         key="distance_to_service",
@@ -247,26 +306,36 @@ ENTITY_DESCRIPTIONS: Final[tuple[PolestarSensorDescription, ...]] = (
         suggested_display_precision=0,
         state_class=SensorStateClass.MEASUREMENT,
         device_class=SensorDeviceClass.DISTANCE,
+        data_source=PolestarEntityDataSource.HEALTH,
+        data_attribute="distance_to_service_km",
     ),
     PolestarSensorDescription(
         key="brake_fluid_level_warning",
         icon="mdi:alert",
         native_unit_of_measurement=None,
+        data_source=PolestarEntityDataSource.HEALTH,
+        data_attribute="brake_fluid_level_warning",
     ),
     PolestarSensorDescription(
         key="engine_coolant_level_warning",
         icon="mdi:alert",
         native_unit_of_measurement=None,
+        data_source=PolestarEntityDataSource.HEALTH,
+        data_attribute="engine_coolant_level_warning",
     ),
     PolestarSensorDescription(
         key="oil_level_warning",
         icon="mdi:alert",
         native_unit_of_measurement=None,
+        data_source=PolestarEntityDataSource.HEALTH,
+        data_attribute="oil_level_warning",
     ),
     PolestarSensorDescription(
         key="service_warning",
         icon="mdi:alert",
         native_unit_of_measurement=None,
+        data_source=PolestarEntityDataSource.HEALTH,
+        data_attribute="service_warning",
     ),
 )
 
@@ -315,4 +384,9 @@ class PolestarSensor(PolestarEntity, SensorEntity):
     @property
     def native_value(self) -> str | None:
         """Return the native value of the sensor."""
-        return self.coordinator.data.get(self.entity_description.key)
+        try:
+            if value := self.get_native_value():
+                return value
+        except AttributeError:
+            _LOGGER.debug("Fallback to data dict %s", self.entity_description.key)
+            return self.coordinator.data.get(self.entity_description.key)

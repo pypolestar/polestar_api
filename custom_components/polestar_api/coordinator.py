@@ -10,6 +10,12 @@ import homeassistant.util.dt as dt_util
 from homeassistant.exceptions import ConfigEntryAuthFailed
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 from pypolestar.exceptions import PolestarApiException, PolestarAuthException
+from pypolestar.models import (
+    CarBatteryData,
+    CarHealthData,
+    CarInformationData,
+    CarOdometerData,
+)
 
 from .const import DEFAULT_SCAN_INTERVAL
 
@@ -45,111 +51,28 @@ class PolestarCoordinator(DataUpdateCoordinator):
             update_interval=DEFAULT_SCAN_INTERVAL,
         )
         self.polestar_api = api
-        self.car_information = self.get_car_information()
-        self.model = (
-            self.car_information["model_name"] if self.car_information else "Unknown"
+
+        self.car_information_data: CarInformationData | None = (
+            self.polestar_api.get_car_information(self.vin)
         )
+        self.car_odometer_data: CarOdometerData | None = None
+        self.car_battery_data: CarBatteryData | None = None
+        self.car_health_data: CarHealthData | None = None
+
+    @property
+    def model(self) -> str:
+        return (
+            self.car_information_data.model_name if self.car_information_data else None
+        ) or "Unknown"
 
     def get_short_id(self) -> str:
         """Last 4 characters of the VIN"""
         return self.vin[-4:]
 
-    def get_car_information(self) -> dict[str, Any]:
-        """Get current car information"""
-
-        if data := self.polestar_api.get_car_information(self.vin):
-            return {
-                "vin": self.vin,
-                "internal_vehicle_id": data.internal_vehicle_identifier,
-                "car_image": data.image_url,
-                "registration_number": data.registration_no,
-                "registration_date": data.registration_date,
-                "factory_complete_date": data.factory_complete_date,
-                "model_name": data.model_name,
-                "software_version": data.software_version,
-                "software_version_release": data.software_version_timestamp,
-                "battery_capacity": data.battery_information.capacity
-                if data.battery_information
-                else None,
-                "torque": data.torque_nm,
-            }
-        else:
-            _LOGGER.warning("No car information for VIN %s", self.vin)
-            return {}
-
-    def get_car_battery(self) -> dict[str, Any]:
-        """Get current car battery readings"""
-
-        if (telematics := self.polestar_api.get_car_telematics(self.vin)) and (
-            data := telematics.battery
-        ):
-            estimated_fully_charged_time = (
-                dt_util.as_local(data.estimated_fully_charged).strftime(
-                    "%Y-%m-%d %H:%M:%S"
-                )
-                if data.estimated_fully_charged
-                else None
-            )
-
-            return {
-                "battery_charge_level": data.battery_charge_level_percentage,
-                "charging_status": data.charging_status,
-                "charger_connection_status": data.charger_connection_status,
-                "charging_power": data.charging_power_watts,
-                "charging_current": data.charging_current_amps,
-                "average_energy_consumption": data.average_energy_consumption_kwh_per_100km,
-                "estimated_range": data.estimated_distance_to_empty_km,
-                "estimated_full_charge_range": data.estimated_full_charge_range_km,
-                "estimated_charging_time_to_target_distance": data.estimated_charging_time_minutes_to_target_distance,
-                "estimated_charging_time_to_full": data.estimated_charging_time_to_full_minutes,
-                "estimated_fully_charged_time": estimated_fully_charged_time,
-                "last_updated_battery_data": data.event_updated_timestamp,
-            }
-        else:
-            _LOGGER.warning("No battery information for VIN %s", self.vin)
-            return {}
-
-    def get_car_odometer(self) -> dict[str, Any]:
-        """Get current car odometer readings"""
-
-        if (telematics := self.polestar_api.get_car_telematics(self.vin)) and (
-            data := telematics.odometer
-        ):
-            return {
-                "current_odometer": data.odometer_meters,
-                "average_speed": data.average_speed_km_per_hour,
-                "current_trip_meter_automatic": data.trip_meter_automatic_km,
-                "current_trip_meter_manual": data.trip_meter_manual_km,
-                "last_updated_odometer_data": data.event_updated_timestamp,
-            }
-        else:
-            _LOGGER.warning("No odometer information for VIN %s", self.vin)
-            return {}
-
-    def get_car_health(self) -> dict[str, Any]:
-        """Get current car health readings"""
-
-        if (telematics := self.polestar_api.get_car_telematics(self.vin)) and (
-            data := telematics.health
-        ):
-            return {
-                "days_to_service": data.days_to_service,
-                "distance_to_service": data.distance_to_service_km,
-                "brake_fluid_level_warning": data.brake_fluid_level_warning,
-                "engine_coolant_level_warning": data.engine_coolant_level_warning,
-                "oil_level_warning": data.oil_level_warning,
-                "service_warning": data.service_warning,
-                "last_updated_health_data": data.event_updated_timestamp,
-            }
-        else:
-            # log as debug for now as data is missing for some models
-            _LOGGER.debug("No health information for VIN %s", self.vin)
-            return {}
-
     async def _async_update_data(self) -> Any:
         """Update data via library."""
 
-        res = self.car_information.copy()
+        res = {}
         try:
             await self.polestar_api.update_latest_data(
                 vin=self.vin,
@@ -157,9 +80,21 @@ class PolestarCoordinator(DataUpdateCoordinator):
                 update_battery=False,
                 update_odometer=False,
             )
-            res.update(self.get_car_odometer())
-            res.update(self.get_car_battery())
-            res.update(self.get_car_health())
+
+            if car_telematics_data := self.polestar_api.get_car_telematics(self.vin):
+                self.car_odometer_data = car_telematics_data.odometer
+                self.car_battery_data = car_telematics_data.battery
+                self.car_health_data = car_telematics_data.health
+
+            if not self.car_odometer_data:
+                _LOGGER.warning("No odometer information for VIN %s", self.vin)
+
+            if not self.car_battery_data:
+                _LOGGER.warning("No battery information for VIN %s", self.vin)
+
+            if not self.car_health_data:
+                _LOGGER.debug("No health information for VIN %s", self.vin)
+
         except PolestarAuthException as exc:
             _LOGGER.error("Authentication failed for VIN %s: %s", self.vin, str(exc))
             res["api_connected"] = False

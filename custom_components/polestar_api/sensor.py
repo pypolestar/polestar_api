@@ -241,7 +241,7 @@ ENTITY_DESCRIPTIONS: Final[tuple[PolestarSensorDescription, ...]] = (
         suggested_display_precision=0,
     ),
     PolestarSensorDescription(
-        key="distance_to_service_km",
+        key="distance_to_service",
         icon="mdi:map-marker-distance",
         native_unit_of_measurement=UnitOfLength.KILOMETERS,
         suggested_display_precision=0,

@@ -134,7 +134,7 @@ class PolestarCoordinator(DataUpdateCoordinator):
         ):
             return {
                 "days_to_service": data.days_to_service,
-                "distance_to_service_km": data.distance_to_service_km,
+                "distance_to_service": data.distance_to_service_km,
                 "brake_fluid_level_warning": data.brake_fluid_level_warning,
                 "engine_coolant_level_warning": data.engine_coolant_level_warning,
                 "oil_level_warning": data.oil_level_warning,

@@ -78,7 +78,7 @@
       "polestar_days_to_service": {
         "name": "Days to service"
       },
-      "polestar_distance_to_service_km": {
+      "polestar_distance_to_service": {
         "name": "Distance to Service"
       },
       "polestar_engine_coolant_level_warning": {

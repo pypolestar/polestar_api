@@ -39,6 +39,13 @@ class PolestarEntityDescription(EntityDescription):
     data_attribute: str | None = None
     data_fn: Callable[[Any], Any] | None = None
 
+    def __post_init__(self):
+        """Validate the data source and attribute configuration."""
+        if bool(self.data_source) != bool(self.data_attribute):
+            raise ValueError(
+                "Both data_source and data_attribute must be provided together"
+            )
+
 
 class PolestarEntity(CoordinatorEntity[PolestarCoordinator]):
     """Base class for Polestar entities."""

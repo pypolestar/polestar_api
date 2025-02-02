@@ -59,6 +59,7 @@ class PolestarCoordinator(DataUpdateCoordinator):
 
     @property
     def model(self) -> str:
+        """Return the car model name, falling back to 'Unknown' if not available."""
         return (
             self.car_information_data.model_name if self.car_information_data else None
         ) or "Unknown"

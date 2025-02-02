@@ -31,7 +31,7 @@ ENTITY_DESCRIPTIONS: Final[tuple[PolestarImageDescription, ...]] = (
         key="car_image",
         entity_registry_enabled_default=False,
         data_source=PolestarEntityDataSource.INFORMATION,
-        data_attribute="image_url",
+        data_state_attribute="image_url",
     ),
 )
 

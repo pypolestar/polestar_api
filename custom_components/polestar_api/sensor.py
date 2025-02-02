@@ -416,8 +416,7 @@ class PolestarSensor(PolestarEntity, SensorEntity):
     def native_value(self) -> str | None:
         """Return the native value of the sensor."""
         try:
-            if value := self.get_native_value():
-                return value
+            return self.get_native_value()
         except PolestarEntityDataSourceException:
             _LOGGER.debug("Fallback to data dict %s", self.entity_description.key)
             return self.coordinator.data.get(self.entity_description.key)

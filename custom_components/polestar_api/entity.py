@@ -5,7 +5,7 @@ from __future__ import annotations
 import logging
 from dataclasses import dataclass
 from enum import StrEnum
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Callable
 
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity import EntityDescription
@@ -33,7 +33,7 @@ class PolestarEntityDescription(EntityDescription):
 
     data_source: PolestarEntityDataSource | None = None
     data_attribute: str | None = None
-    data_fn: Any | None = None
+    data_fn: Callable[[Any], Any] | None = None
 
 
 class PolestarEntity(CoordinatorEntity[PolestarCoordinator]):

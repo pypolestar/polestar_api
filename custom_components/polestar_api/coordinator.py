@@ -52,9 +52,7 @@ class PolestarCoordinator(DataUpdateCoordinator):
         )
         self.polestar_api = api
 
-        self.car_information_data: CarInformationData | None = (
-            self.polestar_api.get_car_information(self.vin)
-        )
+        self.car_information_data: CarInformationData | None = None
         self.car_odometer_data: CarOdometerData | None = None
         self.car_battery_data: CarBatteryData | None = None
         self.car_health_data: CarHealthData | None = None
@@ -73,6 +71,7 @@ class PolestarCoordinator(DataUpdateCoordinator):
         """Update data via library."""
 
         res = {}
+
         try:
             await self.polestar_api.update_latest_data(
                 vin=self.vin,
@@ -81,7 +80,14 @@ class PolestarCoordinator(DataUpdateCoordinator):
                 update_odometer=False,
             )
 
+            if self.car_information_data is None:
+                _LOGGER.debug("Updating car information")
+                self.car_information_data = self.polestar_api.get_car_information(
+                    self.vin
+                )
+
             if car_telematics_data := self.polestar_api.get_car_telematics(self.vin):
+                _LOGGER.debug("Updating car telematics")
                 self.car_odometer_data = car_telematics_data.odometer
                 self.car_battery_data = car_telematics_data.battery
                 self.car_health_data = car_telematics_data.health

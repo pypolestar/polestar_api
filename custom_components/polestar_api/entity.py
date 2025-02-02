@@ -27,6 +27,10 @@ class PolestarEntityDataSource(StrEnum):
     HEALTH = "car_health_data"
 
 
+class PolestarEntityDataSourceException(Exception):
+    """Exception raised when requested data source/attribute is missing"""
+
+
 @dataclass(frozen=True)
 class PolestarEntityDescription(EntityDescription):
     """Describes a Polestar entity."""
@@ -93,4 +97,4 @@ class PolestarEntity(CoordinatorEntity[PolestarCoordinator]):
                 _LOGGER.debug("%s not available", self.entity_description.data_source)
 
             return None
-        raise AttributeError
+        raise PolestarEntityDataSourceException

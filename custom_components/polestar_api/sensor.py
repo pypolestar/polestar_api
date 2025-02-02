@@ -24,7 +24,12 @@ from homeassistant.const import (
     UnitOfTime,
 )
 
-from .entity import PolestarEntity, PolestarEntityDataSource, PolestarEntityDescription
+from .entity import (
+    PolestarEntity,
+    PolestarEntityDataSource,
+    PolestarEntityDataSourceException,
+    PolestarEntityDescription,
+)
 
 if TYPE_CHECKING:
     from homeassistant.core import HomeAssistant
@@ -387,6 +392,6 @@ class PolestarSensor(PolestarEntity, SensorEntity):
         try:
             if value := self.get_native_value():
                 return value
-        except AttributeError:
+        except PolestarEntityDataSourceException:
             _LOGGER.debug("Fallback to data dict %s", self.entity_description.key)
             return self.coordinator.data.get(self.entity_description.key)

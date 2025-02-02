@@ -40,7 +40,7 @@
         "name": "API Token Expires At"
       },
       "polestar_average_energy_consumption": {
-        "name": "Avg. Energy Consumption"
+        "name": "Average Energy Consumption"
       },
       "polestar_average_speed": {
         "name": "Average Speed"
@@ -50,6 +50,9 @@
       },
       "polestar_battery_charge_level": {
         "name": "Battery Charge Level"
+      },
+      "polestar_brake_fluid_level_warning": {
+        "name": "Brake Fluid Level Warning"
       },
       "polestar_charger_connection_status": {
         "name": "Charger Connection Status"
@@ -72,6 +75,15 @@
       "polestar_current_trip_meter_manual": {
         "name": "Trip Meter Manual"
       },
+      "polestar_days_to_service": {
+        "name": "Days to service"
+      },
+      "polestar_distance_to_service": {
+        "name": "Distance to Service"
+      },
+      "polestar_engine_coolant_level_warning": {
+        "name": "Engine Coolant Level Warning"
+      },
       "polestar_estimated_charging_time_to_full": {
         "name": "Charging Time"
       },
@@ -93,14 +105,23 @@
       "polestar_last_updated_battery_data": {
         "name": "Last Updated Battery Data"
       },
+      "polestar_last_updated_health_data": {
+        "name": "Last Updated Health Data"
+      },
       "polestar_last_updated_odometer_data": {
         "name": "Last Updated Odometer Data"
       },
       "polestar_model_name": {
         "name": "Model Name"
       },
+      "polestar_oil_level_warning": {
+        "name": "Oil Level Warning"
+      },
       "polestar_registration_number": {
         "name": "Registration Number"
+      },
+      "polestar_service_warning": {
+        "name": "Service Warning"
       },
       "polestar_software_version": {
         "name": "Software Version"

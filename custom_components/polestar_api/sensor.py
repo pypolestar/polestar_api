@@ -186,6 +186,13 @@ ENTITY_DESCRIPTIONS: Final[tuple[PolestarSensorDescription, ...]] = (
         entity_category=EntityCategory.DIAGNOSTIC,
     ),
     PolestarSensorDescription(
+        key="last_updated_health_data",
+        icon="mdi:clock",
+        native_unit_of_measurement=None,
+        device_class=SensorDeviceClass.TIMESTAMP,
+        entity_category=EntityCategory.DIAGNOSTIC,
+    ),
+    PolestarSensorDescription(
         key="estimated_full_charge_range",
         icon="mdi:map-marker-distance",
         native_unit_of_measurement=UnitOfLength.KILOMETERS,
@@ -226,6 +233,40 @@ ENTITY_DESCRIPTIONS: Final[tuple[PolestarSensorDescription, ...]] = (
         suggested_display_precision=0,
         state_class=SensorStateClass.TOTAL,
         device_class=SensorDeviceClass.ENERGY,
+    ),
+    PolestarSensorDescription(
+        key="days_to_service",
+        icon="mdi:calendar",
+        native_unit_of_measurement=UnitOfTime.DAYS,
+        suggested_display_precision=0,
+    ),
+    PolestarSensorDescription(
+        key="distance_to_service",
+        icon="mdi:map-marker-distance",
+        native_unit_of_measurement=UnitOfLength.KILOMETERS,
+        suggested_display_precision=0,
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.DISTANCE,
+    ),
+    PolestarSensorDescription(
+        key="brake_fluid_level_warning",
+        icon="mdi:alert",
+        native_unit_of_measurement=None,
+    ),
+    PolestarSensorDescription(
+        key="engine_coolant_level_warning",
+        icon="mdi:alert",
+        native_unit_of_measurement=None,
+    ),
+    PolestarSensorDescription(
+        key="oil_level_warning",
+        icon="mdi:alert",
+        native_unit_of_measurement=None,
+    ),
+    PolestarSensorDescription(
+        key="service_warning",
+        icon="mdi:alert",
+        native_unit_of_measurement=None,
     ),
 )
 

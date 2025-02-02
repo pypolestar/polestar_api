@@ -103,7 +103,11 @@ class PolestarEntity(CoordinatorEntity[PolestarCoordinator]):
                         self.entity_id,
                     )
             else:
-                _LOGGER.debug("%s not available", self.entity_description.data_source)
+                _LOGGER.debug(
+                    "%s not available for entity %s",
+                    self.entity_description.data_source,
+                    self.entity_id,
+                )
 
             return None
         raise PolestarEntityDataSourceException

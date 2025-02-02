@@ -48,36 +48,6 @@ class PolestarSensorDescription(SensorEntityDescription, PolestarEntityDescripti
 
 INFORMATION_ENTITY_DESCRIPTIONS: Final[tuple[PolestarSensorDescription, ...]] = (
     PolestarSensorDescription(
-        key="vin",
-        icon="mdi:card-account-details",
-        native_unit_of_measurement=None,
-        data_source=PolestarEntityDataSource.INFORMATION,
-        data_attribute="vin",
-    ),
-    PolestarSensorDescription(
-        key="software_version",
-        icon="mdi:information-outline",
-        native_unit_of_measurement=None,
-        entity_registry_enabled_default=False,
-        data_source=PolestarEntityDataSource.INFORMATION,
-        data_attribute="software_version",
-    ),
-    PolestarSensorDescription(
-        key="software_version_release",
-        icon="mdi:information-outline",
-        native_unit_of_measurement=None,
-        entity_registry_enabled_default=False,
-        data_source=PolestarEntityDataSource.INFORMATION,
-        data_attribute="software_version_timestamp",
-    ),
-    PolestarSensorDescription(
-        key="registration_number",
-        icon="mdi:numeric-1-box",
-        native_unit_of_measurement=None,
-        data_source=PolestarEntityDataSource.INFORMATION,
-        data_attribute="registration_no",
-    ),
-    PolestarSensorDescription(
         key="internal_vehicle_id",
         icon="mdi:numeric-1-box",
         native_unit_of_measurement=None,
@@ -86,11 +56,25 @@ INFORMATION_ENTITY_DESCRIPTIONS: Final[tuple[PolestarSensorDescription, ...]] = 
         data_attribute="internal_vehicle_identifier",
     ),
     PolestarSensorDescription(
+        key="vin",
+        icon="mdi:card-account-details",
+        native_unit_of_measurement=None,
+        data_source=PolestarEntityDataSource.INFORMATION,
+        data_attribute="vin",
+    ),
+    PolestarSensorDescription(
         key="model_name",
         icon="mdi:car-electric",
         native_unit_of_measurement=None,
         data_source=PolestarEntityDataSource.INFORMATION,
         data_attribute="model_name",
+    ),
+    PolestarSensorDescription(
+        key="registration_number",
+        icon="mdi:numeric-1-box",
+        native_unit_of_measurement=None,
+        data_source=PolestarEntityDataSource.INFORMATION,
+        data_attribute="registration_no",
     ),
     PolestarSensorDescription(
         key="torque",
@@ -110,6 +94,22 @@ INFORMATION_ENTITY_DESCRIPTIONS: Final[tuple[PolestarSensorDescription, ...]] = 
         data_attribute="battery_information",
         data_fn=lambda value: value.capacity if value else None,
     ),
+    PolestarSensorDescription(
+        key="software_version",
+        icon="mdi:information-outline",
+        native_unit_of_measurement=None,
+        entity_registry_enabled_default=False,
+        data_source=PolestarEntityDataSource.INFORMATION,
+        data_attribute="software_version",
+    ),
+    PolestarSensorDescription(
+        key="software_version_release",
+        icon="mdi:information-outline",
+        native_unit_of_measurement=None,
+        entity_registry_enabled_default=False,
+        data_source=PolestarEntityDataSource.INFORMATION,
+        data_attribute="software_version_timestamp",
+    ),
 )
 
 ODOMETER_ENTITY_DESCRIPTIONS: Final[tuple[PolestarSensorDescription, ...]] = (
@@ -123,15 +123,6 @@ ODOMETER_ENTITY_DESCRIPTIONS: Final[tuple[PolestarSensorDescription, ...]] = (
         device_class=SensorDeviceClass.DISTANCE,
         data_source=PolestarEntityDataSource.ODOMETER,
         data_attribute="odometer_meters",
-    ),
-    PolestarSensorDescription(
-        key="average_speed",
-        icon="mdi:speedometer",
-        native_unit_of_measurement=UnitOfSpeed.KILOMETERS_PER_HOUR,
-        state_class=SensorStateClass.MEASUREMENT,
-        device_class=SensorDeviceClass.SPEED,
-        data_source=PolestarEntityDataSource.ODOMETER,
-        data_attribute="average_speed_km_per_hour",
     ),
     PolestarSensorDescription(
         key="current_trip_meter_automatic",
@@ -152,6 +143,15 @@ ODOMETER_ENTITY_DESCRIPTIONS: Final[tuple[PolestarSensorDescription, ...]] = (
         device_class=SensorDeviceClass.DISTANCE,
         data_source=PolestarEntityDataSource.ODOMETER,
         data_attribute="trip_meter_manual_km",
+    ),
+    PolestarSensorDescription(
+        key="average_speed",
+        icon="mdi:speedometer",
+        native_unit_of_measurement=UnitOfSpeed.KILOMETERS_PER_HOUR,
+        state_class=SensorStateClass.MEASUREMENT,
+        device_class=SensorDeviceClass.SPEED,
+        data_source=PolestarEntityDataSource.ODOMETER,
+        data_attribute="average_speed_km_per_hour",
     ),
     PolestarSensorDescription(
         key="last_updated_odometer_data",
@@ -397,13 +397,19 @@ class PolestarSensor(PolestarEntity, SensorEntity):
         match self.entity_description.key:
             case "vin":
                 self._attr_extra_state_attributes = {
-                    "factory_complete_date": self.coordinator.data.get(
-                        "factory_complete_date"
+                    "factory_complete_date": getattr(
+                        self.coordinator.car_information_data,
+                        "factory_complete_date",
+                        None,
                     )
                 }
             case "registration_number":
                 self._attr_extra_state_attributes = {
-                    "registration_date": self.coordinator.data.get("registration_date")
+                    "registration_date": getattr(
+                        self.coordinator.car_information_data,
+                        "registration_date",
+                        None,
+                    )
                 }
 
     @property

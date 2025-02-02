@@ -75,9 +75,10 @@ class PolestarEntity(CoordinatorEntity[PolestarCoordinator]):
             if data := getattr(self.coordinator, self.entity_description.data_source):
                 if not hasattr(data, self.entity_description.data_attribute):
                     _LOGGER.error(
-                        "Invalid attribute %s.%s",
+                        "Invalid attribute %s.%s for entity %s",
                         self.entity_description.data_source,
                         self.entity_description.data_attribute,
+                        self.entity_id,
                     )
                     return None
 
@@ -89,9 +90,10 @@ class PolestarEntity(CoordinatorEntity[PolestarCoordinator]):
                     )
                 else:
                     _LOGGER.debug(
-                        "%s.%s not available",
+                        "%s.%s not available for entity %s",
                         self.entity_description.data_source,
                         self.entity_description.data_attribute,
+                        self.entity_id,
                     )
             else:
                 _LOGGER.debug("%s not available", self.entity_description.data_source)

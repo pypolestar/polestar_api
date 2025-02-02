@@ -86,6 +86,7 @@ class PolestarCoordinator(DataUpdateCoordinator):
                     self.vin
                 )
 
+            # Car telematics includes odometer, battery and health data
             if car_telematics_data := self.polestar_api.get_car_telematics(self.vin):
                 _LOGGER.debug("Updating car telematics")
                 self.car_odometer_data = car_telematics_data.odometer
@@ -93,13 +94,14 @@ class PolestarCoordinator(DataUpdateCoordinator):
                 self.car_health_data = car_telematics_data.health
 
             if not self.car_odometer_data:
-                _LOGGER.warning("No odometer information for VIN %s", self.vin)
+                _LOGGER.warning("No odometer data for VIN %s", self.vin)
 
             if not self.car_battery_data:
-                _LOGGER.warning("No battery information for VIN %s", self.vin)
+                _LOGGER.warning("No battery data for VIN %s", self.vin)
 
             if not self.car_health_data:
-                _LOGGER.debug("No health information for VIN %s", self.vin)
+                # Do not warn about missing health data as it is not yet available for all car models
+                _LOGGER.debug("No health data for VIN %s", self.vin)
 
         except PolestarAuthException as exc:
             _LOGGER.error("Authentication failed for VIN %s: %s", self.vin, str(exc))

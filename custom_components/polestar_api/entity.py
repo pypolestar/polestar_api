@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
+from datetime import date, datetime
 from enum import StrEnum
 from typing import TYPE_CHECKING, Any, Callable
 
@@ -38,7 +39,13 @@ class PolestarEntityDescription(EntityDescription):
 
     data_source: PolestarEntityDataSource | None = None
     data_state_attribute: str | None = None
-    data_state_fn: Callable[[Any], Any] | None = None
+    data_state_fn: (
+        Callable[
+            [str | int | float | bool | date | datetime],
+            str | int | float | bool | date | datetime,
+        ]
+        | None
+    ) = None
     data_extra_state_attributes: dict[str, str] | None = None
 
     def __post_init__(self):

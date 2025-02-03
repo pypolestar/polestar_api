@@ -76,93 +76,105 @@ class PolestarEntity(CoordinatorEntity[PolestarCoordinator]):
             serial_number=self.coordinator.vin,
         )
         if self.entity_description.data_extra_state_attributes:
-            self._attr_extra_state_attributes = self.get_extra_state_attributes()
+            self._attr_extra_state_attributes = self.get_extra_state_attributes() or {}
 
     @callback
     def _handle_coordinator_update(self) -> None:
         """Handle updated data from the coordinator."""
         if hasattr(self, "_attr_extra_state_attributes"):
-            self._attr_extra_state_attributes = self.get_extra_state_attributes()
+            self._attr_extra_state_attributes = self.get_extra_state_attributes() or {}
         super()._handle_coordinator_update()
 
-    def get_extra_state_attributes(self) -> dict[str, Any]:
+    def get_extra_state_attributes(self) -> dict[str, Any] | None:
         """Return extra state attributes."""
-        res = {}
-        if (
+
+        if not (
             self.entity_description.data_source
             and self.entity_description.data_extra_state_attributes
         ):
-            for (
-                key,
-                data_attribute,
-            ) in self.entity_description.data_extra_state_attributes.items():
-                if data := getattr(
-                    self.coordinator, self.entity_description.data_source
-                ):
-                    if not hasattr(data, data_attribute):
-                        _LOGGER.error(
-                            "Invalid extra state attribute %s.%s for entity %s",
-                            self.entity_description.data_source,
-                            data_attribute,
-                            self.entity_id,
-                        )
-                        value = None
-                    else:
-                        value = getattr(data, data_attribute, None)
-                        if value is None:
-                            _LOGGER.debug(
-                                "%s.%s not available for entity %s",
-                                self.entity_description.data_source,
-                                data_attribute,
-                                self.entity_id,
-                            )
-                else:
-                    _LOGGER.debug(
-                        "%s not available for entity %s",
-                        self.entity_description.data_source,
-                        self.entity_id,
-                    )
+            return
 
-                res[key] = value
+        # ensure the coordinator has the data source
+        data = getattr(self.coordinator, self.entity_description.data_source, None)
+        if data is None:
+            _LOGGER.debug(
+                "%s not available for entity %s",
+                self.entity_description.data_source,
+                self.entity_id,
+            )
+            return
+
+        # get all extra state attributes
+        res = {}
+        for (
+            key,
+            data_attribute,
+        ) in self.entity_description.data_extra_state_attributes.items():
+            # ensure the data source has the requested attribute
+            if not hasattr(data, data_attribute):
+                _LOGGER.error(
+                    "Invalid extra state attribute %s.%s for entity %s",
+                    self.entity_description.data_source,
+                    data_attribute,
+                    self.entity_id,
+                )
+                res[key] = None
+                continue
+
+            # ensure the requested value is available
+            value = getattr(data, data_attribute, None)
+            if value is None:
+                _LOGGER.debug(
+                    "%s.%s not available for entity %s",
+                    self.entity_description.data_source,
+                    data_attribute,
+                    self.entity_id,
+                )
+            res[key] = value
+
         return res
 
     def get_native_value(self) -> str | None:
         """Return native value."""
-        if (
+        if not (
             self.entity_description.data_source
             and self.entity_description.data_state_attribute
         ):
-            if data := getattr(self.coordinator, self.entity_description.data_source):
-                if not hasattr(data, self.entity_description.data_state_attribute):
-                    _LOGGER.error(
-                        "Invalid state attribute %s.%s for entity %s",
-                        self.entity_description.data_source,
-                        self.entity_description.data_state_attribute,
-                        self.entity_id,
-                    )
-                    return None
+            raise PolestarEntityDataSourceException
 
-                if value := getattr(
-                    data, self.entity_description.data_state_attribute, None
-                ):
-                    return (
-                        self.entity_description.data_state_fn(value)
-                        if self.entity_description.data_state_fn
-                        else value
-                    )
-                else:
-                    _LOGGER.debug(
-                        "%s.%s not available for entity %s",
-                        self.entity_description.data_source,
-                        self.entity_description.data_state_attribute,
-                        self.entity_id,
-                    )
-            else:
-                _LOGGER.debug(
-                    "%s not available for entity %s",
-                    self.entity_description.data_source,
-                    self.entity_id,
-                )
+        # ensure the coordinator has the data source
+        data = getattr(self.coordinator, self.entity_description.data_source, None)
+        if not data:
+            _LOGGER.debug(
+                "%s not available for entity %s",
+                self.entity_description.data_source,
+                self.entity_id,
+            )
+            return
 
-            return None
-        raise PolestarEntityDataSourceException
+        # ensure the data source has the requested attribute
+        if not hasattr(data, self.entity_description.data_state_attribute):
+            _LOGGER.error(
+                "Invalid state attribute %s.%s for entity %s",
+                self.entity_description.data_source,
+                self.entity_description.data_state_attribute,
+                self.entity_id,
+            )
+            return
+
+        # ensure the requested value is available
+        value = getattr(data, self.entity_description.data_state_attribute, None)
+        if value is None:
+            _LOGGER.debug(
+                "%s.%s not available for entity %s",
+                self.entity_description.data_source,
+                self.entity_description.data_state_attribute,
+                self.entity_id,
+            )
+            return
+
+        return (
+            self.entity_description.data_state_fn(value)
+            if self.entity_description.data_state_fn
+            else value
+        )

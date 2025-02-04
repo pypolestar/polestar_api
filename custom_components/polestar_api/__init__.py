@@ -6,6 +6,7 @@ import logging
 from typing import TYPE_CHECKING
 
 from homeassistant.const import CONF_PASSWORD, CONF_USERNAME, Platform
+from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.httpx_client import create_async_httpx_client
 from homeassistant.loader import async_get_loaded_integration
 from pypolestar import PolestarApi
@@ -83,3 +84,10 @@ async def async_unload_entry(hass: HomeAssistant, entry: PolestarConfigEntry) ->
 
     _LOGGER.debug("async_unload_entry: %s", entry)
     return await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
+
+
+async def async_remove_config_entry_device(
+    hass: HomeAssistant, config_entry: PolestarConfigEntry, device_entry: DeviceEntry
+) -> bool:
+    """Remove a config entry from a device."""
+    return True

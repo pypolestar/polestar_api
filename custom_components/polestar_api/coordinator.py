@@ -74,12 +74,7 @@ class PolestarCoordinator(DataUpdateCoordinator):
         res = {}
 
         try:
-            await self.polestar_api.update_latest_data(
-                vin=self.vin,
-                update_telematics=True,
-                update_battery=False,
-                update_odometer=False,
-            )
+            await self.polestar_api.update_latest_data(vin=self.vin)
 
             if self.car_information_data is None:
                 _LOGGER.debug("Updating car information")

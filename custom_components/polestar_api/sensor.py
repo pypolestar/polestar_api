@@ -6,7 +6,6 @@ import logging
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Final
 
-import homeassistant.util.dt as dt_util
 from homeassistant.components.sensor import (
     SensorDeviceClass,
     SensorEntity,
@@ -259,13 +258,9 @@ BATTERY_ENTITY_DESCRIPTIONS: Final[tuple[PolestarSensorDescription, ...]] = (
         key="estimated_fully_charged_time",
         icon="mdi:battery-clock",
         native_unit_of_measurement=None,
-        state_class=SensorStateClass.MEASUREMENT,
-        device_class=SensorDeviceClass.DURATION,
+        device_class=SensorDeviceClass.TIMESTAMP,
         data_source=PolestarEntityDataSource.BATTERY,
         data_state_attribute="estimated_fully_charged",
-        data_state_fn=lambda value: dt_util.as_local(value).strftime(
-            "%Y-%m-%d %H:%M:%S"
-        ),
     ),
     PolestarSensorDescription(
         key="last_updated_battery_data",

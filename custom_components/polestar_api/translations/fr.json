@@ -51,6 +51,9 @@
       "polestar_battery_charge_level": {
         "name": "Niveau de charge de la betterie"
       },
+      "polestar_brake_fluid_level_warning": {
+        "name": "Alerte de niveau de liquide de frein"
+      },
       "polestar_charger_connection_status": {
         "name": "État de connexion du chargeur"
       },
@@ -72,6 +75,15 @@
       "polestar_current_trip_meter_manual": {
         "name": "Compteur kilométrique manuel"
       },
+      "polestar_days_to_service": {
+        "name": "Jours jusqu'au prochain service"
+      },
+      "polestar_distance_to_service": {
+        "name": "Distance jusqu'au prochain service"
+      },
+      "polestar_engine_coolant_level_warning": {
+        "name": "Alerte de niveau de liquide de refroidissement moteur"
+      },
       "polestar_estimated_charging_time_to_full": {
         "name": "Temps de recharge jusqu'à recharge complète"
       },
@@ -87,8 +99,14 @@
       "polestar_estimated_range": {
         "name": "Estimé de l'autonomie"
       },
+      "polestar_internal_vehicle_id": {
+        "name": "Identifiant interne du véhicule"
+      },
       "polestar_last_updated_battery_data": {
         "name": "Dernière mise à jour des données de batterie"
+      },
+      "polestar_last_updated_health_data": {
+        "name": "Dernière mise à jour des données de santé"
       },
       "polestar_last_updated_odometer_data": {
         "name": "Dernière mise à jour des données d'odomètre"
@@ -96,11 +114,20 @@
       "polestar_model_name": {
         "name": "Nom du modèle"
       },
+      "polestar_oil_level_warning": {
+        "name": "Alerte de niveau d'huile"
+      },
       "polestar_registration_number": {
         "name": "Numéro d'enregistrement"
       },
+      "polestar_service_warning": {
+        "name": "Alerte de service"
+      },
       "polestar_software_version": {
         "name": "Version du logiciel"
+      },
+      "polestar_software_version_release": {
+        "name": "Date de la version du logiciel"
       },
       "polestar_torque": {
         "name": "Couple"

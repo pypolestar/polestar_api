@@ -49,7 +49,7 @@
         "name": "Capacité de la batterie"
       },
       "polestar_battery_charge_level": {
-        "name": "Niveau de charge de la betterie"
+        "name": "Niveau de charge de la batterie"
       },
       "polestar_charger_connection_status": {
         "name": "État de connexion du chargeur"

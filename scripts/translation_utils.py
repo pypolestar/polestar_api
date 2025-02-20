@@ -2,6 +2,7 @@
 
 import argparse
 import json
+import logging
 from pathlib import Path
 
 ALL_STRINGS = Path("custom_components/polestar_api/strings.json")
@@ -28,25 +29,22 @@ def cross_check_strings(all_strings, translated_strings, language_tag: str):
 
     for entity_type in all_entity_strings:
         if entity_type not in entity_strings:
-            print(f"Missing entity type {entity_type} in {language_tag}")
-            print("")
+            logging.warning(f"Missing entity type {entity_type} in {language_tag}")
             continue
 
         missing_strings = all_entity_strings[entity_type] - entity_strings[entity_type]
         superflous_strings = (
             entity_strings[entity_type] - all_entity_strings[entity_type]
         )
-        if missing_strings:
-            print(f"Missing strings for {entity_type} in {language_tag}")
-            for string in missing_strings:
-                print(f"- {string}")
-            print("")
+        for string in missing_strings:
+            logging.warning(
+                f"Missing string for {entity_type} in {language_tag}, {string}"
+            )
 
-        if superflous_strings:
-            print(f"Superflous strings for {entity_type} in {language_tag}")
-            for string in superflous_strings:
-                print(f"- {string}")
-            print("")
+        for string in superflous_strings:
+            logging.warning(
+                f"Superflous string for {entity_type} in {language_tag}, {string}"
+            )
 
 
 def sort_json_keys(filename: Path, check_only: bool = False) -> None:
@@ -61,16 +59,16 @@ def sort_json_keys(filename: Path, check_only: bool = False) -> None:
     # Compare input and output
     if input_data == output_data:
         if not check_only:
-            print(f"Input already sorted {filename}")
+            logging.info(f"Input already sorted {filename}")
         return
 
     if check_only:
-        print(f"Input not sorted: {filename}")
+        logging.error(f"Input not sorted: {filename}")
         raise SystemExit(1)
 
     with open(filename, "w") as fp:
         fp.write(output_data)
-    print(f"Sorted {filename}")
+    logging.info(f"Sorted {filename}")
 
 
 def main() -> None:

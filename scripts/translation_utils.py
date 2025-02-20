@@ -13,8 +13,8 @@ def get_all_translated_strings_filenames() -> list[Path]:
     return list(Path(TRANSLATED_STRINGS_DIR).glob("*.json"))
 
 
-def check_strings(all_strings, translated_strings, language_tag: str):
-    """Check strings against all translations."""
+def cross_check_strings(all_strings, translated_strings, language_tag: str):
+    """Cross check strings against all translations."""
 
     all_entity_strings: dict[str, set[str]] = {
         entity_type: set(entity_strings.keys())
@@ -49,14 +49,27 @@ def check_strings(all_strings, translated_strings, language_tag: str):
             print("")
 
 
-def sort_json_keys(filename: Path) -> None:
+def sort_json_keys(filename: Path, check_only: bool = False) -> None:
     """Sort keys in a JSON file."""
 
     with open(filename) as fp:
-        data = json.load(fp)
+        input_data = fp.read()
+        data = json.loads(input_data)
+
+    output_data = json.dumps(data, indent=2, sort_keys=True, ensure_ascii=False) + "\n"
+
+    # Compare input and output
+    if input_data == output_data:
+        if not check_only:
+            print(f"Input already sorted {filename}")
+        return
+
+    if check_only:
+        print(f"Input not sorted: {filename}")
+        raise SystemExit(1)
+
     with open(filename, "w") as fp:
-        json.dump(data, fp, indent=2, sort_keys=True, ensure_ascii=False)
-        fp.write("\n")
+        fp.write(output_data)
     print(f"Sorted {filename}")
 
 
@@ -64,26 +77,24 @@ def main() -> None:
     """Main function."""
 
     arg_parser = argparse.ArgumentParser()
-    arg_parser.add_argument(
-        "--check", action=argparse.BooleanOptionalAction, default=True
-    )
     arg_parser.add_argument("--sort", action=argparse.BooleanOptionalAction)
+    arg_parser.add_argument("--test", action=argparse.BooleanOptionalAction)
     args = arg_parser.parse_args()
 
-    if args.check:
-        with open(ALL_STRINGS) as fp:
-            all_strings = json.load(fp)
+    check_only = args.test or not args.sort
 
-        for filename in get_all_translated_strings_filenames():
-            language_tag = filename.stem
-            with open(filename) as fp:
-                translated_strings = json.load(fp)
-            check_strings(all_strings, translated_strings, language_tag)
+    with open(ALL_STRINGS) as fp:
+        all_strings = json.load(fp)
 
-    if args.sort:
-        sort_json_keys(ALL_STRINGS)
-        for filename in get_all_translated_strings_filenames():
-            sort_json_keys(filename)
+    for filename in get_all_translated_strings_filenames():
+        language_tag = filename.stem
+        with open(filename) as fp:
+            translated_strings = json.load(fp)
+        cross_check_strings(all_strings, translated_strings, language_tag)
+
+    sort_json_keys(ALL_STRINGS, check_only=check_only)
+    for filename in get_all_translated_strings_filenames():
+        sort_json_keys(filename, check_only=check_only)
 
 
 if __name__ == "__main__":

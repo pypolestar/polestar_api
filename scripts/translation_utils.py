@@ -2,6 +2,7 @@
 
 import argparse
 import json
+import logging
 from pathlib import Path
 
 ALL_STRINGS = Path("custom_components/polestar_api/strings.json")
@@ -13,8 +14,8 @@ def get_all_translated_strings_filenames() -> list[Path]:
     return list(Path(TRANSLATED_STRINGS_DIR).glob("*.json"))
 
 
-def check_strings(all_strings, translated_strings, language_tag: str):
-    """Check strings against all translations."""
+def cross_check_strings(all_strings, translated_strings, language_tag: str):
+    """Cross check strings against all translations."""
 
     all_entity_strings: dict[str, set[str]] = {
         entity_type: set(entity_strings.keys())
@@ -28,62 +29,70 @@ def check_strings(all_strings, translated_strings, language_tag: str):
 
     for entity_type in all_entity_strings:
         if entity_type not in entity_strings:
-            print(f"Missing entity type {entity_type} in {language_tag}")
-            print("")
+            logging.warning(f"Missing entity type {entity_type} in {language_tag}")
             continue
 
         missing_strings = all_entity_strings[entity_type] - entity_strings[entity_type]
         superflous_strings = (
             entity_strings[entity_type] - all_entity_strings[entity_type]
         )
-        if missing_strings:
-            print(f"Missing strings for {entity_type} in {language_tag}")
-            for string in missing_strings:
-                print(f"- {string}")
-            print("")
+        for string in missing_strings:
+            logging.warning(
+                f"Missing string for {entity_type} in {language_tag}, {string}"
+            )
 
-        if superflous_strings:
-            print(f"Superflous strings for {entity_type} in {language_tag}")
-            for string in superflous_strings:
-                print(f"- {string}")
-            print("")
+        for string in superflous_strings:
+            logging.warning(
+                f"Superflous string for {entity_type} in {language_tag}, {string}"
+            )
 
 
-def sort_json_keys(filename: Path) -> None:
+def sort_json_keys(filename: Path, check_only: bool = False) -> None:
     """Sort keys in a JSON file."""
 
     with open(filename) as fp:
-        data = json.load(fp)
+        input_data = fp.read()
+        data = json.loads(input_data)
+
+    output_data = json.dumps(data, indent=2, sort_keys=True, ensure_ascii=False) + "\n"
+
+    # Compare input and output
+    if input_data == output_data:
+        if not check_only:
+            logging.info(f"Input already sorted {filename}")
+        return
+
+    if check_only:
+        logging.error(f"Input not sorted: {filename}")
+        raise SystemExit(1)
+
     with open(filename, "w") as fp:
-        json.dump(data, fp, indent=2, sort_keys=True, ensure_ascii=False)
-        fp.write("\n")
-    print(f"Sorted {filename}")
+        fp.write(output_data)
+    logging.info(f"Sorted {filename}")
 
 
 def main() -> None:
     """Main function."""
 
     arg_parser = argparse.ArgumentParser()
-    arg_parser.add_argument(
-        "--check", action=argparse.BooleanOptionalAction, default=True
-    )
     arg_parser.add_argument("--sort", action=argparse.BooleanOptionalAction)
+    arg_parser.add_argument("--test", action=argparse.BooleanOptionalAction)
     args = arg_parser.parse_args()
 
-    if args.check:
-        with open(ALL_STRINGS) as fp:
-            all_strings = json.load(fp)
+    check_only = args.test or not args.sort
 
-        for filename in get_all_translated_strings_filenames():
-            language_tag = filename.stem
-            with open(filename) as fp:
-                translated_strings = json.load(fp)
-            check_strings(all_strings, translated_strings, language_tag)
+    with open(ALL_STRINGS) as fp:
+        all_strings = json.load(fp)
 
-    if args.sort:
-        sort_json_keys(ALL_STRINGS)
-        for filename in get_all_translated_strings_filenames():
-            sort_json_keys(filename)
+    for filename in get_all_translated_strings_filenames():
+        language_tag = filename.stem
+        with open(filename) as fp:
+            translated_strings = json.load(fp)
+        cross_check_strings(all_strings, translated_strings, language_tag)
+
+    sort_json_keys(ALL_STRINGS, check_only=check_only)
+    for filename in get_all_translated_strings_filenames():
+        sort_json_keys(filename, check_only=check_only)
 
 
 if __name__ == "__main__":

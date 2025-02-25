@@ -1,4 +1,5 @@
 # https://www.home-assistant.io/integrations/homeassistant/
+
 homeassistant:
   debug: true
 
@@ -15,4 +16,4 @@ logger:
   default: info
   logs:
     custom_components.polestar_api: debug
-    #pypolestar: debug
+    pypolestar: debug

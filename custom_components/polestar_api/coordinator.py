@@ -9,7 +9,7 @@ from typing import TYPE_CHECKING, Any
 import homeassistant.util.dt as dt_util
 from homeassistant.exceptions import ConfigEntryAuthFailed
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
-from pypolestar.exceptions import PolestarApiException, PolestarAuthException
+from pypolestar.exceptions import PolestarApiException, PolestarAuthFailedException
 from pypolestar.models import (
     CarBatteryData,
     CarHealthData,
@@ -99,7 +99,7 @@ class PolestarCoordinator(DataUpdateCoordinator):
                 # Do not warn about missing health data as it is not yet available for all car models
                 _LOGGER.debug("No health data for VIN %s", self.vin)
 
-        except PolestarAuthException as exc:
+        except PolestarAuthFailedException as exc:
             _LOGGER.error("Authentication failed for VIN %s: %s", self.vin, str(exc))
             res["api_connected"] = False
             raise ConfigEntryAuthFailed(exc) from exc

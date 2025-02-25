@@ -1,5 +1,6 @@
 colorlog==6.8.2
-homeassistant>=2025.2.5
+#homeassistant>=2025.3.0
+git+https://github.com/home-assistant/core.git@dev
 pip>=21.3.1
 ruff==0.8.6
 gql[httpx]>=3.5.0

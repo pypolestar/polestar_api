@@ -70,11 +70,13 @@ class PolestarCoordinator(DataUpdateCoordinator):
 
     def need_car_information_refresh(self) -> bool:
         """Return True if car information needs a refresh"""
-        return self.car_information_data is None or (
-            datetime.now(tz=timezone.utc)
-            - self.car_information_data._received_timestamp
-            > CAR_INFORMATION_UPDATE_INTERVAL
-        )
+
+        if self.car_information_data is None:
+            return True
+
+        current_time = datetime.now(tz=timezone.utc)
+        last_update = self.car_information_data._received_timestamp
+        return (current_time - last_update) > CAR_INFORMATION_UPDATE_INTERVAL
 
     async def _async_update_data(self) -> Any:
         """Update data via library."""

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import TYPE_CHECKING, Any
 
 import homeassistant.util.dt as dt_util
@@ -17,7 +17,7 @@ from pypolestar.models import (
     CarOdometerData,
 )
 
-from .const import DEFAULT_SCAN_INTERVAL
+from .const import CAR_INFORMATION_UPDATE_INTERVAL, DEFAULT_SCAN_INTERVAL
 
 if TYPE_CHECKING:
     from homeassistant.core import HomeAssistant
@@ -68,6 +68,14 @@ class PolestarCoordinator(DataUpdateCoordinator):
         """Last 4 characters of the VIN"""
         return self.vin[-4:]
 
+    def need_car_information_refresh(self) -> bool:
+        """Return True if car information needs a refresh"""
+        return self.car_information_data is None or (
+            datetime.now(tz=timezone.utc)
+            - self.car_information_data._received_timestamp
+            > CAR_INFORMATION_UPDATE_INTERVAL
+        )
+
     async def _async_update_data(self) -> Any:
         """Update data via library."""
 
@@ -76,7 +84,7 @@ class PolestarCoordinator(DataUpdateCoordinator):
         try:
             await self.polestar_api.update_latest_data(vin=self.vin)
 
-            if self.car_information_data is None:
+            if self.need_car_information_refresh():
                 _LOGGER.debug("Updating car information")
                 self.car_information_data = self.polestar_api.get_car_information(
                     self.vin

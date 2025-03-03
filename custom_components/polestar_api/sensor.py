@@ -246,7 +246,7 @@ BATTERY_ENTITY_DESCRIPTIONS: Final[tuple[PolestarSensorDescription, ...]] = (
     ),
     PolestarSensorDescription(
         key="average_energy_consumption",
-        icon="mdi:battery-clock",
+        icon="mdi:lightning-bolt-circle",
         native_unit_of_measurement=UNIT_OF_ENERGY_DISTANCE,
         suggested_display_precision=1,
         state_class=SensorStateClass.MEASUREMENT,

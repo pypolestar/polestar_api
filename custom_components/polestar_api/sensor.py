@@ -23,6 +23,7 @@ from homeassistant.const import (
     UnitOfTime,
 )
 
+# TODO: Remove this hack once 2025.4.0 is released (one month after 2025.3.0)
 try:
     from homeassistant.const import UnitOfEnergyDistance
 

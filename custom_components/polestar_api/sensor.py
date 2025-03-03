@@ -17,12 +17,20 @@ from homeassistant.const import (
     EntityCategory,
     UnitOfElectricCurrent,
     UnitOfEnergy,
-    UnitOfEnergyDistance,
     UnitOfLength,
     UnitOfPower,
     UnitOfSpeed,
     UnitOfTime,
 )
+
+try:
+    from homeassistant.const import UnitOfEnergyDistance
+
+    UNIT_OF_ENERGY_DISTANCE = UnitOfEnergyDistance.KILO_WATT_HOUR_PER_100_KM
+    DEVICE_CLASS_ENERGY_DISTANCE = SensorDeviceClass.ENERGY_DISTANCE
+except ImportError:
+    UNIT_OF_ENERGY_DISTANCE = "kWh/100km"
+    DEVICE_CLASS_ENERGY_DISTANCE = None
 
 from .entity import (
     PolestarEntity,
@@ -239,10 +247,10 @@ BATTERY_ENTITY_DESCRIPTIONS: Final[tuple[PolestarSensorDescription, ...]] = (
     PolestarSensorDescription(
         key="average_energy_consumption",
         icon="mdi:battery-clock",
-        native_unit_of_measurement=UnitOfEnergyDistance.KILO_WATT_HOUR_PER_100_KM,
+        native_unit_of_measurement=UNIT_OF_ENERGY_DISTANCE,
         suggested_display_precision=1,
         state_class=SensorStateClass.MEASUREMENT,
-        device_class=SensorDeviceClass.ENERGY_DISTANCE,
+        device_class=DEVICE_CLASS_ENERGY_DISTANCE,
         data_source=PolestarEntityDataSource.BATTERY,
         data_state_attribute="average_energy_consumption_kwh_per_100km",
     ),

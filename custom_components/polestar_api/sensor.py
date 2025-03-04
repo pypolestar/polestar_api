@@ -23,6 +23,16 @@ from homeassistant.const import (
     UnitOfTime,
 )
 
+# TODO: Remove this hack once 2025.4.0 is released (one month after 2025.3.0)
+try:
+    from homeassistant.const import UnitOfEnergyDistance
+
+    UNIT_OF_ENERGY_DISTANCE = UnitOfEnergyDistance.KILO_WATT_HOUR_PER_100_KM
+    DEVICE_CLASS_ENERGY_DISTANCE = SensorDeviceClass.ENERGY_DISTANCE
+except ImportError:
+    UNIT_OF_ENERGY_DISTANCE = "kWh/100km"
+    DEVICE_CLASS_ENERGY_DISTANCE = None
+
 from .entity import (
     PolestarEntity,
     PolestarEntityDataSource,
@@ -237,11 +247,11 @@ BATTERY_ENTITY_DESCRIPTIONS: Final[tuple[PolestarSensorDescription, ...]] = (
     ),
     PolestarSensorDescription(
         key="average_energy_consumption",
-        icon="mdi:battery-clock",
-        native_unit_of_measurement="kWh/100km",
+        icon="mdi:lightning-bolt-circle",
+        native_unit_of_measurement=UNIT_OF_ENERGY_DISTANCE,
         suggested_display_precision=1,
         state_class=SensorStateClass.MEASUREMENT,
-        device_class=None,
+        device_class=DEVICE_CLASS_ENERGY_DISTANCE,
         data_source=PolestarEntityDataSource.BATTERY,
         data_state_attribute="average_energy_consumption_kwh_per_100km",
     ),

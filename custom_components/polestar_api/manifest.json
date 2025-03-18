@@ -10,7 +10,7 @@
   "requirements": [
     "pypolestar==1.7.0",
     "gql[httpx]>=3.5.0",
-    "homeassistant>=2024.6.0"
+    "homeassistant>=2025.3.0"
   ],
-  "version": "1.15.0"
+  "version": "1.16.0"
 }

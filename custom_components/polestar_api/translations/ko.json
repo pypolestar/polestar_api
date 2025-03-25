@@ -1,10 +1,10 @@
 {
   "config": {
-    "abort": {
-      "already_configured": "Polestar API가 이미 설정되어 있습니다.",
-      "api_failed": "API를 생성하는 중 알 수 없는 에러가 발생했습니다.",
-      "api_timeout": "API 연결 시간이 초과되었습니다.",
-      "no_token": "응답에서 token을 찾을 수 없습니다. Credential을 확인해주세요."
+    "error": {
+      "api": "Error connecting to Polestar API.",
+      "auth_failed": "Invalid username/password.",
+      "no_cars_found": "No cars found for your Polestar ID.",
+      "vin_not_found": "Specified VIN not found for your Polestar ID."
     },
     "step": {
       "user": {
@@ -51,6 +51,9 @@
       "polestar_battery_charge_level": {
         "name": "베터리 레벨"
       },
+      "polestar_brake_fluid_level_warning": {
+        "name": "Brake Fluid Level Warning"
+      },
       "polestar_charger_connection_status": {
         "name": "충전기 연결 상태"
       },
@@ -72,6 +75,15 @@
       "polestar_current_trip_meter_manual": {
         "name": "수동 트립 미터"
       },
+      "polestar_days_to_service": {
+        "name": "Days to service"
+      },
+      "polestar_distance_to_service": {
+        "name": "Distance to Service"
+      },
+      "polestar_engine_coolant_level_warning": {
+        "name": "Engine Coolant Level Warning"
+      },
       "polestar_estimated_charging_time_to_full": {
         "name": "충전 시간"
       },
@@ -87,8 +99,14 @@
       "polestar_estimated_range": {
         "name": "주행 가능 거리"
       },
+      "polestar_internal_vehicle_id": {
+        "name": "Internal Vehicle ID"
+      },
       "polestar_last_updated_battery_data": {
         "name": "최근 배터리 정보"
+      },
+      "polestar_last_updated_health_data": {
+        "name": "Last Updated Health Data"
       },
       "polestar_last_updated_odometer_data": {
         "name": "최근 주행거리계 정보"
@@ -96,11 +114,20 @@
       "polestar_model_name": {
         "name": "모델명"
       },
+      "polestar_oil_level_warning": {
+        "name": "Oil Level Warning"
+      },
       "polestar_registration_number": {
         "name": "차량 번호"
       },
+      "polestar_service_warning": {
+        "name": "Service Warning"
+      },
       "polestar_software_version": {
         "name": "소프트웨어 버전"
+      },
+      "polestar_software_version_release": {
+        "name": "Software Version Release"
       },
       "polestar_torque": {
         "name": "토크"

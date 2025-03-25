@@ -1,10 +1,10 @@
 {
   "config": {
-    "abort": {
-      "already_configured": "L'API Polestar est déjà configurée.",
-      "api_failed": "Erreur inattendue lors de la création de l'API.",
-      "api_timeout": "Délai d'attente expiré lors de la connexion à l'API.",
-      "no_token": "Jeton non trouvé dans la réponse. Veuillez vérifier vos identifiants de connexion."
+    "error": {
+      "api": "Error connecting to Polestar API.",
+      "auth_failed": "Invalid username/password.",
+      "no_cars_found": "No cars found for your Polestar ID.",
+      "vin_not_found": "Specified VIN not found for your Polestar ID."
     },
     "step": {
       "user": {

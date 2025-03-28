@@ -1,15 +1,14 @@
 {
   "config": {
-    "abort": {
-      "already_configured": "Polestar API вже налаштовано.",
-      "api_failed": "Неочікувана помилка при створенні API.",
-      "api_timeout": "Таймаут підключення до API.",
-      "no_token": "Токен не знайдено у відповіді. Будь ласка, перевірте Ваші дані."
+    "error": {
+      "api": "Error connecting to Polestar API.",
+      "auth_failed": "Invalid username/password.",
+      "no_cars_found": "No cars found for your Polestar ID.",
+      "vin_not_found": "Specified VIN not found for your Polestar ID."
     },
     "step": {
       "user": {
         "data": {
-          "name": "Назва",
           "password": "Пароль",
           "username": "Ім’я користувача",
           "vin": "VIN"
@@ -52,6 +51,9 @@
       "polestar_battery_charge_level": {
         "name": "Рівень заряду батареї"
       },
+      "polestar_brake_fluid_level_warning": {
+        "name": "Brake Fluid Level Warning"
+      },
       "polestar_charger_connection_status": {
         "name": "Статус підключення зарядного пристрою"
       },
@@ -73,6 +75,15 @@
       "polestar_current_trip_meter_manual": {
         "name": "Лічильник поїздок, ручний"
       },
+      "polestar_days_to_service": {
+        "name": "Days to service"
+      },
+      "polestar_distance_to_service": {
+        "name": "Distance to Service"
+      },
+      "polestar_engine_coolant_level_warning": {
+        "name": "Engine Coolant Level Warning"
+      },
       "polestar_estimated_charging_time_to_full": {
         "name": "Час до повного заряду"
       },
@@ -88,8 +99,14 @@
       "polestar_estimated_range": {
         "name": "Запас відстані"
       },
+      "polestar_internal_vehicle_id": {
+        "name": "Internal Vehicle ID"
+      },
       "polestar_last_updated_battery_data": {
         "name": "Останні дані батареї"
+      },
+      "polestar_last_updated_health_data": {
+        "name": "Last Updated Health Data"
       },
       "polestar_last_updated_odometer_data": {
         "name": "Останні дані пробігу"
@@ -97,11 +114,20 @@
       "polestar_model_name": {
         "name": "Модель"
       },
+      "polestar_oil_level_warning": {
+        "name": "Oil Level Warning"
+      },
       "polestar_registration_number": {
         "name": "Реєстраційний номер"
       },
+      "polestar_service_warning": {
+        "name": "Service Warning"
+      },
       "polestar_software_version": {
         "name": "Версія програмного забезпечення"
+      },
+      "polestar_software_version_release": {
+        "name": "Software Version Release"
       },
       "polestar_torque": {
         "name": "Крутний момент"

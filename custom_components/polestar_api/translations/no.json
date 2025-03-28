@@ -1,10 +1,10 @@
 {
   "config": {
-    "abort": {
-      "already_configured": "Polestar API er allerede konfigurert",
-      "api_failed": "Uventet feil under oppretting av API.",
-      "api_timeout": "Tidsavbrudd for API-tilkobling.",
-      "no_token": "Ingen token mottatt fra serveren. Vennligst kontroller inntastet informasjon."
+    "error": {
+      "api": "Error connecting to Polestar API.",
+      "auth_failed": "Invalid username/password.",
+      "no_cars_found": "No cars found for your Polestar ID.",
+      "vin_not_found": "Specified VIN not found for your Polestar ID."
     },
     "step": {
       "user": {
@@ -51,6 +51,9 @@
       "polestar_battery_charge_level": {
         "name": "Batterinivå"
       },
+      "polestar_brake_fluid_level_warning": {
+        "name": "Brake Fluid Level Warning"
+      },
       "polestar_charger_connection_status": {
         "name": "Ladekabel tilkoblet"
       },
@@ -72,6 +75,15 @@
       "polestar_current_trip_meter_manual": {
         "name": "Trippteller manuell"
       },
+      "polestar_days_to_service": {
+        "name": "Days to service"
+      },
+      "polestar_distance_to_service": {
+        "name": "Distance to Service"
+      },
+      "polestar_engine_coolant_level_warning": {
+        "name": "Engine Coolant Level Warning"
+      },
       "polestar_estimated_charging_time_to_full": {
         "name": "Estimert ladetid til fullt batteri"
       },
@@ -87,8 +99,14 @@
       "polestar_estimated_range": {
         "name": "Rekkevidde"
       },
+      "polestar_internal_vehicle_id": {
+        "name": "Internal Vehicle ID"
+      },
       "polestar_last_updated_battery_data": {
         "name": "Sist oppdatert batterinivå"
+      },
+      "polestar_last_updated_health_data": {
+        "name": "Last Updated Health Data"
       },
       "polestar_last_updated_odometer_data": {
         "name": "Sist oppdatert kilometerstand"
@@ -96,11 +114,20 @@
       "polestar_model_name": {
         "name": "Modellnavn"
       },
+      "polestar_oil_level_warning": {
+        "name": "Oil Level Warning"
+      },
       "polestar_registration_number": {
         "name": "Registreringsnummer"
       },
+      "polestar_service_warning": {
+        "name": "Service Warning"
+      },
       "polestar_software_version": {
         "name": "Programvareversjon"
+      },
+      "polestar_software_version_release": {
+        "name": "Software Version Release"
       },
       "polestar_torque": {
         "name": "Dreiemoment"

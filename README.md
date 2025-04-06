@@ -7,7 +7,7 @@ This application is not an official app affiliated with Polestar.
 This is the account that you also use in the polestar APP on your mobile phone try here to login if it works or not: https://polestarid.eu.polestar.com/PolestarLogin/login
 
  ## Prerequisites
- 
+
  * HACS (Home Assistant Community Store) must be installed. If you haven't installed HACS yet, follow the [official HACS installation guide](https://hacs.xyz/docs/use/#getting-started-with-hacs).
 
 ## Add in HA Integration
@@ -27,3 +27,8 @@ Email and password: this are the credential to login on your Polestar account
 
 Result:
 ![image](https://github.com/pypolestar/polestar_api/assets/1487966/fe8d08d8-9d0d-424c-a7a8-ce702679a567)
+
+
+## Translation
+
+Translations are managed via [Crowdin](https://crowdin.com/project/polestar-home-assistant) - please join the project and contribute!

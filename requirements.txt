@@ -4,4 +4,4 @@ pip>=21.3.1
 ruff==0.11.0
 gql[httpx]>=3.5.0
 pytest>=8.3.3
-pypolestar==1.8.0
+pypolestar==1.9.0

@@ -72,6 +72,8 @@ class PolestarImage(PolestarEntity, ImageEntity):
         value = self.get_native_value()
         if value is None:
             _LOGGER.debug("No image URL found")
+            self._attr_image_url = None
+            self._attr_image_last_updated = dt_util.utcnow()
         elif isinstance(value, str) and value != self._attr_image_url:
             _LOGGER.debug("Returning updated image URL %s", value)
             self._attr_image_url = value

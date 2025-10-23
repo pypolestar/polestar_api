@@ -2,6 +2,8 @@
 
 This application is not an official app affiliated with Polestar.
 
+N.B. There are currently several sensors that report no information for some or all models. Unfortunatly there is nothing the developers of this integration can do about this, but we do recommend you contact Polestar support and express your support for a public API for integration with Home Assistant and similar systems.
+
 ## Use your Polestar account
 
 This is the account that you also use in the polestar APP on your mobile phone try here to login if it works or not: https://polestarid.eu.polestar.com/PolestarLogin/login

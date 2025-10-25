@@ -6,7 +6,7 @@ N.B. There are currently several sensors that report no information for some or 
 
 ## Use your Polestar account
 
-This is the account that you also use in the polestar APP on your mobile phone try here to login if it works or not: https://polestarid.eu.polestar.com/PolestarLogin/login
+This is the account that you also use in the polestar APP on your mobile phone try here to login if it works or not: https://polestarid.eu.polestar.com/Account/login
 
  ## Prerequisites
 

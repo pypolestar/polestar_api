@@ -1,136 +1,136 @@
 {
   "config": {
     "error": {
-      "api": "Error connecting to Polestar API.",
-      "auth_failed": "Ongeldige gebruikersnaam of wachtwoord.",
-      "no_cars_found": "Er is geen auto gevonden voor jouw Polestar ID.",
-      "vin_not_found": "Opgegeven VIN is niet bekend voor jouw Polestar ID."
+      "api": "Errore di connessione all’API Polestar.",
+      "auth_failed": "Nome utente/password non validi.",
+      "no_cars_found": "Nessuna auto trovata per il tuo ID Polestar.",
+      "vin_not_found": "Il VIN specificato non è stato trovato per il tuo ID Polestar."
     },
     "step": {
       "user": {
         "data": {
-          "password": "Wachtwoord",
-          "username": "Gebruikersnaam",
+          "password": "Password",
+          "username": "Nome utente",
           "vin": "VIN"
         },
-        "description": "Vul authenticatie voor Polestar EV",
-        "title": "Configureer Polestar API"
+        "description": "Inserisci le credenziali per la Polestar EV.",
+        "title": "Configura la Polestar EV"
       }
     }
   },
   "entity": {
     "binary_sensor": {
       "polestar_api_connected": {
-        "name": "API verbonden"
+        "name": "Connessione API stabilita"
       }
     },
     "image": {
       "polestar_car_image": {
-        "name": "Afbeelding van auto"
+        "name": "Immagine auto"
       }
     },
     "sensor": {
       "polestar_api_status_code_auth": {
-        "name": "API Status Code (Auth)"
+        "name": "Codice Stato API (Autenticazione)"
       },
       "polestar_api_status_code_data": {
-        "name": "API Status Code (Data)"
+        "name": "Codice Stato API (Dati)"
       },
       "polestar_api_token_expires_at": {
-        "name": "API Token vervalt op"
+        "name": "Scadenza Token API"
       },
       "polestar_average_energy_consumption": {
-        "name": "Gemiddeld verbruik"
+        "name": "Consumo Medio Energia"
       },
       "polestar_average_speed": {
-        "name": "Gemiddelde snelheid"
+        "name": "Velocità Media"
       },
       "polestar_battery_capacity": {
-        "name": "Batterij capaciteit"
+        "name": "Capacità Batteria"
       },
       "polestar_battery_charge_level": {
-        "name": "Batterij niveau"
+        "name": "Livello Carica Batteria"
       },
       "polestar_brake_fluid_level_warning": {
-        "name": "Brake Fluid Level Warning"
+        "name": "Avviso Livello Liquido Freni"
       },
       "polestar_charger_connection_status": {
-        "name": "Laadkabel status"
+        "name": "Stato Connessione Caricatore"
       },
       "polestar_charging_current": {
-        "name": "Laadstroom"
+        "name": "Corrente di Ricarica"
       },
       "polestar_charging_power": {
-        "name": "Laadvermogen"
+        "name": "Potenza di Ricarica"
       },
       "polestar_charging_status": {
-        "name": "Laadstatus"
+        "name": "Stato Ricarica"
       },
       "polestar_current_odometer": {
-        "name": "Huidige kilometerstand"
+        "name": "Contachilometri"
       },
       "polestar_current_trip_meter_automatic": {
-        "name": "Huidige trip meter (automatisch)"
+        "name": "Contachilometri Parziale Automatico"
       },
       "polestar_current_trip_meter_manual": {
-        "name": "Huidige trip meter (manueel)"
+        "name": "Contachilometri Parziale Manuale"
       },
       "polestar_days_to_service": {
-        "name": "Dagen tot volgende onderhoudsbeurt"
+        "name": "Giorni al Servizio"
       },
       "polestar_distance_to_service": {
-        "name": "Afstand tot volgende onderhoudsbeurt"
+        "name": "Distanza al Servizio"
       },
       "polestar_engine_coolant_level_warning": {
-        "name": "Engine Coolant Level Warning"
+        "name": "Avviso Livello Liquido Refrigerante"
       },
       "polestar_estimated_charging_time_to_full": {
-        "name": "Geschatte laadtijd tot vol"
+        "name": "Tempo di Ricarica"
       },
       "polestar_estimated_charging_time_to_target_distance": {
-        "name": "Geschatte laadtijd tot doelafstand"
+        "name": "Tempo Stimato Ricarica per Distanza Obiettivo"
       },
       "polestar_estimated_full_charge_range": {
-        "name": "Geschat bereik volledig opgeladen"
+        "name": "Autonomia Stimata a Carica Completa"
       },
       "polestar_estimated_fully_charged_time": {
-        "name": "Geschatte volledig opgeladen tijd"
+        "name": "Ora Stimata Carica Completa"
       },
       "polestar_estimated_range": {
-        "name": "Resterende afstand"
+        "name": "Autonomia"
       },
       "polestar_internal_vehicle_id": {
-        "name": "Internal Vehicle ID"
+        "name": "ID Veicolo Interno"
       },
       "polestar_last_updated_battery_data": {
-        "name": "Laatst geüpdatete batterijgegevens"
+        "name": "Ultimo Aggiornamento Dati Batteria"
       },
       "polestar_last_updated_health_data": {
-        "name": "Last Updated Health Data"
+        "name": "Ultimo Aggiornamento Dati Salute"
       },
       "polestar_last_updated_odometer_data": {
-        "name": "Laatst geüpdatete kilometerstand"
+        "name": "Ultimo Aggiornamento Dati Contachilometri"
       },
       "polestar_model_name": {
-        "name": "Model"
+        "name": "Nome Modello"
       },
       "polestar_oil_level_warning": {
-        "name": "Oil Level Warning"
+        "name": "Avviso Livello Olio"
       },
       "polestar_registration_number": {
-        "name": "Registratienummer"
+        "name": "Numero di Targa"
       },
       "polestar_service_warning": {
-        "name": "Service Warning"
+        "name": "Avviso Servizio"
       },
       "polestar_software_version": {
-        "name": "Software Versie"
+        "name": "Versione Software"
       },
       "polestar_software_version_release": {
-        "name": "Software Version Release"
+        "name": "Rilascio Versione Software"
       },
       "polestar_torque": {
-        "name": "Koppel"
+        "name": "Coppia"
       },
       "polestar_vin": {
         "name": "VIN"

@@ -52,7 +52,7 @@
         "name": "Batterinivå"
       },
       "polestar_brake_fluid_level_warning": {
-        "name": "Brake Fluid Level Warning"
+        "name": "Varning för bromsvätskenivå"
       },
       "polestar_charger_connection_status": {
         "name": "Laddare ansluten"
@@ -76,13 +76,13 @@
         "name": "Trippmätare manuell"
       },
       "polestar_days_to_service": {
-        "name": "Days to service"
+        "name": "Dagar till service"
       },
       "polestar_distance_to_service": {
-        "name": "Distance to Service"
+        "name": "Distans till service"
       },
       "polestar_engine_coolant_level_warning": {
-        "name": "Engine Coolant Level Warning"
+        "name": "Motorns kylvätskenivåvarning"
       },
       "polestar_estimated_charging_time_to_full": {
         "name": "Laddningstid till full"
@@ -100,13 +100,13 @@
         "name": "Räckvidd"
       },
       "polestar_internal_vehicle_id": {
-        "name": "Internal Vehicle ID"
+        "name": "Internt fordons-ID"
       },
       "polestar_last_updated_battery_data": {
         "name": "Senast uppdaterad batteridata"
       },
       "polestar_last_updated_health_data": {
-        "name": "Last Updated Health Data"
+        "name": "Senast uppdaterade hälsodata"
       },
       "polestar_last_updated_odometer_data": {
         "name": "Senast uppdaterad mätarställning"
@@ -115,19 +115,19 @@
         "name": "Modell"
       },
       "polestar_oil_level_warning": {
-        "name": "Oil Level Warning"
+        "name": "Varning för oljenivå"
       },
       "polestar_registration_number": {
         "name": "Registreringsnummer"
       },
       "polestar_service_warning": {
-        "name": "Service Warning"
+        "name": "Servicevarning"
       },
       "polestar_software_version": {
         "name": "Mjukvaruversion"
       },
       "polestar_software_version_release": {
-        "name": "Software Version Release"
+        "name": "Version av programvara"
       },
       "polestar_torque": {
         "name": "Vridmoment"

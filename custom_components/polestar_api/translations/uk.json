@@ -79,10 +79,10 @@
         "name": "Days to service"
       },
       "polestar_distance_to_service": {
-        "name": "Distance to Service"
+        "name": "Відстань до обслуговування"
       },
       "polestar_engine_coolant_level_warning": {
-        "name": "Engine Coolant Level Warning"
+        "name": "Попередження про рівень охолоджувальної рідини"
       },
       "polestar_estimated_charging_time_to_full": {
         "name": "Час до повного заряду"

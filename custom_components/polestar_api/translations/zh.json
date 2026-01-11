@@ -1,139 +1,139 @@
 {
   "config": {
     "error": {
-      "api": "Error connecting to Polestar API.",
-      "auth_failed": "Ongeldige gebruikersnaam of wachtwoord.",
-      "no_cars_found": "Er is geen auto gevonden voor jouw Polestar ID.",
-      "vin_not_found": "Opgegeven VIN is niet bekend voor jouw Polestar ID."
+      "api": "连接到 Polestar API 时出错。",
+      "auth_failed": "用户名或密码错误。",
+      "no_cars_found": "你的 Polestar ID 下没有车辆。",
+      "vin_not_found": "你的 Polestar ID 下没有指定的车架号。"
     },
     "step": {
       "user": {
         "data": {
-          "password": "Wachtwoord",
-          "username": "Gebruikersnaam",
-          "vin": "VIN"
+          "password": "密码",
+          "username": "用户名",
+          "vin": "车架号"
         },
-        "description": "Vul authenticatie voor Polestar EV",
-        "title": "Configureer Polestar API"
+        "description": "输入 Polestar EV 认证信息",
+        "title": "配置 Polestar 电车"
       }
     }
   },
   "entity": {
     "binary_sensor": {
       "polestar_api_connected": {
-        "name": "API verbonden"
+        "name": "API 已连接"
       }
     },
     "image": {
       "polestar_car_image": {
-        "name": "Afbeelding van auto"
+        "name": "车辆图像"
       }
     },
     "sensor": {
       "polestar_api_status_code_auth": {
-        "name": "API Status Code (Auth)"
+        "name": "API 状态码 (Auth)"
       },
       "polestar_api_status_code_data": {
-        "name": "API Status Code (Data)"
+        "name": "API 状态码 (Data)"
       },
       "polestar_api_token_expires_at": {
-        "name": "API Token vervalt op"
+        "name": "API 令牌到期于"
       },
       "polestar_average_energy_consumption": {
-        "name": "Gemiddeld verbruik"
+        "name": "平均能源消耗"
       },
       "polestar_average_speed": {
-        "name": "Gemiddelde snelheid"
+        "name": "平均时速"
       },
       "polestar_battery_capacity": {
-        "name": "Batterij capaciteit"
+        "name": "电池容量"
       },
       "polestar_battery_charge_level": {
-        "name": "Batterij niveau"
+        "name": "电池电量"
       },
       "polestar_brake_fluid_level_warning": {
-        "name": "Brake Fluid Level Warning"
+        "name": "刹车油液位"
       },
       "polestar_charger_connection_status": {
-        "name": "Laadkabel status"
+        "name": "充电枪连接状态"
       },
       "polestar_charging_current": {
-        "name": "Laadstroom"
+        "name": "充电电流"
       },
       "polestar_charging_power": {
-        "name": "Laadvermogen"
+        "name": "充电功率"
       },
       "polestar_charging_status": {
-        "name": "Laadstatus"
+        "name": "充电状态"
       },
       "polestar_current_odometer": {
-        "name": "Huidige kilometerstand"
+        "name": "里程表"
       },
       "polestar_current_trip_meter_automatic": {
-        "name": "Huidige trip meter (automatisch)"
+        "name": "自动旅程表"
       },
       "polestar_current_trip_meter_manual": {
-        "name": "Huidige trip meter (manueel)"
+        "name": "手动旅程表"
       },
       "polestar_days_to_service": {
-        "name": "Dagen tot volgende onderhoudsbeurt"
+        "name": "保养到期天数"
       },
       "polestar_distance_to_service": {
-        "name": "Afstand tot volgende onderhoudsbeurt"
+        "name": "保养到期里程"
       },
       "polestar_engine_coolant_level_warning": {
-        "name": "Engine Coolant Level Warning"
+        "name": "引擎冷却液液位警告"
       },
       "polestar_estimated_charging_time_to_full": {
-        "name": "Geschatte laadtijd tot vol"
+        "name": "充电时间"
       },
       "polestar_estimated_charging_time_to_target_distance": {
-        "name": "Geschatte laadtijd tot doelafstand"
+        "name": "预计到目标距离的充电时间"
       },
       "polestar_estimated_full_charge_range": {
-        "name": "Geschat bereik volledig opgeladen"
+        "name": "预计满电里程"
       },
       "polestar_estimated_fully_charged_time": {
-        "name": "Geschatte volledig opgeladen tijd"
+        "name": "预计完全充电时间"
       },
       "polestar_estimated_range": {
-        "name": "Resterende afstand"
+        "name": "续航里程"
       },
       "polestar_internal_vehicle_id": {
-        "name": "Internal Vehicle ID"
+        "name": "内部车辆ID"
       },
       "polestar_last_updated_battery_data": {
-        "name": "Laatst geüpdatete batterijgegevens"
+        "name": "最近更新电池数据"
       },
       "polestar_last_updated_health_data": {
-        "name": "Last Updated Health Data"
+        "name": "最近更新的健康数据"
       },
       "polestar_last_updated_odometer_data": {
-        "name": "Laatst geüpdatete kilometerstand"
+        "name": "最近更新的里程表数据"
       },
       "polestar_model_name": {
-        "name": "Model"
+        "name": "型号名称"
       },
       "polestar_oil_level_warning": {
-        "name": "Oil Level Warning"
+        "name": "机油液位警告"
       },
       "polestar_registration_number": {
-        "name": "Registratienummer"
+        "name": "注册号"
       },
       "polestar_service_warning": {
-        "name": "Service Warning"
+        "name": "保养警告"
       },
       "polestar_software_version": {
-        "name": "Software Versie"
+        "name": "软件版本"
       },
       "polestar_software_version_release": {
-        "name": "Software Version Release"
+        "name": "软件发布版本"
       },
       "polestar_torque": {
-        "name": "Koppel"
+        "name": "扭矩"
       },
       "polestar_vin": {
-        "name": "VIN"
+        "name": "车架号"
       }
     }
   }

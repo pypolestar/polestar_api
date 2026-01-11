@@ -1,10 +1,10 @@
 {
   "config": {
     "error": {
-      "api": "Error connecting to Polestar API.",
-      "auth_failed": "Invalid username/password.",
-      "no_cars_found": "No cars found for your Polestar ID.",
-      "vin_not_found": "Specified VIN not found for your Polestar ID."
+      "api": "Erreur de connexion à l'API Polestar.",
+      "auth_failed": "Nom d'utilisateur / Mot de passe invalide.",
+      "no_cars_found": "Aucune voiture trouvée pour votre Polestar ID.",
+      "vin_not_found": "Le VIN spécifié est introuvable pour votre Polestar ID."
     },
     "step": {
       "user": {
@@ -91,13 +91,13 @@
         "name": "Temps de recharge restant pour la distance jusqu'à destination"
       },
       "polestar_estimated_full_charge_range": {
-        "name": "Estimé de l'autonomie complète"
+        "name": "Estimation de l'autonomie complète"
       },
       "polestar_estimated_fully_charged_time": {
-        "name": "Temps de recharge restant"
+        "name": "Temps de recharge restant estimé"
       },
       "polestar_estimated_range": {
-        "name": "Estimé de l'autonomie"
+        "name": "Estimation de l'autonomie"
       },
       "polestar_internal_vehicle_id": {
         "name": "Identifiant interne du véhicule"
@@ -118,7 +118,7 @@
         "name": "Alerte de niveau d'huile"
       },
       "polestar_registration_number": {
-        "name": "Numéro d'enregistrement"
+        "name": "Numéro d'Immatriculation"
       },
       "polestar_service_warning": {
         "name": "Alerte de service"
@@ -133,7 +133,7 @@
         "name": "Couple"
       },
       "polestar_vin": {
-        "name": "NIV"
+        "name": "VIN"
       }
     }
   }

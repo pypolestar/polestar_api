@@ -13,5 +13,5 @@ Clone or copy this repository and copy the folder 'custom_components/tibber_ev' 
 
 ## Configuration
 
-Once installed the Polestar API integration can be configured via the Home Assistant integration interface 
+Once installed the Polestar API integration can be configured via the Home Assistant integration interface
 where you can enter the your username, password, vin and vcc_api_key.

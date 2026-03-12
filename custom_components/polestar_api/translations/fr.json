@@ -114,6 +114,9 @@
       "polestar_model_name": {
         "name": "Nom du modèle"
       },
+      "polestar_model_year": {
+        "name": "Model Year"
+      },
       "polestar_oil_level_warning": {
         "name": "Alerte de niveau d'huile"
       },

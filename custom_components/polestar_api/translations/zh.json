@@ -114,6 +114,9 @@
       "polestar_model_name": {
         "name": "型号名称"
       },
+      "polestar_model_year": {
+        "name": "Model Year"
+      },
       "polestar_oil_level_warning": {
         "name": "机油液位警告"
       },

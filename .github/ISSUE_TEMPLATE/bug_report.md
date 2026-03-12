@@ -15,7 +15,7 @@ assignees: ''
   DO NOT DELETE ANY TEXT from this template! Otherwise, your issue may be closed without comment.
 
   N.B.: This integration will only work if you can login and see your vehicle's status (e.g. odometer and
-        state of charge) via polestar.com. If you only have access via the app, the integration will not be 
+        state of charge) via polestar.com. If you only have access via the app, the integration will not be
         able to access the Polestar API.
 
 -->

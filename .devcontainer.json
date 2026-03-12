@@ -1,6 +1,6 @@
 {
     "name": "pypolestar/polestar_api",
-    "image": "mcr.microsoft.com/devcontainers/python:dev-3.13",
+    "image": "mcr.microsoft.com/devcontainers/python:dev-3.14",
     "postCreateCommand": "scripts/setup",
     "forwardPorts": [
         8123

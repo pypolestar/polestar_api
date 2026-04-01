@@ -46,7 +46,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: PolestarConfigEntry) -> 
     except api.PolestarAuthException as exc:
         raise ConfigEntryNotReady from exc
 
-    if not api_client.get_available_vins():
+    available_vins = api_client.get_available_vins()
+
+    if not available_vins:
         raise ConfigEntryNotReady("No cars found for the provided credentials")
 
     coordinators = []
@@ -58,7 +60,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: PolestarConfigEntry) -> 
             config_entry=entry,
             vin=vin,
         )
-        for vin in api_client.get_available_vins()
+        for vin in available_vins
     ]:
         await coordinator.async_config_entry_first_refresh()
         coordinators.append(coordinator)

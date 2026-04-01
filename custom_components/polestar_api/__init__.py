@@ -10,7 +10,8 @@ from homeassistant.exceptions import ConfigEntryError
 from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.httpx_client import create_async_httpx_client
 from homeassistant.loader import async_get_loaded_integration
-from pypolestar import PolestarApi, api
+from pypolestar import PolestarApi
+from pypolestar.exceptions import PolestarAuthException
 
 from .const import CONF_VIN
 from .coordinator import PolestarCoordinator
@@ -43,7 +44,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: PolestarConfigEntry) -> 
 
     try:
         await api_client.async_init()
-    except api.PolestarAuthException as exc:
+    except PolestarAuthException as exc:
         raise ConfigEntryError from exc
 
     available_vins = api_client.get_available_vins()

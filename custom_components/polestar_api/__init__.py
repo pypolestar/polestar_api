@@ -6,10 +6,12 @@ import logging
 from typing import TYPE_CHECKING
 
 from homeassistant.const import CONF_PASSWORD, CONF_USERNAME, Platform
+from homeassistant.exceptions import ConfigEntryError
 from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.httpx_client import create_async_httpx_client
 from homeassistant.loader import async_get_loaded_integration
 from pypolestar import PolestarApi
+from pypolestar.exceptions import PolestarAuthException
 
 from .const import CONF_VIN
 from .coordinator import PolestarCoordinator
@@ -40,7 +42,15 @@ async def async_setup_entry(hass: HomeAssistant, entry: PolestarConfigEntry) -> 
         unique_id=entry.entry_id,
     )
 
-    await api_client.async_init()
+    try:
+        await api_client.async_init()
+    except PolestarAuthException as exc:
+        raise ConfigEntryError from exc
+
+    available_vins = api_client.get_available_vins()
+
+    if not available_vins:
+        raise ConfigEntryError("No cars found for the provided credentials")
 
     coordinators = []
 
@@ -51,7 +61,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: PolestarConfigEntry) -> 
             config_entry=entry,
             vin=vin,
         )
-        for vin in api_client.get_available_vins()
+        for vin in available_vins
     ]:
         await coordinator.async_config_entry_first_refresh()
         coordinators.append(coordinator)

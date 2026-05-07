@@ -73,9 +73,6 @@ class PolestarEntity(CoordinatorEntity[PolestarCoordinator]):
         """Initialize the Polestar entity."""
         super().__init__(coordinator)
         self.entity_description = entity_description
-        self.entity_id = (
-            f"{DOMAIN}.polestar_{coordinator.get_short_id()}_{entity_description.key}"
-        )
         self._attr_unique_id = f"polestar_{coordinator.vin}_{entity_description.key}"
         self._attr_translation_key = f"polestar_{entity_description.key}"
         self._attr_device_info = DeviceInfo(

@@ -30,8 +30,9 @@ ENTITY_DESCRIPTIONS: Final[tuple[PolestarImageDescription, ...]] = (
     PolestarImageDescription(
         key="car_image",
         entity_registry_enabled_default=False,
-        data_source=PolestarEntityDataSource.INFORMATION,
-        data_state_attribute="image_url",
+        data_source=PolestarEntityDataSource.IMAGES,
+        data_state_attribute="transparent",
+        data_state_fn=lambda images: images[0].url if len(images) else None,
     ),
 )
 

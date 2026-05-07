@@ -13,6 +13,7 @@ from pypolestar.exceptions import PolestarApiException, PolestarAuthFailedExcept
 from pypolestar.models import (
     CarBatteryData,
     CarHealthData,
+    CarImagesData,
     CarInformationData,
     CarOdometerData,
 )
@@ -56,6 +57,7 @@ class PolestarCoordinator(DataUpdateCoordinator):
         self.car_odometer_data: CarOdometerData | None = None
         self.car_battery_data: CarBatteryData | None = None
         self.car_health_data: CarHealthData | None = None
+        self.car_images_data: CarImagesData | None = None
 
     @property
     def model(self) -> str:
@@ -91,6 +93,7 @@ class PolestarCoordinator(DataUpdateCoordinator):
                 self.car_information_data = self.polestar_api.get_car_information(
                     self.vin
                 )
+                self.car_images_data = self.polestar_api.get_car_images(self.vin)
 
             # Car telematics includes odometer, battery and health data
             if car_telematics_data := self.polestar_api.get_car_telematics(self.vin):

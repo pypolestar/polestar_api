@@ -13,6 +13,7 @@ from homeassistant.core import callback
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity import EntityDescription
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
+from pypolestar.models import CarImage
 
 from .const import ATTRIBUTION, DOMAIN
 from .coordinator import PolestarCoordinator
@@ -28,6 +29,7 @@ class PolestarEntityDataSource(StrEnum):
     ODOMETER = "car_odometer_data"
     BATTERY = "car_battery_data"
     HEALTH = "car_health_data"
+    IMAGES = "car_images_data"
 
 
 class PolestarEntityDataSourceException(Exception):
@@ -42,7 +44,7 @@ class PolestarEntityDescription(EntityDescription):
     data_state_attribute: str | None = None
     data_state_fn: (
         Callable[
-            [str | int | float | bool | date | datetime],
+            [str | int | float | bool | date | datetime | list[CarImage]],
             str | int | float | bool | date | datetime,
         ]
         | None

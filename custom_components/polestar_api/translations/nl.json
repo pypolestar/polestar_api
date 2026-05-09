@@ -1,7 +1,7 @@
 {
   "config": {
     "error": {
-      "api": "Error connecting to Polestar API.",
+      "api": "Fout bij verbinden met de Polestar API",
       "auth_failed": "Ongeldige gebruikersnaam of wachtwoord.",
       "no_cars_found": "Er is geen auto gevonden voor jouw Polestar ID.",
       "vin_not_found": "Opgegeven VIN is niet bekend voor jouw Polestar ID."
@@ -31,10 +31,10 @@
     },
     "sensor": {
       "polestar_api_status_code_auth": {
-        "name": "API Status Code (Auth)"
+        "name": "Statuscode API"
       },
       "polestar_api_status_code_data": {
-        "name": "API Status Code (Data)"
+        "name": "Statuscode API"
       },
       "polestar_api_token_expires_at": {
         "name": "API Token vervalt op"
@@ -52,7 +52,7 @@
         "name": "Batterij niveau"
       },
       "polestar_brake_fluid_level_warning": {
-        "name": "Brake Fluid Level Warning"
+        "name": "Waarschuwing remvloeistof"
       },
       "polestar_charger_connection_status": {
         "name": "Laadkabel status"
@@ -70,10 +70,10 @@
         "name": "Huidige kilometerstand"
       },
       "polestar_current_trip_meter_automatic": {
-        "name": "Huidige trip meter (automatisch)"
+        "name": "Gereden afstand automatisch"
       },
       "polestar_current_trip_meter_manual": {
-        "name": "Huidige trip meter (manueel)"
+        "name": "Gereden afstand handmatig"
       },
       "polestar_days_to_service": {
         "name": "Dagen tot volgende onderhoudsbeurt"
@@ -82,7 +82,7 @@
         "name": "Afstand tot volgende onderhoudsbeurt"
       },
       "polestar_engine_coolant_level_warning": {
-        "name": "Engine Coolant Level Warning"
+        "name": "Waarschuwing koelvloeistof"
       },
       "polestar_estimated_charging_time_to_full": {
         "name": "Geschatte laadtijd tot vol"
@@ -100,13 +100,13 @@
         "name": "Resterende afstand"
       },
       "polestar_internal_vehicle_id": {
-        "name": "Internal Vehicle ID"
+        "name": "Intern voertuig ID"
       },
       "polestar_last_updated_battery_data": {
         "name": "Laatst geüpdatete batterijgegevens"
       },
       "polestar_last_updated_health_data": {
-        "name": "Last Updated Health Data"
+        "name": "Gegevens het laatst bijgewerkt"
       },
       "polestar_last_updated_odometer_data": {
         "name": "Laatst geüpdatete kilometerstand"
@@ -115,22 +115,22 @@
         "name": "Model"
       },
       "polestar_model_year": {
-        "name": "Model Year"
+        "name": "Modeljaar"
       },
       "polestar_oil_level_warning": {
-        "name": "Oil Level Warning"
+        "name": "Olie waarschuwing"
       },
       "polestar_registration_number": {
         "name": "Registratienummer"
       },
       "polestar_service_warning": {
-        "name": "Service Warning"
+        "name": "Service waarschuwing"
       },
       "polestar_software_version": {
-        "name": "Software Versie"
+        "name": "Softwareversie"
       },
       "polestar_software_version_release": {
-        "name": "Software Version Release"
+        "name": "Softwareversie release"
       },
       "polestar_torque": {
         "name": "Koppel"

@@ -12,7 +12,7 @@
   "issue_tracker": "https://github.com/pypolestar/polestar_api/issues",
   "requirements": [
     "pypolestar==1.12.2",
-    "homeassistant>=2025.4.0"
+    "homeassistant>=2026.4.0"
   ],
   "version": "1.23.1"
 }

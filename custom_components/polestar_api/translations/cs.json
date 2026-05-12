@@ -1,0 +1,143 @@
+{
+  "config": {
+    "error": {
+      "api": "Chyba připojování k Polestar API.",
+      "auth_failed": "Neplatné jméno/heslo.",
+      "no_cars_found": "Nenalezena žádná auta pro vaše Polestar ID.",
+      "vin_not_found": "Zadané VIN nenalezeno pro vaše Polestar ID."
+    },
+    "step": {
+      "user": {
+        "data": {
+          "password": "Heslo",
+          "username": "Uživatelské jméno",
+          "vin": "VIN"
+        },
+        "description": "Vložte ověření Polestar EV",
+        "title": "Konfigurace Polestar EV"
+      }
+    }
+  },
+  "entity": {
+    "binary_sensor": {
+      "polestar_api_connected": {
+        "name": "API připojeno"
+      }
+    },
+    "image": {
+      "polestar_car_image": {
+        "name": "Obrázek vozidla"
+      }
+    },
+    "sensor": {
+      "polestar_api_status_code_auth": {
+        "name": "Kód stavu API (Auth)"
+      },
+      "polestar_api_status_code_data": {
+        "name": "Kód stavu API (Data)"
+      },
+      "polestar_api_token_expires_at": {
+        "name": "Platnost API tokenu vyprší"
+      },
+      "polestar_average_energy_consumption": {
+        "name": "Průměrná spotřeba energie"
+      },
+      "polestar_average_speed": {
+        "name": "Průměrná rychlost"
+      },
+      "polestar_battery_capacity": {
+        "name": "Kapacita baterie"
+      },
+      "polestar_battery_charge_level": {
+        "name": "Úroveň nabití baterie"
+      },
+      "polestar_brake_fluid_level_warning": {
+        "name": "Varování úrovně hladiny brzdové kapaliny"
+      },
+      "polestar_charger_connection_status": {
+        "name": "Stav připojení nabíječky"
+      },
+      "polestar_charging_current": {
+        "name": "Nabíjecí proud"
+      },
+      "polestar_charging_power": {
+        "name": "Nabíjecí výkon"
+      },
+      "polestar_charging_status": {
+        "name": "Stav nabíjení"
+      },
+      "polestar_current_odometer": {
+        "name": "Tachometr"
+      },
+      "polestar_current_trip_meter_automatic": {
+        "name": "Denní počítadlo automatické"
+      },
+      "polestar_current_trip_meter_manual": {
+        "name": "Denní počítadlo manuální"
+      },
+      "polestar_days_to_service": {
+        "name": "Počet dnů do servisu"
+      },
+      "polestar_distance_to_service": {
+        "name": "Vzdálenost do servisu"
+      },
+      "polestar_engine_coolant_level_warning": {
+        "name": "Varování úrovně chladicí kapaliny"
+      },
+      "polestar_estimated_charging_time_to_full": {
+        "name": "Doba nabíjení"
+      },
+      "polestar_estimated_charging_time_to_target_distance": {
+        "name": "Odhad času nabíjení do cíle"
+      },
+      "polestar_estimated_full_charge_range": {
+        "name": "Odhad dojezdu při plném nabití"
+      },
+      "polestar_estimated_fully_charged_time": {
+        "name": "Odhad času plného nabití"
+      },
+      "polestar_estimated_range": {
+        "name": "Dojezd"
+      },
+      "polestar_internal_vehicle_id": {
+        "name": "Interní ID vozidla"
+      },
+      "polestar_last_updated_battery_data": {
+        "name": "Poslední aktualizace dat o baterii"
+      },
+      "polestar_last_updated_health_data": {
+        "name": "Poslední aktualizace stavu vozidla"
+      },
+      "polestar_last_updated_odometer_data": {
+        "name": "Poslední stav tachometru"
+      },
+      "polestar_model_name": {
+        "name": "Název modelu"
+      },
+      "polestar_model_year": {
+        "name": "Modelový rok"
+      },
+      "polestar_oil_level_warning": {
+        "name": "Varování hladiny oleje"
+      },
+      "polestar_registration_number": {
+        "name": "Registrační značka"
+      },
+      "polestar_service_warning": {
+        "name": "Servisní hlášení"
+      },
+      "polestar_software_version": {
+        "name": "Verze softwaru"
+      },
+      "polestar_software_version_release": {
+        "name": "Vydání verze softwaru"
+      },
+      "polestar_torque": {
+        "name": "Točivý moment"
+      },
+      "polestar_vin": {
+        "name": "VIN"
+      }
+    }
+  }
+}

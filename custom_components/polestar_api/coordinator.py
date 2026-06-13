@@ -10,6 +10,7 @@ import homeassistant.util.dt as dt_util
 from homeassistant.exceptions import ConfigEntryAuthFailed
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 from pypolestar.exceptions import PolestarApiException, PolestarAuthFailedException
+from pypolestar.grpc_models import GrpcBatteryData, GrpcTargetSocData
 from pypolestar.models import (
     CarBatteryData,
     CarHealthData,
@@ -58,6 +59,8 @@ class PolestarCoordinator(DataUpdateCoordinator):
         self.car_battery_data: CarBatteryData | None = None
         self.car_health_data: CarHealthData | None = None
         self.car_images_data: CarImagesData | None = None
+        self.grpc_battery_data: GrpcBatteryData | None = None
+        self.grpc_target_soc_data: GrpcTargetSocData | None = None
 
     @property
     def model(self) -> str:
@@ -111,6 +114,18 @@ class PolestarCoordinator(DataUpdateCoordinator):
             if not self.car_health_data:
                 # Do not warn about missing health data as it is not yet available for all car models
                 _LOGGER.debug("No health data for VIN %s", self.vin)
+
+            # gRPC data: charger connection status and charging target level.
+            # This is best-effort; pypolestar treats gRPC as non-fatal and these
+            # getters return None when the data is unavailable.
+            self.grpc_battery_data = self.polestar_api.get_grpc_battery(self.vin)
+            self.grpc_target_soc_data = self.polestar_api.get_grpc_target_soc(self.vin)
+
+            if not self.grpc_battery_data:
+                _LOGGER.debug("No gRPC battery data for VIN %s", self.vin)
+
+            if not self.grpc_target_soc_data:
+                _LOGGER.debug("No gRPC target SOC data for VIN %s", self.vin)
 
         except PolestarAuthFailedException as exc:
             _LOGGER.error("Authentication failed for VIN %s: %s", self.vin, str(exc))

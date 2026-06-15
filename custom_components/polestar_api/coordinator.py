@@ -54,11 +54,14 @@ class PolestarCoordinator(DataUpdateCoordinator):
         )
         self.polestar_api = api
 
+        # Data from GraphQL API
         self.car_information_data: CarInformationData | None = None
         self.car_odometer_data: CarOdometerData | None = None
         self.car_battery_data: CarBatteryData | None = None
         self.car_health_data: CarHealthData | None = None
         self.car_images_data: CarImagesData | None = None
+
+        # Data from gRPC API
         self.grpc_battery_data: GrpcBatteryData | None = None
         self.grpc_target_soc_data: GrpcTargetSocData | None = None
 

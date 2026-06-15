@@ -180,6 +180,14 @@ BATTERY_ENTITY_DESCRIPTIONS: Final[tuple[PolestarSensorDescription, ...]] = (
         data_state_attribute="charging_status",
     ),
     PolestarSensorDescription(
+        key="charger_connection_status",
+        icon="mdi:connection",
+        native_unit_of_measurement=None,
+        device_class=None,
+        data_source=PolestarEntityDataSource.GRPC_BATTERY,
+        data_state_attribute="charger_connection_status",
+    ),
+    PolestarSensorDescription(
         key="charging_type",
         icon="mdi:connection",
         native_unit_of_measurement=None,
@@ -206,14 +214,6 @@ BATTERY_ENTITY_DESCRIPTIONS: Final[tuple[PolestarSensorDescription, ...]] = (
         device_class=SensorDeviceClass.CURRENT,
         data_source=PolestarEntityDataSource.GRPC_BATTERY,
         data_state_attribute="charging_current_amps",
-    ),
-    PolestarSensorDescription(
-        key="charger_connection_status",
-        icon="mdi:connection",
-        native_unit_of_measurement=None,
-        device_class=None,
-        data_source=PolestarEntityDataSource.GRPC_BATTERY,
-        data_state_attribute="charger_connection_status",
     ),
     PolestarSensorDescription(
         key="charging_voltage",

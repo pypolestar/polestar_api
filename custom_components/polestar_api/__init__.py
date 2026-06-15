@@ -40,7 +40,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: PolestarConfigEntry) -> 
         client_session=create_async_httpx_client(hass),
         vins=[vin] if vin else None,
         unique_id=entry.entry_id,
-        enable_grpc=False,
+        enable_grpc=True,
     )
 
     try:

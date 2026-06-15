@@ -203,7 +203,7 @@ BATTERY_ENTITY_DESCRIPTIONS: Final[tuple[PolestarSensorDescription, ...]] = (
         icon="mdi:connection",
         native_unit_of_measurement=None,
         device_class=None,
-        data_source=PolestarEntityDataSource.BATTERY,
+        data_source=PolestarEntityDataSource.GRPC_BATTERY,
         data_state_attribute="charger_connection_status",
     ),
     PolestarSensorDescription(
@@ -302,6 +302,24 @@ HEALTH_ENTITY_DESCRIPTIONS: Final[tuple[PolestarSensorDescription, ...]] = (
     ),
 )
 
+GRPC_TARGET_SOC_ENTITY_DESCRIPTIONS: Final[tuple[PolestarSensorDescription, ...]] = (
+    PolestarSensorDescription(
+        key="charging_target_level",
+        icon="mdi:battery-charging-100",
+        native_unit_of_measurement=PERCENTAGE,
+        suggested_display_precision=0,
+        data_source=PolestarEntityDataSource.GRPC_TARGET_SOC,
+        data_state_attribute="battery_charge_target_level",
+    ),
+    PolestarSensorDescription(
+        key="charging_target_setting_type",
+        icon="mdi:battery-sync",
+        native_unit_of_measurement=None,
+        data_source=PolestarEntityDataSource.GRPC_TARGET_SOC,
+        data_state_attribute="charge_target_level_setting_type",
+    ),
+)
+
 API_ENTITY_DESCRIPTIONS: Final[tuple[PolestarSensorDescription, ...]] = (
     PolestarSensorDescription(
         key="api_status_code_data",
@@ -331,6 +349,7 @@ ENTITY_DESCRIPTIONS: Final[tuple[PolestarSensorDescription, ...]] = (
     *ODOMETER_ENTITY_DESCRIPTIONS,
     *BATTERY_ENTITY_DESCRIPTIONS,
     *HEALTH_ENTITY_DESCRIPTIONS,
+    *GRPC_TARGET_SOC_ENTITY_DESCRIPTIONS,
     *API_ENTITY_DESCRIPTIONS,
 )
 

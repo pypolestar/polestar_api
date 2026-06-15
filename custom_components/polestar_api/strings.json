@@ -66,6 +66,12 @@
       "polestar_charging_status": {
         "name": "Charging Status"
       },
+      "polestar_charging_target_level": {
+        "name": "Charging Target Level"
+      },
+      "polestar_charging_target_setting_type": {
+        "name": "Charging Target Setting Type"
+      },
       "polestar_current_odometer": {
         "name": "Odometer"
       },

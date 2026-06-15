@@ -30,6 +30,8 @@ class PolestarEntityDataSource(StrEnum):
     BATTERY = "car_battery_data"
     HEALTH = "car_health_data"
     IMAGES = "car_images_data"
+    GRPC_BATTERY = "grpc_battery_data"
+    GRPC_TARGET_SOC = "grpc_target_soc_data"
 
 
 class PolestarEntityDataSourceException(Exception):

@@ -176,7 +176,7 @@ BATTERY_ENTITY_DESCRIPTIONS: Final[tuple[PolestarSensorDescription, ...]] = (
         key="charging_status",
         icon="mdi:ev-station",
         native_unit_of_measurement=None,
-        data_source=PolestarEntityDataSource.BATTERY,
+        data_source=PolestarEntityDataSource.GRPC_BATTERY,
         data_state_attribute="charging_status",
     ),
     PolestarSensorDescription(

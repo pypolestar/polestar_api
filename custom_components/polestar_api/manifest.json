@@ -7,6 +7,6 @@
   "documentation": "https://github.com/pypolestar/polestar_api",
   "iot_class": "cloud_polling",
   "issue_tracker": "https://github.com/pypolestar/polestar_api/issues",
-  "requirements": ["pypolestar==1.12.5", "homeassistant>=2026.4.0"],
-  "version": "1.24.0"
+  "requirements": ["pypolestar==1.12.6", "homeassistant>=2026.4.0"],
+  "version": "1.24.1"
 }

@@ -22,6 +22,45 @@
     "binary_sensor": {
       "polestar_api_connected": {
         "name": "API Connected"
+      },
+      "polestar_central_lock": {
+        "name": "Central Lock"
+      },
+      "polestar_exterior_light_failure": {
+        "name": "Exterior Light Failure"
+      },
+      "polestar_front_left_door": {
+        "name": "Front Left Door"
+      },
+      "polestar_front_left_window": {
+        "name": "Front Left Window"
+      },
+      "polestar_front_right_door": {
+        "name": "Front Right Door"
+      },
+      "polestar_front_right_window": {
+        "name": "Front Right Window"
+      },
+      "polestar_hood": {
+        "name": "Hood"
+      },
+      "polestar_rear_left_door": {
+        "name": "Rear Left Door"
+      },
+      "polestar_rear_left_window": {
+        "name": "Rear Left Window"
+      },
+      "polestar_rear_right_door": {
+        "name": "Rear Right Door"
+      },
+      "polestar_rear_right_window": {
+        "name": "Rear Right Window"
+      },
+      "polestar_tailgate": {
+        "name": "Tailgate"
+      },
+      "polestar_tailgate_lock": {
+        "name": "Tailgate Lock"
       }
     },
     "image": {
@@ -30,6 +69,9 @@
       }
     },
     "sensor": {
+      "polestar_alarm_status": {
+        "name": "Alarm Status"
+      },
       "polestar_api_status_code_auth": {
         "name": "API Status Code (Auth)"
       },
@@ -90,6 +132,9 @@
       "polestar_engine_coolant_level_warning": {
         "name": "Engine Coolant Level Warning"
       },
+      "polestar_engine_hours_to_service": {
+        "name": "Engine Hours to Service"
+      },
       "polestar_estimated_charging_time_to_full": {
         "name": "Charging Time"
       },
@@ -105,6 +150,9 @@
       "polestar_estimated_range": {
         "name": "Range"
       },
+      "polestar_failed_exterior_lights": {
+        "name": "Failed Exterior Lights"
+      },
       "polestar_internal_vehicle_id": {
         "name": "Internal Vehicle ID"
       },
@@ -116,6 +164,9 @@
       },
       "polestar_last_updated_odometer_data": {
         "name": "Last Updated Odometer Data"
+      },
+      "polestar_low_voltage_battery_warning": {
+        "name": "12V Battery Warning"
       },
       "polestar_model_name": {
         "name": "Model Name"
@@ -143,6 +194,14 @@
       },
       "polestar_vin": {
         "name": "VIN"
+      },
+      "polestar_washer_fluid_level_warning": {
+        "name": "Washer Fluid Level Warning"
+      }
+    },
+    "device_tracker": {
+      "polestar_location": {
+        "name": "Location"
       }
     }
   }

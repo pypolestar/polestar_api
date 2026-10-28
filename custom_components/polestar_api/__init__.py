@@ -22,7 +22,12 @@ if TYPE_CHECKING:
 
     from .data import PolestarConfigEntry
 
-PLATFORMS = [Platform.IMAGE, Platform.SENSOR, Platform.BINARY_SENSOR]
+PLATFORMS = [
+    Platform.IMAGE,
+    Platform.SENSOR,
+    Platform.BINARY_SENSOR,
+    Platform.DEVICE_TRACKER,
+]
 
 _LOGGER = logging.getLogger(__name__)
 

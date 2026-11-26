@@ -3,6 +3,7 @@
     "error": {
       "api": "Error connecting to Polestar API.",
       "auth_failed": "Invalid username/password.",
+      "mfa_required": "Polestar ID requested an additional verification step. Sign in once at polestar.com with this account, then try again.",
       "no_cars_found": "No cars found for your Polestar ID.",
       "vin_not_found": "Specified VIN not found for your Polestar ID."
     },

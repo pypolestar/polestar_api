@@ -10,12 +10,12 @@ from homeassistant.exceptions import ConfigEntryError
 from homeassistant.helpers.device_registry import DeviceEntry
 from homeassistant.helpers.httpx_client import create_async_httpx_client
 from homeassistant.loader import async_get_loaded_integration
-from pypolestar import PolestarApi
-from pypolestar.exceptions import PolestarAuthException
+from pypolestar.exceptions import PolestarAuthException, PolestarAuthFailedException
 
 from .const import CONF_VIN
 from .coordinator import PolestarCoordinator
 from .data import PolestarData
+from .keycloak_auth import create_polestar_api
 
 if TYPE_CHECKING:
     from homeassistant.core import HomeAssistant
@@ -34,7 +34,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: PolestarConfigEntry) -> 
 
     vin = entry.data.get(CONF_VIN)
 
-    api_client = PolestarApi(
+    api_client = create_polestar_api(
         username=entry.data[CONF_USERNAME],
         password=entry.data[CONF_PASSWORD],
         client_session=create_async_httpx_client(hass),
@@ -45,7 +45,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: PolestarConfigEntry) -> 
 
     try:
         await api_client.async_init()
-    except PolestarAuthException as exc:
+    except (PolestarAuthException, PolestarAuthFailedException) as exc:
         raise ConfigEntryError from exc
 
     available_vins = api_client.get_available_vins()

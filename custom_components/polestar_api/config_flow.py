@@ -7,10 +7,14 @@ from homeassistant import config_entries
 from homeassistant.config_entries import ConfigFlowResult
 from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
 from homeassistant.helpers.httpx_client import get_async_client
-from pypolestar import PolestarApi
-from pypolestar.exceptions import PolestarApiException, PolestarAuthException
+from pypolestar.exceptions import (
+    PolestarApiException,
+    PolestarAuthException,
+    PolestarAuthFailedException,
+)
 
 from .const import CONF_VIN, DOMAIN
+from .keycloak_auth import PolestarMfaRequiredException, create_polestar_api
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -47,6 +51,12 @@ class FlowHandler(config_entries.ConfigFlow):
             except VinNotFoundException as exc:
                 _LOGGER.error(exc)
                 _errors["base"] = "vin_not_found"
+            except PolestarMfaRequiredException as exc:
+                _LOGGER.warning(exc)
+                _errors["base"] = "mfa_required"
+            except PolestarAuthFailedException as exc:
+                _LOGGER.warning(exc)
+                _errors["base"] = "auth_failed"
             except PolestarAuthException as exc:
                 _LOGGER.warning(exc)
                 _errors["base"] = "auth_failed"
@@ -80,7 +90,7 @@ class FlowHandler(config_entries.ConfigFlow):
     ) -> None:
         """Validate credentials and return VINs of found cars."""
 
-        api_client = PolestarApi(
+        api_client = create_polestar_api(
             username=username,
             password=password,
             client_session=get_async_client(self.hass),

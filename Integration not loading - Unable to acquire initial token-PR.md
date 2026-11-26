@@ -40,6 +40,9 @@ Add a small authentication shim. The shim does these steps:
 If the page is not a Keycloak page, the shim uses the old PingFederate flow.
 The shim also reports a one-time code page as a separate error.
 
+Each credential validation uses a new HTTP client. The client closes after the
+attempt. A Keycloak session from one account cannot validate another account.
+
 ## Changes
 
 ### New file
@@ -56,10 +59,12 @@ The shim also reports a one-time code page as a separate error.
 
 - Uses `create_polestar_api()`.
 - Handles `PolestarAuthFailedException` during setup.
+- Keeps the one-time-code message in the setup error.
 
 `custom_components/polestar_api/config_flow.py`
 
 - Uses `create_polestar_api()`.
+- Validates each account on a dedicated HTTP client and closes it.
 - Maps authentication errors to these config flow errors:
   - `auth_failed`: the username or password is not correct.
   - `mfa_required`: Polestar asks for an additional step, for example a
@@ -73,7 +78,7 @@ The shim also reports a one-time code page as a separate error.
 - Add the `mfa_required` message. The message tells the user to sign in once at
   `polestar.com`.
 
-### Test file
+### Test files
 
 `tests/test_keycloak_auth.py`
 
@@ -82,6 +87,13 @@ The shim also reports a one-time code page as a separate error.
 - Tests a one-time code page.
 - Tests the old PingFederate flow.
 - Tests URL unescaping.
+
+`tests/test_setup_entry.py`
+
+- Tests that the setup error keeps the one-time-code message.
+- Tests other authentication errors during setup.
+- Tests that a successful authentication continues setup.
+- Tests that a second account cannot reuse the first account's Keycloak session.
 
 ## User action for one-time code
 
@@ -106,7 +118,7 @@ python scripts/translation_utils.py --test
 
 Results:
 
-- `pytest -q tests`: 6 passed.
+- `pytest -q tests`: 10 passed.
 - `ruff check`: all changed files pass.
 - `ruff format --check`: all changed files pass.
 - `translation_utils.py --test`: exit code 0.

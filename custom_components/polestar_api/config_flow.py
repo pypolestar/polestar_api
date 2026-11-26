@@ -2,11 +2,11 @@
 
 import logging
 
+import httpx
 import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.config_entries import ConfigFlowResult
 from homeassistant.const import CONF_PASSWORD, CONF_USERNAME
-from homeassistant.helpers.httpx_client import get_async_client
 from pypolestar.exceptions import (
     PolestarApiException,
     PolestarAuthException,
@@ -90,23 +90,27 @@ class FlowHandler(config_entries.ConfigFlow):
     ) -> None:
         """Validate credentials and return VINs of found cars."""
 
-        api_client = create_polestar_api(
-            username=username,
-            password=password,
-            client_session=get_async_client(self.hass),
-        )
+        # Use a dedicated client for each validation. The shared Home Assistant
+        # client can keep the Keycloak session of a previous account, and that
+        # session must not validate a different account.
+        async with httpx.AsyncClient() as client_session:
+            api_client = create_polestar_api(
+                username=username,
+                password=password,
+                client_session=client_session,
+            )
 
-        try:
-            await api_client.async_init()
+            try:
+                await api_client.async_init()
 
-            if found_vins := api_client.get_available_vins():
-                _LOGGER.debug("Found %d VINs for %s", len(found_vins), username)
-            else:
-                _LOGGER.warning("No VINs found for %s", username)
-                raise NoCarsFoundException
+                if found_vins := api_client.get_available_vins():
+                    _LOGGER.debug("Found %d VINs for %s", len(found_vins), username)
+                else:
+                    _LOGGER.warning("No VINs found for %s", username)
+                    raise NoCarsFoundException
 
-            if vin and vin not in found_vins:
-                _LOGGER.warning("VIN %s not found for %s", vin, username)
-                raise VinNotFoundException
-        finally:
-            await api_client.async_logout()
+                if vin and vin not in found_vins:
+                    _LOGGER.warning("VIN %s not found for %s", vin, username)
+                    raise VinNotFoundException
+            finally:
+                await api_client.async_logout()

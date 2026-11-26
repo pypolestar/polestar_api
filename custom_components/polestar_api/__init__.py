@@ -15,7 +15,7 @@ from pypolestar.exceptions import PolestarAuthException, PolestarAuthFailedExcep
 from .const import CONF_VIN
 from .coordinator import PolestarCoordinator
 from .data import PolestarData
-from .keycloak_auth import create_polestar_api
+from .keycloak_auth import PolestarMfaRequiredException, create_polestar_api
 
 if TYPE_CHECKING:
     from homeassistant.core import HomeAssistant
@@ -45,6 +45,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: PolestarConfigEntry) -> 
 
     try:
         await api_client.async_init()
+    except PolestarMfaRequiredException as exc:
+        raise ConfigEntryError(str(exc)) from exc
     except (PolestarAuthException, PolestarAuthFailedException) as exc:
         raise ConfigEntryError from exc
 

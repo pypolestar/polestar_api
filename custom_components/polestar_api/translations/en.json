@@ -1,5 +1,8 @@
 {
   "config": {
+    "abort": {
+      "reauth_successful": "Re-authentication was successful"
+    },
     "error": {
       "api": "Error connecting to Polestar API.",
       "auth_failed": "Invalid username/password.",
@@ -8,6 +11,13 @@
       "vin_not_found": "Specified VIN not found for your Polestar ID."
     },
     "step": {
+      "reauth_confirm": {
+        "data": {
+          "password": "Password"
+        },
+        "description": "The Polestar ID account {username} could not be authenticated. Enter the current password.",
+        "title": "Reauthenticate Polestar EV"
+      },
       "user": {
         "data": {
           "password": "Password",

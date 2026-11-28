@@ -66,6 +66,12 @@
       "polestar_charging_status": {
         "name": "충전 상태"
       },
+      "polestar_charging_target_level": {
+        "name": "Charging Target Level"
+      },
+      "polestar_charging_target_setting_type": {
+        "name": "Charging Target Setting Type"
+      },
       "polestar_current_odometer": {
         "name": "총 주행 거리"
       },

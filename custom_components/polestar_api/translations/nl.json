@@ -1,7 +1,7 @@
 {
   "config": {
     "error": {
-      "api": "Fout bij verbinden met de Polestar API",
+      "api": "Fout bij verbinden met de Polestar API.",
       "auth_failed": "Ongeldige gebruikersnaam of wachtwoord.",
       "no_cars_found": "Er is geen auto gevonden voor jouw Polestar ID.",
       "vin_not_found": "Opgegeven VIN is niet bekend voor jouw Polestar ID."
@@ -65,6 +65,12 @@
       },
       "polestar_charging_status": {
         "name": "Laadstatus"
+      },
+      "polestar_charging_target_level": {
+        "name": "Laad limiet"
+      },
+      "polestar_charging_target_setting_type": {
+        "name": "Charging Target Setting Type"
       },
       "polestar_current_odometer": {
         "name": "Huidige kilometerstand"

@@ -66,6 +66,12 @@
       "polestar_charging_status": {
         "name": "Ladestatus"
       },
+      "polestar_charging_target_level": {
+        "name": "Ladeziel"
+      },
+      "polestar_charging_target_setting_type": {
+        "name": "Einstellungen Ladeziel"
+      },
       "polestar_current_odometer": {
         "name": "Kilometerstand"
       },

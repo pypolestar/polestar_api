@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import logging
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import TYPE_CHECKING, Any
 
 import homeassistant.util.dt as dt_util
@@ -82,7 +82,7 @@ class PolestarCoordinator(DataUpdateCoordinator):
         if self.car_information_data is None:
             return True
 
-        current_time = datetime.now(tz=timezone.utc)
+        current_time = datetime.now(tz=UTC)
         last_update = self.car_information_data._received_timestamp
         return (current_time - last_update) > CAR_INFORMATION_UPDATE_INTERVAL
 

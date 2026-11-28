@@ -7,6 +7,6 @@
   "documentation": "https://github.com/pypolestar/polestar_api",
   "iot_class": "cloud_polling",
   "issue_tracker": "https://github.com/pypolestar/polestar_api/issues",
-  "requirements": ["pypolestar==1.12.7"],
-  "version": "1.24.3"
+  "requirements": ["pypolestar==1.13.0"],
+  "version": "1.25.0"
 }

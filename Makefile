@@ -7,8 +7,8 @@ lint:
 	ruff check $(SOURCE)
 
 reformat:
-	ruff check --select I --fix $(SOURCE) tests
-	ruff format $(SOURCE) tests
+	ruff check --select I --fix $(SOURCE)
+	ruff format $(SOURCE)
 
 test:
 	PYTHONPATH=. $(PYTEST) -vv tests

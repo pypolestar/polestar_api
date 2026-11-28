@@ -339,6 +339,55 @@ GRPC_TARGET_SOC_ENTITY_DESCRIPTIONS: Final[tuple[PolestarSensorDescription, ...]
     ),
 )
 
+
+def failed_exterior_lights(value: dict) -> str | None:
+    """Comma-separated names of failed exterior lights, 'none', or unknown."""
+    if not value or all(str(v) == "Unspecified" for v in value.values()):
+        return None
+    failed = sorted(k for k, v in value.items() if str(v) == "Failure")
+    return ", ".join(k.replace("_", " ") for k in failed)[:255] if failed else "none"
+
+
+GRPC_EXTERIOR_ENTITY_DESCRIPTIONS: Final[tuple[PolestarSensorDescription, ...]] = (
+    PolestarSensorDescription(
+        key="alarm_status",
+        icon="mdi:shield-car",
+        data_source=PolestarEntityDataSource.GRPC_EXTERIOR,
+        data_state_attribute="alarm",
+    ),
+)
+
+GRPC_HEALTH_ENTITY_DESCRIPTIONS: Final[tuple[PolestarSensorDescription, ...]] = (
+    PolestarSensorDescription(
+        key="washer_fluid_level_warning",
+        icon="mdi:wiper-wash",
+        data_source=PolestarEntityDataSource.GRPC_HEALTH,
+        data_state_attribute="washer_fluid_level_warning",
+    ),
+    PolestarSensorDescription(
+        key="low_voltage_battery_warning",
+        icon="mdi:car-battery",
+        data_source=PolestarEntityDataSource.GRPC_HEALTH,
+        data_state_attribute="low_voltage_battery_warning",
+    ),
+    PolestarSensorDescription(
+        key="failed_exterior_lights",
+        icon="mdi:car-light-alert",
+        data_source=PolestarEntityDataSource.GRPC_HEALTH,
+        data_state_attribute="exterior_light_warnings",
+        data_state_fn=failed_exterior_lights,
+    ),
+    PolestarSensorDescription(
+        key="engine_hours_to_service",
+        icon="mdi:wrench-clock",
+        native_unit_of_measurement=UnitOfTime.HOURS,
+        state_class=SensorStateClass.MEASUREMENT,
+        data_source=PolestarEntityDataSource.GRPC_HEALTH,
+        data_state_attribute="engine_hours_to_service",
+        entity_category=EntityCategory.DIAGNOSTIC,
+    ),
+)
+
 API_ENTITY_DESCRIPTIONS: Final[tuple[PolestarSensorDescription, ...]] = (
     PolestarSensorDescription(
         key="api_status_code_data",
@@ -369,6 +418,8 @@ ENTITY_DESCRIPTIONS: Final[tuple[PolestarSensorDescription, ...]] = (
     *BATTERY_ENTITY_DESCRIPTIONS,
     *HEALTH_ENTITY_DESCRIPTIONS,
     *GRPC_TARGET_SOC_ENTITY_DESCRIPTIONS,
+    *GRPC_EXTERIOR_ENTITY_DESCRIPTIONS,
+    *GRPC_HEALTH_ENTITY_DESCRIPTIONS,
     *API_ENTITY_DESCRIPTIONS,
 )
 

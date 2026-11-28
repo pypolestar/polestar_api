@@ -10,7 +10,13 @@ import homeassistant.util.dt as dt_util
 from homeassistant.exceptions import ConfigEntryAuthFailed
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 from pypolestar.exceptions import PolestarApiException, PolestarAuthFailedException
-from pypolestar.grpc_models import GrpcBatteryData, GrpcTargetSocData
+from pypolestar.grpc_models import (
+    GrpcBatteryData,
+    GrpcExteriorData,
+    GrpcHealthData,
+    GrpcLocationData,
+    GrpcTargetSocData,
+)
 from pypolestar.models import (
     CarBatteryData,
     CarHealthData,
@@ -64,6 +70,9 @@ class PolestarCoordinator(DataUpdateCoordinator):
         # Data from gRPC API
         self.grpc_battery_data: GrpcBatteryData | None = None
         self.grpc_target_soc_data: GrpcTargetSocData | None = None
+        self.grpc_exterior_data: GrpcExteriorData | None = None
+        self.grpc_health_data: GrpcHealthData | None = None
+        self.grpc_location_data: GrpcLocationData | None = None
 
     @property
     def model(self) -> str:
@@ -134,6 +143,27 @@ class PolestarCoordinator(DataUpdateCoordinator):
             else:
                 self.grpc_target_soc_data = None
                 _LOGGER.debug("No gRPC target SOC data for VIN %s", self.vin)
+
+            # Doors/windows/locks and health (washer fluid, 12V battery, exterior
+            # lights): best-effort, None when the vehicle doesn't serve them.
+            if self.polestar_api.is_grpc_exterior_supported(self.vin):
+                self.grpc_exterior_data = self.polestar_api.get_grpc_exterior(self.vin)
+            else:
+                self.grpc_exterior_data = None
+                _LOGGER.debug("No gRPC exterior data for VIN %s", self.vin)
+
+            if self.polestar_api.is_grpc_health_supported(self.vin):
+                self.grpc_health_data = self.polestar_api.get_grpc_health(self.vin)
+            else:
+                self.grpc_health_data = None
+                _LOGGER.debug("No gRPC health data for VIN %s", self.vin)
+
+            # Last parked location: pypolestar already fetches it each update.
+            if self.polestar_api.is_grpc_location_supported(self.vin):
+                self.grpc_location_data = self.polestar_api.get_grpc_location(self.vin)
+            else:
+                self.grpc_location_data = None
+                _LOGGER.debug("No gRPC location data for VIN %s", self.vin)
 
         except PolestarAuthFailedException as exc:
             _LOGGER.error("Authentication failed for VIN %s: %s", self.vin, str(exc))
